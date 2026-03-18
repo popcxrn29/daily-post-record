@@ -3,274 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>บันทึกโพสต์รายวัน PRO</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>ระบบจัดการโพสต์ทรัพย์</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-grad: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --secondary-grad: linear-gradient(135deg, #2af598 0%, #009efd 100%);
-            --bg: #F0F4F8;
-            --white: #FFFFFF;
-            --text-main: #2D3748;
-            --text-sub: #718096;
-            --border: #E2E8F0;
-            --shadow-soft: 0 10px 30px rgba(0,0,0,0.04);
-            --shadow-btn: 0 5px 15px rgba(118, 75, 162, 0.3);
+            --primary: #4A90E2; --secondary: #67C23A; --bg: #F5F7FA; --white: #FFFFFF;
         }
-
-        body {
-            font-family: 'Sarabun', sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            margin: 0;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        .main-container {
-            width: 100%;
-            max-width: 480px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        /* Card พื้นฐาน */
-        .card {
-            background: var(--white);
-            border-radius: 24px;
-            box-shadow: var(--shadow-soft);
-            padding: 25px;
-            box-sizing: border-box;
-        }
-
-        /* ส่วนหัวเว็บสุดหรู */
-        .header-card {
-            background: var(--primary-grad);
-            color: white;
-            text-align: center;
-            padding: 30px 20px;
-        }
-        .header-card h1 { font-size: 1.6rem; margin: 0; font-weight: 700; }
-        .header-card p { font-size: 0.9rem; margin: 5px 0 0 0; opacity: 0.8; }
-
-        /* ส่วนสุ่มทรัพย์ */
-        .random-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 5px;
-        }
-        .random-title { font-size: 1.1rem; font-weight: 600; color: var(--text-main); }
-        .btn-random {
-            background: var(--secondary-grad);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 16px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 5px 15px rgba(0, 158, 253, 0.3);
-        }
-        .btn-random:active { transform: scale(0.97); box-shadow: none; }
-
-        /* ฟอร์มบันทึก */
-        .form-section h2 { font-size: 1.3rem; margin: 0 0 20px 0; text-align: center; color: var(--text-main); }
+        body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: var(--white); width: 100%; max-width: 450px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.05); padding: 20px; box-sizing: border-box; margin-bottom: 15px; }
         
-        .input-group { margin-bottom: 18px; }
-        .label-text { display: block; font-weight: 600; font-size: 0.9rem; color: var(--text-sub); margin-bottom: 8px; }
+        /* Header & Random Button */
+        .random-box { background: linear-gradient(135deg, #6e8efb, #a777e3); border-radius: 15px; padding: 20px; color: white; text-align: center; margin-bottom: 20px; }
+        .btn-random { background: white; color: #6e8efb; border: none; padding: 12px 25px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
-        input[type="date"] {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            font-size: 1rem;
-            box-sizing: border-box;
-            background: #F8FAFC;
+        h2 { text-align: center; margin: 0 0 15px 0; color: #333; }
+        .label-title { font-weight: bold; display: block; margin-bottom: 5px; color: #555; }
+        
+        /* Input Styles */
+        input[type="date"], input[type="text"], input[type="number"], textarea {
+            width: 100%; padding: 12px; border: 1px solid #E0E6ED; border-radius: 10px; box-sizing: border-box; font-size: 1rem;
         }
+        .person-group { background: #F9FAFC; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #EDF2F7; }
+        .person-name { font-weight: bold; color: var(--primary); margin-bottom: 10px; display: block; border-bottom: 2px solid #E2E8F0; padding-bottom: 5px; }
+        .row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+        .time-label { min-width: 45px; font-size: 0.85rem; color: #777; font-weight: bold; }
+        input[type="number"] { width: 70px; text-align: center; }
 
-        /* ส่วนของพี่ๆ */
-        .person-box {
-            background: #F8FAFC;
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border);
-        }
-        .person-header {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #4A5568;
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--border);
-        }
-        .person-header.su { color: #E6A23C; border-bottom-color: #FEEBC8; }
-
-        .time-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            align-items: center;
-        }
-        .time-badge {
-            font-size: 0.75rem;
-            font-weight: 600;
-            background: #EDF2F7;
-            color: #4A5568;
-            padding: 5px 10px;
-            border-radius: 8px;
-            min-width: 45px;
-            text-align: center;
-        }
-
-        input[type="text"] {
-            flex: 1;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 12px;
-            font-size: 0.95rem;
-            background: var(--white);
-        }
-        input[type="number"] {
-            width: 60px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 12px;
-            text-align: center;
-            background: var(--white);
-        }
-
-        textarea {
-            width: 100%;
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 14px;
-            box-sizing: border-box;
-            margin-top: 5px;
-            font-family: inherit;
-            background: #F8FAFC;
-        }
-
-        /* ปุ่มบันทึกสุดอลัง */
-        .btn-save {
-            background: var(--primary-grad);
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 20px;
-            border-radius: 20px;
-            font-size: 1.3rem;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 10px;
-            box-shadow: var(--shadow-btn);
-            transition: 0.3s;
-        }
-        .btn-save:active { transform: translateY(3px); box-shadow: none; }
-
-        /* ส่วนประวัติ */
-        .history-title { font-size: 1.1rem; font-weight: 600; color: var(--text-main); margin-top: 10px; text-align: center; }
-        .history-card {
-            background: var(--white);
-            border-radius: 20px;
-            padding: 18px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-            border-left: 6px solid #667eea;
-            box-sizing: border-box;
-        }
-        .history-date { font-weight: 700; color: var(--text-main); margin-bottom: 10px; font-size: 1rem; }
-        .history-details { font-size: 0.85rem; color: var(--text-sub); line-height: 1.7; }
-        .name-highlight { font-weight: 600; color: #4A5568; }
+        .btn-save { background: var(--secondary); color: white; border: none; width: 100%; padding: 18px; border-radius: 15px; font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(103, 194, 58, 0.3); }
+        
+        /* History */
+        .history-card { background: white; width: 100%; max-width: 450px; padding: 15px; border-radius: 15px; margin-top: 10px; border-left: 5px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-<div class="main-container">
-    <div class="card header-card">
-        <h1>📊 บันทึกโพสต์รายวัน PRO</h1>
-        <p>ระบบจัดการยอดโพสต์ทรัพย์อัตโนมัติ</p>
+<div class="card">
+    <span class="label-title">📅 ขั้นตอนที่ 1: เลือกวันที่และกดสุ่ม</span>
+    <input id="date" type="date" style="margin-bottom: 15px;">
+    
+    <div class="random-box">
+        <button class="btn-random" onclick="handleRandom()">🎲 สุ่มทรัพย์ 3 อย่าง</button>
     </div>
 
-    <div class="card random-section">
-        <span class="random-title">🎡 จัดการทรัพย์อัตโนมัติ</span>
-        <button class="btn-random" onclick="randomAndFill()">🎲 สุ่มและจัดตารางโพสต์</button>
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+    <span class="label-title">📝 ขั้นตอนที่ 2: ใส่จำนวนโพสต์</span>
+    
+    <div class="person-group">
+        <span class="person-name">👤 พี่ขวัญ</span>
+        <div class="row"><span class="time-label">เช้า</span><input id="kw_m_name" type="text" placeholder="ทรัพย์ 1"><input id="kw_m_num" type="number" placeholder="0"></div>
+        <div class="row"><span class="time-label">เที่ยง</span><input id="kw_n_name" type="text" placeholder="ทรัพย์ 2"><input id="kw_n_num" type="number" placeholder="0"></div>
+        <div class="row"><span class="time-label">เย็น</span><input id="kw_e_name" type="text" placeholder="ทรัพย์ 3"><input id="kw_e_num" type="number" placeholder="0"></div>
     </div>
 
-    <div class="card form-section">
-        <h2>📝 กรอกข้อมูล</h2>
-        
-        <div class="input-group">
-            <span class="label-text">📅 เลือกวันที่</span>
-            <input id="date" type="date">
-        </div>
-
-        <div class="person-box">
-            <div class="person-header">👤 พี่ขวัญ</div>
-            <div class="time-row">
-                <span class="time-badge">เช้า</span>
-                <input id="kw_m_name" type="text" placeholder="ชื่อทรัพย์">
-                <input id="kw_m_num" type="number" placeholder="0">
-            </div>
-            <div class="time-row">
-                <span class="time-badge">เที่ยง</span>
-                <input id="kw_n_name" type="text" placeholder="ชื่อทรัพย์">
-                <input id="kw_n_num" type="number" placeholder="0">
-            </div>
-            <div class="time-row">
-                <span class="time-badge">เย็น</span>
-                <input id="kw_e_name" type="text" placeholder="ชื่อทรัพย์">
-                <input id="kw_e_num" type="number" placeholder="0">
-            </div>
-        </div>
-
-        <div class="person-box">
-            <div class="person-header su">👤 พี่สุ</div>
-            <div class="time-row">
-                <span class="time-badge">เช้า</span>
-                <input id="su_m_name" type="text" placeholder="ชื่อทรัพย์">
-                <input id="su_m_num" type="number" placeholder="0">
-            </div>
-            <div class="time-row">
-                <span class="time-badge">เที่ยง</span>
-                <input id="su_n_name" type="text" placeholder="ชื่อทรัพย์">
-                <input id="su_n_num" type="number" placeholder="0">
-            </div>
-            <div class="time-row">
-                <span class="time-badge">เย็น</span>
-                <input id="su_e_name" type="text" placeholder="ชื่อทรัพย์">
-                <input id="su_e_num" type="number" placeholder="0">
-            </div>
-        </div>
-
-        <div class="input-group">
-            <span class="label-text">📝 หมายเหตุเพิ่มเติม</span>
-            <textarea id="note" rows="2" placeholder="ใส่รายละเอียดอื่น ๆ..."></textarea>
-        </div>
-
-        <button class="btn-save" onclick="saveData()">💾 บันทึกข้อมูลเสร็จสิ้น</button>
+    <div class="person-group">
+        <span class="person-name" style="color:#E6A23C">👤 พี่สุ</span>
+        <div class="row"><span class="time-label">เช้า</span><input id="su_m_name" type="text" placeholder="ทรัพย์ 2"><input id="su_m_num" type="number" placeholder="0"></div>
+        <div class="row"><span class="time-label">เที่ยง</span><input id="su_n_name" type="text" placeholder="ทรัพย์ 3"><input id="su_n_num" type="number" placeholder="0"></div>
+        <div class="row"><span class="time-label">เย็น</span><input id="su_e_name" type="text" placeholder="ทรัพย์ 1"><input id="su_e_num" type="number" placeholder="0"></div>
     </div>
 
-    <div class="history-title">📋 ประวัติการบันทึก 5 วันล่าสุด</div>
-    <div id="list" style="width:100%;"></div>
+    <span class="label-title">หมายเหตุ</span>
+    <textarea id="note" rows="2" placeholder="เพิ่มเติม..."></textarea>
+
+    <button class="btn-save" onclick="saveData()">💾 บันทึกและส่งข้อมูล</button>
 </div>
+
+<div id="historyList" style="width:100%; display:flex; flex-direction:column; align-items:center;"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-// Firebase Config ของคุณ
 const firebaseConfig = {
   apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI",
   authDomain: "save-data-92eca.firebaseapp.com",
@@ -283,8 +87,84 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// รายชื่อทรัพย์ 26 รายการ
 const allAssets = [
     "บ้านพี่แดง อรัญนคร3", "แม่ย่าพี่ปลา 14 ไร่", "แม่ย่าพี่ปลา 11 ไร่", "พี่ศรีไพร (คอนสาย)",
     "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1 (คุณแคท )",
-    "คอนโดชีวาทัย ฮอล์มาร์ค ลาดพร้าว-โชคชัย4
+    "คอนโดชีวาทัย ฮอล์มาร์ค ลาดพร้าว-โชคชัย4(ฝน)", "ที่ดิน หลังอรัญนคร 1 ซ.ประสบโชค", 
+    "บ้านพี่หนึ่ง อรัญวิลล์", "ที่ดินราชพัสดุ พี่แอน", "บ้านเอื้อ 214/278", "บ้านเอื้ื้อ 214/381",
+    "บ้านเอื้อ 214/293", "โกดัง 1 ไร่ (พี่แอน)", "คอนโด The Base Park East Sukhumvit 77",
+    "คอนโด Aston", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง",
+    "แฮปปี้คอนโด", "บ้านทาวน์โฮมพฤกษา9", "BANGKOK HORIZON รามคำแหง",
+    "THE IRIS ศรีนครินทร์ - พระราม 9", "กรี เน่ คอนโดดอนเมือง-สรงประภา เฟส1"
+];
+
+// ฟังก์ชันสุ่มและกระจายชื่อทรัพย์
+function handleRandom() {
+    let temp = [...allAssets];
+    let chosen = [];
+    for (let i = 0; i < 3; i++) {
+        const idx = Math.floor(Math.random() * temp.length);
+        chosen.push(temp.splice(idx, 1)[0]);
+    }
+    
+    // กระจายให้พี่ขวัญ
+    document.getElementById("kw_m_name").value = chosen[0];
+    document.getElementById("kw_n_name").value = chosen[1];
+    document.getElementById("kw_e_name").value = chosen[2];
+    
+    // กระจายให้พี่สุ (สลับเวลาเพื่อไม่ให้ซ้ำกับพี่ขวัญในเวลาเดียวกัน)
+    document.getElementById("su_m_name").value = chosen[1];
+    document.getElementById("su_n_name").value = chosen[2];
+    document.getElementById("su_e_name").value = chosen[0];
+    
+    alert("สุ่มทรัพย์สำเร็จ! กรุณาตรวจสอบและใส่จำนวนโพสต์");
+}
+
+function saveData() {
+    const dateVal = document.getElementById("date").value;
+    if (!dateVal) { alert("กรุณาเลือกวันที่ก่อนบันทึก!"); return; }
+
+    const payload = {
+        date: dateVal,
+        kw: {
+            m: { name: document.getElementById("kw_m_name").value, num: document.getElementById("kw_m_num").value || 0 },
+            n: { name: document.getElementById("kw_n_name").value, num: document.getElementById("kw_n_num").value || 0 },
+            e: { name: document.getElementById("kw_e_name").value, num: document.getElementById("kw_e_num").value || 0 }
+        },
+        su: {
+            m: { name: document.getElementById("su_m_name").value, num: document.getElementById("su_m_num").value || 0 },
+            n: { name: document.getElementById("su_n_name").value, num: document.getElementById("su_n_num").value || 0 },
+            e: { name: document.getElementById("su_e_name").value, num: document.getElementById("su_e_num").value || 0 }
+        },
+        note: document.getElementById("note").value,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    db.collection("posts").add(payload).then(() => {
+        alert("บันทึกข้อมูลเรียบร้อยแล้ว!");
+        location.reload();
+    });
+}
+
+function loadHistory() {
+    db.collection("posts").orderBy("date", "desc").limit(5).get().then(snap => {
+        let html = "";
+        snap.forEach(doc => {
+            const d = doc.data();
+            html += `<div class="history-card">
+                <b>🗓 วันที่: ${d.date}</b><br>
+                <small>ขวัญ: ${d.kw.m.name}(${d.kw.m.num}), ${d.kw.n.name}(${d.kw.n.num}), ${d.kw.e.name}(${d.kw.e.num})</small><br>
+                <small>สุ: ${d.su.m.name}(${d.su.m.num}), ${d.su.n.name}(${d.su.n.num}), ${d.su.e.name}(${d.su.e.num})</small>
+            </div>`;
+        });
+        document.getElementById("historyList").innerHTML = html;
+    });
+}
+
+window.onload = () => {
+    loadHistory();
+    document.getElementById("date").value = new Date().toISOString().split('T')[0];
+};
+</script>
+</body>
+</html>
