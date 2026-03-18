@@ -7,174 +7,54 @@
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #4A90E2;
-            --secondary: #27ae60;
-            --orange: #f39c12;
-            --bg: #F0F2F5;
-            --card-bg: #ffffff;
-            --text-main: #2C3E50;
-            --text-sub: #7F8C8D;
+            --primary: #4A90E2; --secondary: #27ae60; --orange: #f39c12; --danger: #e74c3c;
+            --bg: #F0F2F5; --card-bg: #ffffff; --text-main: #2C3E50; --text-sub: #7F8C8D;
         }
 
-        body {
-            font-family: 'Sarabun', sans-serif;
-            background-color: var(--bg);
-            margin: 0;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: var(--text-main);
-        }
+        body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; color: var(--text-main); }
+        .main-container { width: 100%; max-width: 480px; }
 
-        /* Container หลัก */
-        .main-container {
-            width: 100%;
-            max-width: 480px;
-        }
-
-        /* ส่วนหัวและวันที่ */
-        .header-section {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
+        /* Card ส่วนหัว */
+        .header-section { background: var(--card-bg); padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; text-align: center; }
         h2 { margin: 0 0 15px 0; font-size: 1.2rem; color: var(--primary); }
+        input[type="date"] { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #E0E6ED; font-family: inherit; font-size: 1rem; text-align: center; outline: none; }
 
-        input[type="date"] {
-            width: 100%;
-            padding: 12px;
-            border-radius: 12px;
-            border: 2px solid #E0E6ED;
-            font-family: inherit;
-            font-size: 1rem;
-            text-align: center;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        input[type="date"]:focus { border-color: var(--primary); }
-
-        /* กล่องปุ่มสุ่ม */
-        .random-box {
-            background: linear-gradient(135deg, #6e8efb, #a777e3);
-            padding: 25px;
-            border-radius: 20px;
-            color: white;
-            text-align: center;
-            margin-bottom: 15px;
-            box-shadow: 0 8px 20px rgba(110, 142, 251, 0.3);
-        }
-
-        .btn-random {
-            background: white;
-            color: #6e8efb;
-            border: none;
-            padding: 14px;
-            border-radius: 12px;
-            font-weight: bold;
-            width: 100%;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: transform 0.2s;
-        }
-
-        .btn-random:active { transform: scale(0.98); }
+        /* กล่องสุ่ม */
+        .random-box { background: linear-gradient(135deg, #6e8efb, #a777e3); padding: 25px; border-radius: 20px; color: white; text-align: center; margin-bottom: 15px; box-shadow: 0 8px 20px rgba(110, 142, 251, 0.3); }
+        .btn-random { background: white; color: #6e8efb; border: none; padding: 14px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; font-size: 1rem; }
 
         /* ส่วนกรอกข้อมูล */
-        .input-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            display: none;
-            border: 1px solid #E0E6ED;
-        }
-
-        .person-group { margin-bottom: 20px; }
-        
-        .person-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-
+        .input-card { background: var(--card-bg); border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: none; border: 1px solid #E0E6ED; margin-bottom: 20px;}
+        .person-badge { display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; margin-bottom: 15px; }
         .kw-badge { background: #EBF5FF; color: var(--primary); }
         .su-badge { background: #FFF4E5; color: var(--orange); }
-
-        .row {
-            display: grid;
-            grid-template-columns: 50px 1fr 70px;
-            gap: 10px;
-            margin-bottom: 12px;
-            align-items: center;
-        }
-
+        .row { display: grid; grid-template-columns: 50px 1fr 70px; gap: 10px; margin-bottom: 12px; align-items: center; }
         .time-label { font-size: 0.85rem; color: var(--text-sub); font-weight: 600; }
+        input[type="text"] { padding: 10px; border: 1px solid #F0F2F5; border-radius: 10px; font-size: 0.85rem; background: #F8F9FA; color: #555; }
+        input[type="number"] { padding: 10px; border: 2px solid #F0F2F5; border-radius: 10px; text-align: center; font-weight: bold; font-size: 1rem; }
+        .btn-save { background: var(--secondary); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
 
-        input[type="text"] {
-            padding: 10px;
-            border: 1px solid #F0F2F5;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            background: #F8F9FA;
-            color: #555;
-            outline: none;
-        }
-
-        input[type="number"] {
-            padding: 10px;
-            border: 2px solid #F0F2F5;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 1rem;
-            outline: none;
-        }
-
-        input[type="number"]:focus { border-color: var(--secondary); }
-
-        .btn-save {
-            background: var(--secondary);
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 16px;
-            border-radius: 15px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
-            margin-top: 10px;
-        }
-
-        /* ประวัติ */
-        .history-section { margin-top: 20px; }
-        .history-card {
-            background: white;
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-left: 5px solid var(--primary);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-        }
-
-        .h-date { font-weight: bold; font-size: 0.9rem; color: var(--text-main); display: block; margin-bottom: 5px; }
-        .h-detail { font-size: 0.8rem; color: var(--text-sub); line-height: 1.5; }
+        /* --- ส่วนแสดงประวัติ (History) แบบละเอียด --- */
+        .history-title { font-weight: bold; margin: 10px 0; color: var(--text-sub); font-size: 0.9rem; }
+        .history-card { background: white; border-radius: 20px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; }
+        .h-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; margin-bottom: 12px; }
+        .h-date { font-weight: bold; color: var(--primary); font-size: 1rem; }
+        
+        .h-person-section { margin-bottom: 15px; }
+        .h-person-name { font-weight: bold; font-size: 0.9rem; margin-bottom: 8px; display: block; }
+        .h-item { display: grid; grid-template-columns: 50px 1fr 40px; font-size: 0.85rem; padding: 5px 0; border-bottom: 1px solid #fafafa; }
+        .h-time { color: var(--text-sub); }
+        .h-asset { color: #555; }
+        .h-num { text-align: right; font-weight: bold; color: var(--secondary); }
+        
+        .btn-delete { background: none; border: none; color: var(--danger); font-size: 0.8rem; cursor: pointer; padding: 5px; }
     </style>
 </head>
 <body>
 
 <div class="main-container">
     <div class="header-section">
-        <h2>📊 บันทึกโพสต์รายวัน</h2>
+        <h2>📊 ระบบบันทึกโพสต์</h2>
         <input id="date" type="date" onchange="checkTodayStatus()">
     </div>
 
@@ -184,24 +64,21 @@
     </div>
 
     <div id="inputSection" class="input-card">
-        <div class="person-group">
-            <div class="person-badge kw-badge">👤 พี่ขวัญ</div>
-            <div class="row"><span class="time-label">เช้า</span><input id="kw_m_name" type="text" readonly><input id="kw_m_num" type="number" placeholder="0"></div>
-            <div class="row"><span class="time-label">เที่ยง</span><input id="kw_n_name" type="text" readonly><input id="kw_n_num" type="number" placeholder="0"></div>
-            <div class="row"><span class="time-label">เย็น</span><input id="kw_e_name" type="text" readonly><input id="kw_e_num" type="number" placeholder="0"></div>
-        </div>
-
-        <div class="person-group">
-            <div class="person-badge su-badge">👤 พี่สุ</div>
-            <div class="row"><span class="time-label">เช้า</span><input id="su_m_name" type="text" readonly><input id="su_m_num" type="number" placeholder="0"></div>
-            <div class="row"><span class="time-label">เที่ยง</span><input id="su_n_name" type="text" readonly><input id="su_n_num" type="number" placeholder="0"></div>
-            <div class="row"><span class="time-label">เย็น</span><input id="su_e_name" type="text" readonly><input id="su_e_num" type="number" placeholder="0"></div>
-        </div>
+        <div class="person-badge kw-badge">👤 พี่ขวัญ</div>
+        <div class="row"><span class="time-label">เช้า</span><input id="kw_m_name" type="text" readonly><input id="kw_m_num" type="number" placeholder="0"></div>
+        <div class="row"><span class="time-label">เที่ยง</span><input id="kw_n_name" type="text" readonly><input id="kw_n_num" type="number" placeholder="0"></div>
+        <div class="row"><span class="time-label">เย็น</span><input id="kw_e_name" type="text" readonly><input id="kw_e_num" type="number" placeholder="0"></div>
+        
+        <div style="margin-top:20px;" class="person-badge su-badge">👤 พี่สุ</div>
+        <div class="row"><span class="time-label">เช้า</span><input id="su_m_name" type="text" readonly><input id="su_m_num" type="number" placeholder="0"></div>
+        <div class="row"><span class="time-label">เที่ยง</span><input id="su_n_name" type="text" readonly><input id="su_n_num" type="number" placeholder="0"></div>
+        <div class="row"><span class="time-label">เย็น</span><input id="su_e_name" type="text" readonly><input id="su_e_num" type="number" placeholder="0"></div>
         
         <button class="btn-save" onclick="updateNumbers()">💾 บันทึกจำนวนโพสต์</button>
     </div>
 
-    <div class="history-section" id="historyList"></div>
+    <div class="history-title">📋 ประวัติการบันทึกล่าสุด</div>
+    <div id="historyList"></div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -231,22 +108,13 @@ async function checkTodayStatus() {
         const doc = snap.docs[0]; const d = doc.data(); currentDocId = doc.id;
         document.getElementById("randomBox").style.display = "none";
         document.getElementById("inputSection").style.display = "block";
-        document.getElementById("kw_m_name").value = d.kw.m.name;
-        document.getElementById("kw_n_name").value = d.kw.n.name;
-        document.getElementById("kw_e_name").value = d.kw.e.name;
-        document.getElementById("su_m_name").value = d.su.m.name;
-        document.getElementById("su_n_name").value = d.su.n.name;
-        document.getElementById("su_e_name").value = d.su.e.name;
-        document.getElementById("kw_m_num").value = d.kw.m.num || "";
-        document.getElementById("kw_n_num").value = d.kw.n.num || "";
-        document.getElementById("kw_e_num").value = d.kw.e.num || "";
-        document.getElementById("su_m_num").value = d.su.m.num || "";
-        document.getElementById("su_n_num").value = d.su.n.num || "";
-        document.getElementById("su_e_num").value = d.su.e.num || "";
+        document.getElementById("kw_m_name").value = d.kw.m.name; document.getElementById("kw_n_name").value = d.kw.n.name; document.getElementById("kw_e_name").value = d.kw.e.name;
+        document.getElementById("su_m_name").value = d.su.m.name; document.getElementById("su_n_name").value = d.su.n.name; document.getElementById("su_e_name").value = d.su.e.name;
+        document.getElementById("kw_m_num").value = d.kw.m.num || ""; document.getElementById("kw_n_num").value = d.kw.n.num || ""; document.getElementById("kw_e_num").value = d.kw.e.num || "";
+        document.getElementById("su_m_num").value = d.su.m.num || ""; document.getElementById("su_n_num").value = d.su.n.num || ""; document.getElementById("su_e_num").value = d.su.e.num || "";
     } else {
         document.getElementById("randomBox").style.display = "block";
         document.getElementById("inputSection").style.display = "none";
-        document.getElementById("statusLabel").innerText = "วันที่เลือกยังไม่มีข้อมูล กดสุ่มได้เลย ✨";
     }
 }
 
@@ -265,32 +133,51 @@ async function startRandom() {
     };
     await db.collection("posts").add(data);
     checkTodayStatus();
+    loadHistory();
 }
 
 async function updateNumbers() {
     if (!currentDocId) return;
     await db.collection("posts").doc(currentDocId).update({
-        "kw.m.num": document.getElementById("kw_m_num").value,
-        "kw.n.num": document.getElementById("kw_n_num").value,
-        "kw.e.num": document.getElementById("kw_e_num").value,
-        "su.m.num": document.getElementById("su_m_num").value,
-        "su.n.num": document.getElementById("su_n_num").value,
-        "su.e.num": document.getElementById("su_e_num").value
+        "kw.m.num": document.getElementById("kw_m_num").value, "kw.n.num": document.getElementById("kw_n_num").value, "kw.e.num": document.getElementById("kw_e_num").value,
+        "su.m.num": document.getElementById("su_m_num").value, "su.n.num": document.getElementById("su_n_num").value, "su.e.num": document.getElementById("su_e_num").value
     });
-    alert("บันทึกสำเร็จ!");
+    alert("บันทึกจำนวนเรียบร้อย!");
     loadHistory();
 }
 
+async function deleteData(id) {
+    if(confirm("ยืนยันการลบข้อมูลนี้หรือไม่?")) {
+        await db.collection("posts").doc(id).delete();
+        loadHistory();
+        checkTodayStatus();
+    }
+}
+
 function loadHistory() {
-    db.collection("posts").orderBy("date", "desc").limit(5).get().then(snap => {
+    db.collection("posts").orderBy("date", "desc").limit(10).get().then(snap => {
         let html = "";
         snap.forEach(doc => {
             const d = doc.data();
-            html += `<div class="history-card">
-                <span class="h-date">🗓 ${d.date}</span>
-                <div class="h-detail">
-                    <b>ขวัญ:</b> ${d.kw.m.num||0}, ${d.kw.n.num||0}, ${d.kw.e.num||0}<br>
-                    <b>สุ:</b> ${d.su.m.num||0}, ${d.su.n.num||0}, ${d.su.e.num||0}
+            html += `
+            <div class="history-card">
+                <div class="h-header">
+                    <span class="h-date">🗓 ${d.date}</span>
+                    <button class="btn-delete" onclick="deleteData('${doc.id}')">ลบ</button>
+                </div>
+                
+                <div class="h-person-section">
+                    <span class="h-person-name" style="color:var(--primary)">👤 พี่ขวัญ</span>
+                    <div class="h-item"><span class="h-time">เช้า</span><span class="h-asset">${d.kw.m.name}</span><span class="h-num">${d.kw.m.num||0}</span></div>
+                    <div class="h-item"><span class="h-time">เที่ยง</span><span class="h-asset">${d.kw.n.name}</span><span class="h-num">${d.kw.n.num||0}</span></div>
+                    <div class="h-item"><span class="h-time">เย็น</span><span class="h-asset">${d.kw.e.name}</span><span class="h-num">${d.kw.e.num||0}</span></div>
+                </div>
+
+                <div class="h-person-section" style="margin-bottom:0;">
+                    <span class="h-person-name" style="color:var(--orange)">👤 พี่สุ</span>
+                    <div class="h-item"><span class="h-time">เช้า</span><span class="h-asset">${d.su.m.name}</span><span class="h-num">${d.su.m.num||0}</span></div>
+                    <div class="h-item"><span class="h-time">เที่ยง</span><span class="h-asset">${d.su.n.name}</span><span class="h-num">${d.su.n.num||0}</span></div>
+                    <div class="h-item"><span class="h-time">เย็น</span><span class="h-asset">${d.su.e.name}</span><span class="h-num">${d.su.e.num||0}</span></div>
                 </div>
             </div>`;
         });
