@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>บันทึกโพสต์</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #f5f6fa;
+  padding: 20px;
+}
+
+h2 {
+  text-align: center;
+}
+
+.box {
+  background: white;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+input, textarea {
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.item {
+  background: white;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+}
+</style>
+
+</head>
+
+<body>
+
+<h2>📊 บันทึกโพสต์รายวัน</h2>
+
+<div class="box">
+📅 วันที่
+<input id="date" type="date">
+
+<h3> พี่ขวัญ</h3>
+🌅 เช้า <input id="kw_m" type="number" placeholder="จำนวน">
+☀️ กลางวัน <input id="kw_n" type="number" placeholder="จำนวน">
+🌙 เย็น <input id="kw_e" type="number" placeholder="จำนวน">
+
+<h3> พี่สุ</h3>
+🌅 เช้า <input id="su_m" type="number" placeholder="จำนวน">
+☀️ กลางวัน <input id="su_n" type="number" placeholder="จำนวน">
+🌙 เย็น <input id="su_e" type="number" placeholder="จำนวน">
+
+📝 หมายเหตุ
+<textarea id="note"></textarea>
+
+<button onclick="save()">💾 บันทึก</button>
+</div>
+
+<div id="list"></div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI",
+  authDomain: "save-data-92eca.firebaseapp.com",
+  projectId: "save-data-92eca",
+  storageBucket: "save-data-92eca.firebasestorage.app",
+  messagingSenderId: "661096454777",
+  appId: "1:661096454777:web:d8b4297db798e14b76d2a8",
+  measurementId: "G-L4K35CD4F2"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+function save(){
+  const data = {
+    date: document.getElementById("date").value,
+    kw: {
+      m: document.getElementById("kw_m").value,
+      n: document.getElementById("kw_n").value,
+      e: document.getElementById("kw_e").value
+    },
+    su: {
+      m: document.getElementById("su_m").value,
+      n: document.getElementById("su_n").value,
+      e: document.getElementById("su_e").value
+    },
+    note: document.getElementById("note").value
+  };
+
+  db.collection("posts").add(data).then(()=>{
+    alert("✅ บันทึกสำเร็จ");
+    loadData();
+  });
+}
+
+function loadData(){
+  document.getElementById("list").innerHTML = "";
+
+  db.collection("posts")
+    .orderBy("date","desc")
+    .get()
+    .then(snap=>{
+      snap.forEach(doc=>{
+        const d = doc.data();
+
+        document.getElementById("list").innerHTML += `
+        <div class="item">
+        📅 ${d.date}<br><br>
+
+         พี่ขวัญ<br>
+        🌅 ${d.kw.m} | ☀️ ${d.kw.n} | 🌙 ${d.kw.e}<br><br>
+
+         พี่สุ<br>
+        🌅 ${d.su.m} | ☀️ ${d.su.n} | 🌙 ${d.su.e}<br><br>
+
+        📝 ${d.note || "-"}
+        </div>
+        `;
+      });
+    });
+}
+
+loadData();
+</script>
+
+</body>
+</html>
