@@ -3,78 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ระบบจัดการโพสต์ทรัพย์</title>
+    <title>ระบบบันทึกโพสต์</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #4A90E2; --secondary: #67C23A; --bg: #F5F7FA; --white: #FFFFFF;
+            --primary: #4A90E2; --secondary: #27ae60; --bg: #f0f2f5; --white: #ffffff;
         }
         body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        .card { background: var(--white); width: 100%; max-width: 450px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.05); padding: 20px; box-sizing: border-box; margin-bottom: 15px; }
         
-        /* Header & Random Button */
-        .random-box { background: linear-gradient(135deg, #6e8efb, #a777e3); border-radius: 15px; padding: 20px; color: white; text-align: center; margin-bottom: 20px; }
-        .btn-random { background: white; color: #6e8efb; border: none; padding: 12px 25px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        /* Card หลัก */
+        .card { background: var(--white); width: 100%; max-width: 450px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); padding: 20px; box-sizing: border-box; }
         
-        h2 { text-align: center; margin: 0 0 15px 0; color: #333; }
-        .label-title { font-weight: bold; display: block; margin-bottom: 5px; color: #555; }
+        /* แถบหัวเว็บ: วันที่ + ปุ่มสุ่ม (Compact) */
+        .top-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; background: #f8f9fa; padding: 10px; border-radius: 15px; border: 1px solid #eee; }
         
-        /* Input Styles */
-        input[type="date"], input[type="text"], input[type="number"], textarea {
-            width: 100%; padding: 12px; border: 1px solid #E0E6ED; border-radius: 10px; box-sizing: border-box; font-size: 1rem;
+        input[type="date"] { 
+            flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 0.9rem; font-family: inherit; outline: none;
         }
-        .person-group { background: #F9FAFC; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #EDF2F7; }
-        .person-name { font-weight: bold; color: var(--primary); margin-bottom: 10px; display: block; border-bottom: 2px solid #E2E8F0; padding-bottom: 5px; }
-        .row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
-        .time-label { min-width: 45px; font-size: 0.85rem; color: #777; font-weight: bold; }
-        input[type="number"] { width: 70px; text-align: center; }
-
-        .btn-save { background: var(--secondary); color: white; border: none; width: 100%; padding: 18px; border-radius: 15px; font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(103, 194, 58, 0.3); }
         
-        /* History */
-        .history-card { background: white; width: 100%; max-width: 450px; padding: 15px; border-radius: 15px; margin-top: 10px; border-left: 5px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); box-sizing: border-box; }
+        .btn-random { 
+            flex: 1.5; background: linear-gradient(135deg, #6e8efb, #a777e3); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(110, 142, 251, 0.2);
+        }
+        .btn-random:active { transform: scale(0.95); }
+
+        /* ส่วนกรอกข้อมูล */
+        .person-section { margin-bottom: 15px; }
+        .person-title { font-weight: bold; font-size: 1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+        
+        .row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+        .time-label { min-width: 40px; font-size: 0.8rem; color: #888; font-weight: bold; }
+        
+        input[type="text"] { flex: 1; padding: 10px; border: 1px solid #eee; border-radius: 10px; font-size: 0.9rem; background: #fafafa; }
+        input[type="number"] { width: 55px; padding: 10px; border: 1px solid #eee; border-radius: 10px; text-align: center; font-size: 0.9rem; }
+
+        .btn-save { background: var(--secondary); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; box-shadow: 0 5px 15px rgba(39, 174, 96, 0.2); }
+        .btn-save:active { transform: translateY(2px); }
+
+        /* ประวัติ */
+        .history-list { width: 100%; max-width: 450px; margin-top: 15px; }
+        .history-item { background: white; padding: 12px; border-radius: 15px; margin-bottom: 8px; border-left: 5px solid var(--primary); font-size: 0.85rem; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <span class="label-title">📅 ขั้นตอนที่ 1: เลือกวันที่และกดสุ่ม</span>
-    <input id="date" type="date" style="margin-bottom: 15px;">
-    
-    <div class="random-box">
-        <button class="btn-random" onclick="handleRandom()">🎲 สุ่มทรัพย์ 3 อย่าง</button>
+    <h3 style="margin-top:0; color:#333; font-size:1.1rem; text-align:center;">📊 บันทึกโพสต์ & สุ่มทรัพย์</h3>
+
+    <div class="top-bar">
+        <input id="date" type="date">
+        <button class="btn-random" onclick="handleRandom()">🎲 กดสุ่มทรัพย์</button>
     </div>
 
-    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-
-    <span class="label-title">📝 ขั้นตอนที่ 2: ใส่จำนวนโพสต์</span>
-    
-    <div class="person-group">
-        <span class="person-name">👤 พี่ขวัญ</span>
-        <div class="row"><span class="time-label">เช้า</span><input id="kw_m_name" type="text" placeholder="ทรัพย์ 1"><input id="kw_m_num" type="number" placeholder="0"></div>
-        <div class="row"><span class="time-label">เที่ยง</span><input id="kw_n_name" type="text" placeholder="ทรัพย์ 2"><input id="kw_n_num" type="number" placeholder="0"></div>
-        <div class="row"><span class="time-label">เย็น</span><input id="kw_e_name" type="text" placeholder="ทรัพย์ 3"><input id="kw_e_num" type="number" placeholder="0"></div>
+    <div class="person-section">
+        <div class="person-title" style="color:var(--primary);">👤 พี่ขวัญ</div>
+        <div class="row"><span class="time-label">เช้า</span><input id="kw_m_name" type="text"><input id="kw_m_num" type="number" placeholder="0"></div>
+        <div class="row"><span class="time-label">เที่ยง</span><input id="kw_n_name" type="text"><input id="kw_n_num" type="number" placeholder="0"></div>
+        <div class="row"><span class="time-label">เย็น</span><input id="kw_e_name" type="text"><input id="kw_e_num" type="number" placeholder="0"></div>
     </div>
 
-    <div class="person-group">
-        <span class="person-name" style="color:#E6A23C">👤 พี่สุ</span>
-        <div class="row"><span class="time-label">เช้า</span><input id="su_m_name" type="text" placeholder="ทรัพย์ 2"><input id="su_m_num" type="number" placeholder="0"></div>
-        <div class="row"><span class="time-label">เที่ยง</span><input id="su_n_name" type="text" placeholder="ทรัพย์ 3"><input id="su_n_num" type="number" placeholder="0"></div>
-        <div class="row"><span class="time-label">เย็น</span><input id="su_e_name" type="text" placeholder="ทรัพย์ 1"><input id="su_e_num" type="number" placeholder="0"></div>
+    <div class="person-section">
+        <div class="person-title" style="color:#E6A23C;">👤 พี่สุ</div>
+        <div class="row"><span class="time-label">เช้า</span><input id="su_m_name" type="text"><input id="su_m_num" type="number" placeholder="0"></div>
+        <div class="row"><span class="time-label">เที่ยง</span><input id="su_n_name" type="text"><input id="su_n_num" type="number" placeholder="0"></div>
+        <div class="row"><span class="time-label">เย็น</span><input id="su_e_name" type="text"><input id="su_e_num" type="number" placeholder="0"></div>
     </div>
-
-    <span class="label-title">หมายเหตุ</span>
-    <textarea id="note" rows="2" placeholder="เพิ่มเติม..."></textarea>
 
     <button class="btn-save" onclick="saveData()">💾 บันทึกและส่งข้อมูล</button>
 </div>
 
-<div id="historyList" style="width:100%; display:flex; flex-direction:column; align-items:center;"></div>
+<div class="history-list" id="historyList"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
+// Firebase Config ของคุณ
 const firebaseConfig = {
   apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI",
   authDomain: "save-data-92eca.firebaseapp.com",
@@ -98,7 +101,6 @@ const allAssets = [
     "THE IRIS ศรีนครินทร์ - พระราม 9", "กรี เน่ คอนโดดอนเมือง-สรงประภา เฟส1"
 ];
 
-// ฟังก์ชันสุ่มและกระจายชื่อทรัพย์
 function handleRandom() {
     let temp = [...allAssets];
     let chosen = [];
@@ -106,23 +108,19 @@ function handleRandom() {
         const idx = Math.floor(Math.random() * temp.length);
         chosen.push(temp.splice(idx, 1)[0]);
     }
-    
-    // กระจายให้พี่ขวัญ
+    // กรอกให้พี่ขวัญ
     document.getElementById("kw_m_name").value = chosen[0];
     document.getElementById("kw_n_name").value = chosen[1];
     document.getElementById("kw_e_name").value = chosen[2];
-    
-    // กระจายให้พี่สุ (สลับเวลาเพื่อไม่ให้ซ้ำกับพี่ขวัญในเวลาเดียวกัน)
+    // กรอกให้พี่สุ (สลับเวลา)
     document.getElementById("su_m_name").value = chosen[1];
     document.getElementById("su_n_name").value = chosen[2];
     document.getElementById("su_e_name").value = chosen[0];
-    
-    alert("สุ่มทรัพย์สำเร็จ! กรุณาตรวจสอบและใส่จำนวนโพสต์");
 }
 
 function saveData() {
     const dateVal = document.getElementById("date").value;
-    if (!dateVal) { alert("กรุณาเลือกวันที่ก่อนบันทึก!"); return; }
+    if (!dateVal) { alert("กรุณาเลือกวันที่!"); return; }
 
     const payload = {
         date: dateVal,
@@ -136,12 +134,11 @@ function saveData() {
             n: { name: document.getElementById("su_n_name").value, num: document.getElementById("su_n_num").value || 0 },
             e: { name: document.getElementById("su_e_name").value, num: document.getElementById("su_e_num").value || 0 }
         },
-        note: document.getElementById("note").value,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
     };
 
     db.collection("posts").add(payload).then(() => {
-        alert("บันทึกข้อมูลเรียบร้อยแล้ว!");
+        alert("บันทึกสำเร็จ!");
         location.reload();
     });
 }
@@ -151,11 +148,7 @@ function loadHistory() {
         let html = "";
         snap.forEach(doc => {
             const d = doc.data();
-            html += `<div class="history-card">
-                <b>🗓 วันที่: ${d.date}</b><br>
-                <small>ขวัญ: ${d.kw.m.name}(${d.kw.m.num}), ${d.kw.n.name}(${d.kw.n.num}), ${d.kw.e.name}(${d.kw.e.num})</small><br>
-                <small>สุ: ${d.su.m.name}(${d.su.m.num}), ${d.su.n.name}(${d.su.n.num}), ${d.su.e.name}(${d.su.e.num})</small>
-            </div>`;
+            html += `<div class="history-item"><b>📅 ${d.date}</b><br>ขวัญ: ${d.kw.m.num}, ${d.kw.n.num}, ${d.kw.e.num} | สุ: ${d.su.m.num}, ${d.su.n.num}, ${d.su.e.num}</div>`;
         });
         document.getElementById("historyList").innerHTML = html;
     });
