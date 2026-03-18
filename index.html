@@ -2,150 +2,138 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>บันทึกโพสต์</title>
-
+<title>บันทึกโพสต์รายวัน</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body {
-  font-family: Arial;
-  background: #f5f6fa;
-  padding: 20px;
-}
-
-h2 {
-  text-align: center;
-}
-
-.box {
-  background: white;
-  padding: 15px;
-  margin-bottom: 15px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-input, textarea {
-  width: 100%;
-  padding: 8px;
-  margin: 5px 0;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-button {
-  width: 100%;
-  padding: 10px;
-  background: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-}
-
-.item {
-  background: white;
-  padding: 10px;
-  margin-top: 10px;
-  border-radius: 8px;
-}
+  body { font-family: Arial, sans-serif; background: #f4f7f6; padding: 15px; }
+  .box { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 450px; margin: auto; }
+  h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
+  h3 { color: #27ae60; border-bottom: 2px solid #27ae60; padding-bottom: 5px; margin-top: 25px; }
+  .input-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+  .time-label { min-width: 50px; font-weight: bold; font-size: 14px; }
+  input[type="text"], input[type="number"], input[type="date"], textarea {
+    padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box;
+  }
+  input[type="text"] { flex: 2; } /* ช่องชื่อทรัพย์กว้างกว่า */
+  input[type="number"] { width: 70px; } /* ช่องจำนวนแคบหน่อย */
+  input[type="date"], textarea { width: 100%; margin-top: 5px; }
+  button {
+    width: 100%; padding: 15px; background: #27ae60; color: white; border: none;
+    border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px;
+  }
+  .item { background: #fff; padding: 15px; margin-top: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 </style>
-
 </head>
-
 <body>
 
-<h2>📊 บันทึกโพสต์รายวัน</h2>
-
 <div class="box">
-📅 วันที่
-<input id="date" type="date">
+  <h2>📊 บันทึกข้อมูลประจำวัน</h2>
+  
+  <strong>📅 เลือกวันที่</strong>
+  <input id="date" type="date">
 
-<h3> พี่ขวัญ</h3>
-🌅 เช้า <input id="kw_m" type="number" placeholder="จำนวน">
-☀️ กลางวัน <input id="kw_n" type="number" placeholder="จำนวน">
-🌙 เย็น <input id="kw_e" type="number" placeholder="จำนวน">
+  <h3>👨🏻พี่ขวัญ</h3>
+  <div class="input-row">
+    <span class="time-label">🌅 เช้า:</span>
+    <input id="kw_m_name" type="text" placeholder="ชื่อทรัพย์">
+    <input id="kw_m_num" type="number" placeholder="จำนวน">
+  </div>
+  <div class="input-row">
+    <span class="time-label">☀️ เที่ยง:</span>
+    <input id="kw_n_name" type="text" placeholder="ชื่อทรัพย์">
+    <input id="kw_n_num" type="number" placeholder="จำนวน">
+  </div>
+  <div class="input-row">
+    <span class="time-label">🌙 เย็น:</span>
+    <input id="kw_e_name" type="text" placeholder="ชื่อทรัพย์">
+    <input id="kw_e_num" type="number" placeholder="จำนวน">
+  </div>
 
-<h3> พี่สุ</h3>
-🌅 เช้า <input id="su_m" type="number" placeholder="จำนวน">
-☀️ กลางวัน <input id="su_n" type="number" placeholder="จำนวน">
-🌙 เย็น <input id="su_e" type="number" placeholder="จำนวน">
+  <h3>👩 พี่สุ</h3>
+  <div class="input-row">
+    <span class="time-label">🌅 เช้า:</span>
+    <input id="su_m_name" type="text" placeholder="ชื่อทรัพย์">
+    <input id="su_m_num" type="number" placeholder="จำนวน">
+  </div>
+  <div class="input-row">
+    <span class="time-label">☀️ เที่ยง:</span>
+    <input id="su_n_name" type="text" placeholder="ชื่อทรัพย์">
+    <input id="su_n_num" type="number" placeholder="จำนวน">
+  </div>
+  <div class="input-row">
+    <span class="time-label">🌙 เย็น:</span>
+    <input id="su_e_name" type="text" placeholder="ชื่อทรัพย์">
+    <input id="su_e_num" type="number" placeholder="จำนวน">
+  </div>
 
-📝 หมายเหตุ
-<textarea id="note"></textarea>
+  <br>
+  <strong>📝 หมายเหตุ</strong>
+  <textarea id="note" rows="2" placeholder="เพิ่มเติม..."></textarea>
 
-<button onclick="save()">💾 บันทึก</button>
+  <button onclick="save()">💾 กดบันทึกข้อมูล</button>
 </div>
 
-<div id="list"></div>
+<div id="list" style="max-width: 450px; margin: 20px auto;"></div>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+<script>
+// --- ก๊อปปี้ค่า Config จากหน้า Firebase มาวางตรงนี้ ---
 const firebaseConfig = {
   apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI",
   authDomain: "save-data-92eca.firebaseapp.com",
   projectId: "save-data-92eca",
   storageBucket: "save-data-92eca.firebasestorage.app",
-  messagingSenderId: "661096454777",
-  appId: "1:661096454777:web:d8b4297db798e14b76d2a8",
-  measurementId: "G-L4K35CD4F2"
+  messagingSenderId: "1:661096454777", // ดูจากหน้าจอ Config ของคุณ
+  appId: "1:661096454777:web:d8b4297db798e14b76d2a8" // ดูจากหน้าจอ Config ของคุณ
 };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 function save(){
+  const dateVal = document.getElementById("date").value;
+  if(!dateVal) { alert("กรุณาเลือกวันที่ด้วยครับ"); return; }
+
   const data = {
-    date: document.getElementById("date").value,
+    date: dateVal,
     kw: {
-      m: document.getElementById("kw_m").value,
-      n: document.getElementById("kw_n").value,
-      e: document.getElementById("kw_e").value
+      m: { name: document.getElementById("kw_m_name").value, num: document.getElementById("kw_m_num").value },
+      n: { name: document.getElementById("kw_n_name").value, num: document.getElementById("kw_n_num").value },
+      e: { name: document.getElementById("kw_e_name").value, num: document.getElementById("kw_e_num").value }
     },
     su: {
-      m: document.getElementById("su_m").value,
-      n: document.getElementById("su_n").value,
-      e: document.getElementById("su_e").value
+      m: { name: document.getElementById("su_m_name").value, num: document.getElementById("su_m_num").value },
+      n: { name: document.getElementById("su_n_name").value, num: document.getElementById("su_n_num").value },
+      e: { name: document.getElementById("su_e_name").value, num: document.getElementById("su_e_num").value }
     },
-    note: document.getElementById("note").value
+    note: document.getElementById("note").value,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
   };
 
-  db.collection("posts").add(data).then(()=>{
-    alert("✅ บันทึกสำเร็จ");
-    loadData();
-  });
+  db.collection("posts").add(data).then(() => {
+    alert("✅ บันทึกเรียบร้อยแล้ว!");
+    location.reload(); 
+  }).catch(err => alert("เกิดข้อผิดพลาด: " + err));
 }
 
 function loadData(){
-  document.getElementById("list").innerHTML = "";
-
-  db.collection("posts")
-    .orderBy("date","desc")
-    .get()
-    .then(snap=>{
-      snap.forEach(doc=>{
-        const d = doc.data();
-
-        document.getElementById("list").innerHTML += `
-        <div class="item">
-        📅 ${d.date}<br><br>
-
-         พี่ขวัญ<br>
-        🌅 ${d.kw.m} | ☀️ ${d.kw.n} | 🌙 ${d.kw.e}<br><br>
-
-         พี่สุ<br>
-        🌅 ${d.su.m} | ☀️ ${d.su.n} | 🌙 ${d.su.e}<br><br>
-
-        📝 ${d.note || "-"}
-        </div>
-        `;
-      });
+  db.collection("posts").orderBy("date","desc").limit(5).get().then(snap => {
+    let html = "";
+    snap.forEach(doc => {
+      const d = doc.data();
+      html += `<div class="item">
+        <b>📅 วันที่: ${d.date}</b><br>
+        <small>👨🏻ขวัญ: เช้า(${d.kw.m.num}) เที่ยง(${d.kw.n.num}) เย็น(${d.kw.e.num})</small><br>
+        <small>👩 สุ: เช้า(${d.su.m.num}) เที่ยง(${d.su.n.num}) เย็น(${d.su.e.num})</small>
+      </div>`;
     });
+    document.getElementById("list").innerHTML = html;
+  });
 }
-
 loadData();
 </script>
-
 </body>
 </html>
+
