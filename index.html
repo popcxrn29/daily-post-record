@@ -119,21 +119,25 @@ function save(){
 }
 
 function loadData(){
-  db.collection("posts").orderBy("date","desc").limit(5).get().then(snap => {
+  db.collection("posts").orderBy("date","desc").limit(10).get().then(snap => {
     let html = "";
     snap.forEach(doc => {
       const d = doc.data();
+      
+      // ส่วนที่เพิ่มให้โชว์ "ชื่อทรัพย์" (d.kw.m.name)
       html += `<div class="item">
-        <b>📅 วันที่: ${d.date}</b><br>
-        <small>👨🏻ขวัญ: เช้า(${d.kw.m.num}) เที่ยง(${d.kw.n.num}) เย็น(${d.kw.e.num})</small><br>
-        <small>👩 สุ: เช้า(${d.su.m.num}) เที่ยง(${d.su.n.num}) เย็น(${d.su.e.num})</small>
+        <b>📅 วันที่: ${d.date}</b><br><hr>
+        👨🏻 <b>พี่ขวัญ:</b><br>
+        - เช้า: ${d.kw.m.name || '-'} (${d.kw.m.num || 0})<br>
+        - เที่ยง: ${d.kw.n.name || '-'} (${d.kw.n.num || 0})<br>
+        - เย็น: ${d.kw.e.name || '-'} (${d.kw.e.num || 0})<br><br>
+        👩 <b>พี่สุ:</b><br>
+        - เช้า: ${d.su.m.name || '-'} (${d.su.m.num || 0})<br>
+        - เที่ยง: ${d.su.n.name || '-'} (${d.su.n.num || 0})<br>
+        - เย็น: ${d.su.e.name || '-'} (${d.su.e.num || 0})<br><hr>
+        📝 หมายเหตุ: ${d.note || '-'}
       </div>`;
     });
     document.getElementById("list").innerHTML = html;
   });
 }
-loadData();
-</script>
-</body>
-</html>
-
