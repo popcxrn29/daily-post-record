@@ -1,143 +1,139 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-<meta charset="UTF-8">
-<title>บันทึกโพสต์รายวัน</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-  body { font-family: Arial, sans-serif; background: #f4f7f6; padding: 15px; }
-  .box { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 450px; margin: auto; }
-  h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
-  h3 { color: #27ae60; border-bottom: 2px solid #27ae60; padding-bottom: 5px; margin-top: 25px; }
-  .input-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
-  .time-label { min-width: 50px; font-weight: bold; font-size: 14px; }
-  input[type="text"], input[type="number"], input[type="date"], textarea {
-    padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box;
-  }
-  input[type="text"] { flex: 2; } /* ช่องชื่อทรัพย์กว้างกว่า */
-  input[type="number"] { width: 70px; } /* ช่องจำนวนแคบหน่อย */
-  input[type="date"], textarea { width: 100%; margin-top: 5px; }
-  button {
-    width: 100%; padding: 15px; background: #27ae60; color: white; border: none;
-    border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px;
-  }
-  .item { background: #fff; padding: 15px; margin-top: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>บันทึกโพสต์รายวัน</title>
+    <style>
+        :root { --primary: #27ae60; --bg: #f8f9fa; }
+        body { font-family: 'Tahoma', sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        .container { background: white; width: 100%; max-width: 400px; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); box-sizing: border-box; }
+        h2 { text-align: center; color: #333; font-size: 1.4rem; margin-bottom: 20px; }
+        .section-header { background: #e8f5e9; color: #2e7d32; padding: 8px 15px; border-radius: 10px; margin: 15px 0 10px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .input-group { display: flex; gap: 8px; margin-bottom: 10px; }
+        .label-time { min-width: 45px; font-size: 0.85rem; color: #666; align-self: center; }
+        input, textarea { border: 1px solid #ddd; border-radius: 10px; padding: 10px; font-size: 14px; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--primary); }
+        input[type="text"] { flex: 2; min-width: 0; }
+        input[type="number"] { width: 60px; text-align: center; }
+        input[type="date"] { width: 100%; margin-bottom: 10px; background: #fff; cursor: pointer; }
+        button { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 15px; transition: transform 0.1s; }
+        button:active { transform: scale(0.98); }
+        .history-card { background: white; width: 100%; max-width: 400px; margin-top: 15px; padding: 15px; border-radius: 15px; border-left: 5px solid var(--primary); box-shadow: 0 4px 6px rgba(0,0,0,0.05); box-sizing: border-box; font-size: 0.9rem; }
+        hr { border: 0; border-top: 1px solid #eee; margin: 10px 0; }
+    </style>
 </head>
 <body>
 
-<div class="box">
-  <h2>📊 บันทึกข้อมูลประจำวัน</h2>
-  
-  <strong>📅 เลือกวันที่</strong>
-  <input id="date" type="date">
+<div class="container">
+    <h2>📊 บันทึกข้อมูลประจำวัน</h2>
+    
+    <strong>📅 วันที่</strong>
+    <input id="date" type="date">
 
-  <h3>👨🏻พี่ขวัญ</h3>
-  <div class="input-row">
-    <span class="time-label">🌅 เช้า:</span>
-    <input id="kw_m_name" type="text" placeholder="ชื่อทรัพย์">
-    <input id="kw_m_num" type="number" placeholder="จำนวน">
-  </div>
-  <div class="input-row">
-    <span class="time-label">☀️ เที่ยง:</span>
-    <input id="kw_n_name" type="text" placeholder="ชื่อทรัพย์">
-    <input id="kw_n_num" type="number" placeholder="จำนวน">
-  </div>
-  <div class="input-row">
-    <span class="time-label">🌙 เย็น:</span>
-    <input id="kw_e_name" type="text" placeholder="ชื่อทรัพย์">
-    <input id="kw_e_num" type="number" placeholder="จำนวน">
-  </div>
+    <div class="section-header">👨🏻 พี่ขวัญ</div>
+    <div class="input-group">
+        <span class="label-time">🌅 เช้า</span>
+        <input id="kw_m_name" type="text" placeholder="ชื่อทรัพย์">
+        <input id="kw_m_num" type="number" placeholder="0">
+    </div>
+    <div class="input-group">
+        <span class="label-time">☀️ เที่ยง</span>
+        <input id="kw_n_name" type="text" placeholder="ชื่อทรัพย์">
+        <input id="kw_n_num" type="number" placeholder="0">
+    </div>
+    <div class="input-group">
+        <span class="label-time">🌙 เย็น</span>
+        <input id="kw_e_name" type="text" placeholder="ชื่อทรัพย์">
+        <input id="kw_e_num" type="number" placeholder="0">
+    </div>
 
-  <h3>👩 พี่สุ</h3>
-  <div class="input-row">
-    <span class="time-label">🌅 เช้า:</span>
-    <input id="su_m_name" type="text" placeholder="ชื่อทรัพย์">
-    <input id="su_m_num" type="number" placeholder="จำนวน">
-  </div>
-  <div class="input-row">
-    <span class="time-label">☀️ เที่ยง:</span>
-    <input id="su_n_name" type="text" placeholder="ชื่อทรัพย์">
-    <input id="su_n_num" type="number" placeholder="จำนวน">
-  </div>
-  <div class="input-row">
-    <span class="time-label">🌙 เย็น:</span>
-    <input id="su_e_name" type="text" placeholder="ชื่อทรัพย์">
-    <input id="su_e_num" type="number" placeholder="จำนวน">
-  </div>
+    <div class="section-header">👩 พี่สุ</div>
+    <div class="input-group">
+        <span class="label-time">🌅 เช้า</span>
+        <input id="su_m_name" type="text" placeholder="ชื่อทรัพย์">
+        <input id="su_m_num" type="number" placeholder="0">
+    </div>
+    <div class="input-group">
+        <span class="label-time">☀️ เที่ยง</span>
+        <input id="su_n_name" type="text" placeholder="ชื่อทรัพย์">
+        <input id="su_n_num" type="number" placeholder="0">
+    </div>
+    <div class="input-group">
+        <span class="label-time">🌙 เย็น</span>
+        <input id="su_e_name" type="text" placeholder="ชื่อทรัพย์">
+        <input id="su_e_num" type="number" placeholder="0">
+    </div>
 
-  <br>
-  <strong>📝 หมายเหตุ</strong>
-  <textarea id="note" rows="2" placeholder="เพิ่มเติม..."></textarea>
+    <strong>📝 หมายเหตุ</strong>
+    <textarea id="note" style="width:100%; margin-top:5px;" rows="2"></textarea>
 
-  <button onclick="save()">💾 กดบันทึกข้อมูล</button>
+    <button onclick="saveData()">💾 กดบันทึกข้อมูล</button>
 </div>
 
-<div id="list" style="max-width: 450px; margin: 20px auto;"></div>
+<div id="list"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-// --- ก๊อปปี้ค่า Config จากหน้า Firebase มาวางตรงนี้ ---
+// ก๊อปปี้ค่าจากหน้า Config ของคุณมาวางที่นี่
 const firebaseConfig = {
   apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI",
   authDomain: "save-data-92eca.firebaseapp.com",
   projectId: "save-data-92eca",
   storageBucket: "save-data-92eca.firebasestorage.app",
-  messagingSenderId: "1:661096454777", // ดูจากหน้าจอ Config ของคุณ
-  appId: "1:661096454777:web:d8b4297db798e14b76d2a8" // ดูจากหน้าจอ Config ของคุณ
+  messagingSenderId: "661096454777",
+  appId: "1:661096454777:web:d8b4297db798e14b76d2a8"
 };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-function save(){
-  const dateVal = document.getElementById("date").value;
-  if(!dateVal) { alert("กรุณาเลือกวันที่ด้วยครับ"); return; }
+function saveData() {
+    const dateVal = document.getElementById("date").value;
+    if (!dateVal) { alert("กรุณาเลือกวันที่ก่อนบันทึกครับ"); return; }
 
-  const data = {
-    date: dateVal,
-    kw: {
-      m: { name: document.getElementById("kw_m_name").value, num: document.getElementById("kw_m_num").value },
-      n: { name: document.getElementById("kw_n_name").value, num: document.getElementById("kw_n_num").value },
-      e: { name: document.getElementById("kw_e_name").value, num: document.getElementById("kw_e_num").value }
-    },
-    su: {
-      m: { name: document.getElementById("su_m_name").value, num: document.getElementById("su_m_num").value },
-      n: { name: document.getElementById("su_n_name").value, num: document.getElementById("su_n_num").value },
-      e: { name: document.getElementById("su_e_name").value, num: document.getElementById("su_e_num").value }
-    },
-    note: document.getElementById("note").value,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  };
+    const payload = {
+        date: dateVal,
+        kw: {
+            m: { name: document.getElementById("kw_m_name").value, num: document.getElementById("kw_m_num").value || 0 },
+            n: { name: document.getElementById("kw_n_name").value, num: document.getElementById("kw_n_num").value || 0 },
+            e: { name: document.getElementById("kw_e_name").value, num: document.getElementById("kw_e_num").value || 0 }
+        },
+        su: {
+            m: { name: document.getElementById("su_m_name").value, num: document.getElementById("su_m_num").value || 0 },
+            n: { name: document.getElementById("su_n_name").value, num: document.getElementById("su_n_num").value || 0 },
+            e: { name: document.getElementById("su_e_name").value, num: document.getElementById("su_e_num").value || 0 }
+        },
+        note: document.getElementById("note").value,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
 
-  db.collection("posts").add(data).then(() => {
-    alert("✅ บันทึกเรียบร้อยแล้ว!");
-    location.reload(); 
-  }).catch(err => alert("เกิดข้อผิดพลาด: " + err));
-}
-
-function loadData(){
-  db.collection("posts").orderBy("date","desc").limit(10).get().then(snap => {
-    let html = "";
-    snap.forEach(doc => {
-      const d = doc.data();
-      
-      // ส่วนที่เพิ่มให้โชว์ "ชื่อทรัพย์" (d.kw.m.name)
-      html += `<div class="item">
-        <b>📅 วันที่: ${d.date}</b><br><hr>
-        👨🏻 <b>พี่ขวัญ:</b><br>
-        - เช้า: ${d.kw.m.name || '-'} (${d.kw.m.num || 0})<br>
-        - เที่ยง: ${d.kw.n.name || '-'} (${d.kw.n.num || 0})<br>
-        - เย็น: ${d.kw.e.name || '-'} (${d.kw.e.num || 0})<br><br>
-        👩 <b>พี่สุ:</b><br>
-        - เช้า: ${d.su.m.name || '-'} (${d.su.m.num || 0})<br>
-        - เที่ยง: ${d.su.n.name || '-'} (${d.su.n.num || 0})<br>
-        - เย็น: ${d.su.e.name || '-'} (${d.su.e.num || 0})<br><hr>
-        📝 หมายเหตุ: ${d.note || '-'}
-      </div>`;
+    db.collection("daily_records").add(payload).then(() => {
+        alert("✅ บันทึกข้อมูลสำเร็จแล้ว!");
+        location.reload();
+    }).catch((error) => {
+        alert("❌ บันทึกไม่สำเร็จ: " + error.message);
     });
-    document.getElementById("list").innerHTML = html;
-  });
 }
+
+function fetchRecords() {
+    db.collection("daily_records").orderBy("date", "desc").limit(5).get().then((querySnapshot) => {
+        let content = "";
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            content += `
+                <div class="history-card">
+                    <b>📅 วันที่: ${data.date}</b><hr>
+                    👨🏻 ขวัญ: ${data.kw.m.name}(${data.kw.m.num}), ${data.kw.n.name}(${data.kw.n.num}), ${data.kw.e.name}(${data.kw.e.num})<br>
+                    👩‍💼 สุ: ${data.su.m.name}(${data.su.m.num}), ${data.su.n.name}(${data.su.n.num}), ${data.su.e.name}(${data.su.e.num})
+                </div>`;
+        });
+        document.getElementById("list").innerHTML = content;
+    });
+}
+window.onload = fetchRecords;
+</script>
+</body>
+</html>
