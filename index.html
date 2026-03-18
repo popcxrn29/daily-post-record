@@ -4,80 +4,202 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>บันทึกโพสต์รายวัน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #27ae60; --bg: #f8f9fa; }
-        body { font-family: 'Tahoma', sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        .container { background: white; width: 100%; max-width: 400px; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); box-sizing: border-box; }
-        h2 { text-align: center; color: #333; font-size: 1.4rem; margin-bottom: 20px; }
-        .section-header { background: #e8f5e9; color: #2e7d32; padding: 8px 15px; border-radius: 10px; margin: 15px 0 10px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
-        .input-group { display: flex; gap: 8px; margin-bottom: 10px; }
-        .label-time { min-width: 45px; font-size: 0.85rem; color: #666; align-self: center; }
-        input, textarea { border: 1px solid #ddd; border-radius: 10px; padding: 10px; font-size: 14px; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--primary); }
-        input[type="text"] { flex: 2; min-width: 0; }
-        input[type="number"] { width: 60px; text-align: center; }
-        input[type="date"] { width: 100%; margin-bottom: 10px; background: #fff; cursor: pointer; }
-        button { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 15px; transition: transform 0.1s; }
-        button:active { transform: scale(0.98); }
-        .history-card { background: white; width: 100%; max-width: 400px; margin-top: 15px; padding: 15px; border-radius: 15px; border-left: 5px solid var(--primary); box-shadow: 0 4px 6px rgba(0,0,0,0.05); box-sizing: border-box; font-size: 0.9rem; }
-        hr { border: 0; border-top: 1px solid #eee; margin: 10px 0; }
+        :root {
+            --primary: #4A90E2;
+            --secondary: #67C23A;
+            --accent: #E6A23C;
+            --bg: #F5F7FA;
+            --white: #FFFFFF;
+            --text: #2C3E50;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card {
+            background: var(--white);
+            width: 100%;
+            max-width: 420px;
+            border-radius: 24px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.05);
+            padding: 24px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+
+        /* ส่วนสุ่มทรัพย์สุดเท่ */
+        .random-container {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(110, 142, 251, 0.3);
+        }
+
+        .random-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; display: block; }
+        
+        .btn-random {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 12px;
+            border-radius: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            backdrop-filter: blur(5px);
+            transition: 0.3s;
+        }
+        .btn-random:active { background: white; color: #6e8efb; }
+
+        h2 { font-size: 1.5rem; margin: 0 0 20px 0; text-align: center; color: var(--text); }
+
+        .label-main { font-weight: bold; display: block; margin-bottom: 8px; font-size: 0.95rem; color: #555; }
+
+        input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #E0E6ED;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        /* จัดกลุ่มพี่ๆ */
+        .group-box {
+            background: #f9fafc;
+            border-radius: 18px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #edf2f7;
+        }
+
+        .group-title {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 5px;
+        }
+
+        .input-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
+        .time-tag { font-size: 0.75rem; background: #E0E6ED; padding: 4px 8px; border-radius: 6px; min-width: 40px; text-align: center; }
+
+        input[type="text"] { flex: 1; border: 1px solid #E0E6ED; border-radius: 10px; padding: 10px; font-size: 0.9rem; }
+        input[type="number"] { width: 55px; border: 1px solid #E0E6ED; border-radius: 10px; padding: 10px; text-align: center; }
+
+        textarea { width: 100%; border: 1px solid #E0E6ED; border-radius: 12px; padding: 12px; box-sizing: border-box; margin-top: 5px; font-family: inherit; }
+
+        .btn-save {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 18px;
+            border-radius: 18px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 6px 20px rgba(103, 194, 58, 0.3);
+            transition: 0.2s;
+        }
+        .btn-save:active { transform: translateY(3px); box-shadow: none; }
+
+        /* ประวัติการบันทึก */
+        .history-card {
+            background: white;
+            width: 100%;
+            max-width: 420px;
+            padding: 18px;
+            border-radius: 20px;
+            margin-top: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border-left: 6px solid var(--primary);
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>📊 บันทึกข้อมูลประจำวัน</h2>
+<div class="card">
+    <div class="random-container">
+        <span class="random-title">🎡 จัดการทรัพย์อัตโนมัติ</span>
+        <button class="btn-random" onclick="randomAndFill()">🎲 สุ่มและจัดตารางโพสต์</button>
+    </div>
+
+    <h2>📊 บันทึกข้อมูล</h2>
     
-    <strong>📅 วันที่</strong>
+    <span class="label-main">📅 เลือกวันที่</span>
     <input id="date" type="date">
 
-    <div class="section-header">👨🏻 พี่ขวัญ</div>
-    <div class="input-group">
-        <span class="label-time">🌅 เช้า</span>
-        <input id="kw_m_name" type="text" placeholder="ชื่อทรัพย์">
-        <input id="kw_m_num" type="number" placeholder="0">
-    </div>
-    <div class="input-group">
-        <span class="label-time">☀️ เที่ยง</span>
-        <input id="kw_n_name" type="text" placeholder="ชื่อทรัพย์">
-        <input id="kw_n_num" type="number" placeholder="0">
-    </div>
-    <div class="input-group">
-        <span class="label-time">🌙 เย็น</span>
-        <input id="kw_e_name" type="text" placeholder="ชื่อทรัพย์">
-        <input id="kw_e_num" type="number" placeholder="0">
-    </div>
-
-    <div class="section-header">👩 พี่สุ</div>
-    <div class="input-group">
-        <span class="label-time">🌅 เช้า</span>
-        <input id="su_m_name" type="text" placeholder="ชื่อทรัพย์">
-        <input id="su_m_num" type="number" placeholder="0">
-    </div>
-    <div class="input-group">
-        <span class="label-time">☀️ เที่ยง</span>
-        <input id="su_n_name" type="text" placeholder="ชื่อทรัพย์">
-        <input id="su_n_num" type="number" placeholder="0">
-    </div>
-    <div class="input-group">
-        <span class="label-time">🌙 เย็น</span>
-        <input id="su_e_name" type="text" placeholder="ชื่อทรัพย์">
-        <input id="su_e_num" type="number" placeholder="0">
+    <div class="group-box">
+        <div class="group-title">👤 พี่ขวัญ</div>
+        <div class="input-row">
+            <span class="time-tag">เช้า</span>
+            <input id="kw_m_name" type="text" placeholder="ชื่อทรัพย์">
+            <input id="kw_m_num" type="number" placeholder="0">
+        </div>
+        <div class="input-row">
+            <span class="time-tag">เที่ยง</span>
+            <input id="kw_n_name" type="text" placeholder="ชื่อทรัพย์">
+            <input id="kw_n_num" type="number" placeholder="0">
+        </div>
+        <div class="input-row">
+            <span class="time-tag">เย็น</span>
+            <input id="kw_e_name" type="text" placeholder="ชื่อทรัพย์">
+            <input id="kw_e_num" type="number" placeholder="0">
+        </div>
     </div>
 
-    <strong>📝 หมายเหตุ</strong>
-    <textarea id="note" style="width:100%; margin-top:5px;" rows="2"></textarea>
+    <div class="group-box">
+        <div class="group-title" style="color:var(--accent)">👤 พี่สุ</div>
+        <div class="input-row">
+            <span class="time-tag">เช้า</span>
+            <input id="su_m_name" type="text" placeholder="ชื่อทรัพย์">
+            <input id="su_m_num" type="number" placeholder="0">
+        </div>
+        <div class="input-row">
+            <span class="time-tag">เที่ยง</span>
+            <input id="su_n_name" type="text" placeholder="ชื่อทรัพย์">
+            <input id="su_n_num" type="number" placeholder="0">
+        </div>
+        <div class="input-row">
+            <span class="time-tag">เย็น</span>
+            <input id="su_e_name" type="text" placeholder="ชื่อทรัพย์">
+            <input id="su_e_num" type="number" placeholder="0">
+        </div>
+    </div>
 
-    <button onclick="saveData()">💾 กดบันทึกข้อมูล</button>
+    <span class="label-main">📝 หมายเหตุเพิ่มเติม</span>
+    <textarea id="note" rows="2" placeholder="ใส่รายละเอียดอื่น ๆ..."></textarea>
+
+    <button class="btn-save" onclick="saveData()">💾 บันทึกข้อมูลเสร็จสิ้น</button>
 </div>
 
-<div id="list"></div>
+<div id="list" style="width:100%; display:flex; flex-direction:column; align-items:center;"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-// ก๊อปปี้ค่าจากหน้า Config ของคุณมาวางที่นี่
+// Firebase Config จากภาพที่เคยส่งมา
 const firebaseConfig = {
   apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI",
   authDomain: "save-data-92eca.firebaseapp.com",
@@ -90,11 +212,43 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+const allAssets = [
+    "บ้านพี่แดง อรัญนคร3", "แม่ย่าพี่ปลา 14 ไร่", "แม่ย่าพี่ปลา 11 ไร่", "พี่ศรีไพร (คอนสาย)",
+    "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1 (คุณแคท )",
+    "คอนโดชีวาทัย ฮอล์มาร์ค ลาดพร้าว-โชคชัย4(ฝน)", "ที่ดิน หลังอรัญนคร 1 ซ.ประสบโชค", 
+    "บ้านพี่หนึ่ง อรัญวิลล์", "ที่ดินราชพัสดุ พี่แอน", "บ้านเอื้อ 214/278", "บ้านเอื้ื้อ 214/381",
+    "บ้านเอื้อ 214/293", "โกดัง 1 ไร่ (พี่แอน)", "คอนโด The Base Park East Sukhumvit 77",
+    "คอนโด Aston", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง",
+    "แฮปปี้คอนโด", "บ้านทาวน์โฮมพฤกษา9", "BANGKOK HORIZON รามคำแหง",
+    "THE IRIS ศรีนครินทร์ - พระราม 9", "กรี เน่ คอนโดดอนเมือง-สรงประภา เฟส1"
+];
+
+function randomAndFill() {
+    let temp = [...allAssets];
+    let chosen = [];
+    for (let i = 0; i < 3; i++) {
+        const idx = Math.floor(Math.random() * temp.length);
+        chosen.push(temp.splice(idx, 1)[0]);
+    }
+    
+    // พี่ขวัญ (1-2-3)
+    document.getElementById("kw_m_name").value = chosen[0];
+    document.getElementById("kw_n_name").value = chosen[1];
+    document.getElementById("kw_e_name").value = chosen[2];
+    
+    // พี่สุ (2-3-1) สลับไม่ให้ซ้ำเวลาเดียวกัน
+    document.getElementById("su_m_name").value = chosen[1];
+    document.getElementById("su_n_name").value = chosen[2];
+    document.getElementById("su_e_name").value = chosen[0];
+    
+    alert("✨ สุ่มและเตรียมข้อมูลให้แล้ว!");
+}
+
 function saveData() {
     const dateVal = document.getElementById("date").value;
-    if (!dateVal) { alert("กรุณาเลือกวันที่ก่อนบันทึกครับ"); return; }
+    if (!dateVal) { alert("ลืมเลือกวันที่ครับ!"); return; }
 
-    const payload = {
+    const data = {
         date: dateVal,
         kw: {
             m: { name: document.getElementById("kw_m_name").value, num: document.getElementById("kw_m_num").value || 0 },
@@ -107,33 +261,5 @@ function saveData() {
             e: { name: document.getElementById("su_e_name").value, num: document.getElementById("su_e_num").value || 0 }
         },
         note: document.getElementById("note").value,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-
-    db.collection("daily_records").add(payload).then(() => {
-        alert("✅ บันทึกข้อมูลสำเร็จแล้ว!");
-        location.reload();
-    }).catch((error) => {
-        alert("❌ บันทึกไม่สำเร็จ: " + error.message);
-    });
-}
-
-function fetchRecords() {
-    db.collection("daily_records").orderBy("date", "desc").limit(5).get().then((querySnapshot) => {
-        let content = "";
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            content += `
-                <div class="history-card">
-                    <b>📅 วันที่: ${data.date}</b><hr>
-                    👨🏻 ขวัญ: ${data.kw.m.name}(${data.kw.m.num}), ${data.kw.n.name}(${data.kw.n.num}), ${data.kw.e.name}(${data.kw.e.num})<br>
-                    👩‍💼 สุ: ${data.su.m.name}(${data.su.m.num}), ${data.su.n.name}(${data.su.n.num}), ${data.su.e.name}(${data.su.e.num})
-                </div>`;
-        });
-        document.getElementById("list").innerHTML = content;
-    });
-}
-window.onload = fetchRecords;
-</script>
-</body>
-</html>
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+   
