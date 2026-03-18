@@ -3,58 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ระบบบันทึกโพสต์ (สุ่มล่วงหน้าได้)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <title>Post Record Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #4A90E2; --secondary: #27ae60; --orange: #f39c12; --bg: #f4f7f6; }
-        body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        .card { background: #fff; width: 100%; max-width: 480px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); padding: 20px; box-sizing: border-box; margin-bottom: 15px; }
-        input[type="date"] { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; font-family: inherit; margin-bottom: 15px; box-sizing: border-box; font-size: 1rem; text-align: center; background: #fff; }
-        .random-btn-box { background: linear-gradient(135deg, #6e8efb, #a777e3); padding: 20px; border-radius: 15px; text-align: center; color: white; margin-bottom: 15px; }
-        .btn-main { background: white; color: #6e8efb; border: none; padding: 14px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .input-section { border: 2px solid var(--primary); border-radius: 15px; padding: 15px; background: #fff; display: none; }
-        .person-title { font-weight: bold; font-size: 1.1rem; margin: 10px 0; display: block; }
-        .row { display: grid; grid-template-columns: 50px 1fr 75px; gap: 8px; margin-bottom: 12px; align-items: center; }
-        .time-label { font-size: 0.85rem; color: #666; font-weight: bold; }
-        input[type="text"] { padding: 10px; border: 1px solid #eee; border-radius: 10px; font-size: 0.85rem; background: #f9f9f9; color: #555; }
-        input[type="number"] { padding: 10px; border: 2px solid #e0e0e0; border-radius: 10px; text-align: center; font-weight: bold; font-size: 1rem; }
-        .btn-save { background: var(--secondary); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-size: 1.2rem; font-weight: bold; margin-top: 15px; cursor: pointer; }
-        .history-card { background: white; border-radius: 18px; padding: 15px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border-top: 4px solid var(--primary); width: 100%; max-width: 480px; box-sizing: border-box; }
-        .h-date { font-weight: bold; color: var(--primary); border-bottom: 1px dashed #eee; padding-bottom: 8px; margin-bottom: 10px; display: block; }
-        .h-item { font-size: 0.85rem; padding: 3px 0; color: #555; display: flex; justify-content: space-between; }
+        :root {
+            --primary: #4A90E2;
+            --secondary: #27ae60;
+            --orange: #f39c12;
+            --bg: #F0F2F5;
+            --card-bg: #ffffff;
+            --text-main: #2C3E50;
+            --text-sub: #7F8C8D;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-main);
+        }
+
+        /* Container หลัก */
+        .main-container {
+            width: 100%;
+            max-width: 480px;
+        }
+
+        /* ส่วนหัวและวันที่ */
+        .header-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        h2 { margin: 0 0 15px 0; font-size: 1.2rem; color: var(--primary); }
+
+        input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid #E0E6ED;
+            font-family: inherit;
+            font-size: 1rem;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="date"]:focus { border-color: var(--primary); }
+
+        /* กล่องปุ่มสุ่ม */
+        .random-box {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            padding: 25px;
+            border-radius: 20px;
+            color: white;
+            text-align: center;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 20px rgba(110, 142, 251, 0.3);
+        }
+
+        .btn-random {
+            background: white;
+            color: #6e8efb;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .btn-random:active { transform: scale(0.98); }
+
+        /* ส่วนกรอกข้อมูล */
+        .input-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: none;
+            border: 1px solid #E0E6ED;
+        }
+
+        .person-group { margin-bottom: 20px; }
+        
+        .person-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .kw-badge { background: #EBF5FF; color: var(--primary); }
+        .su-badge { background: #FFF4E5; color: var(--orange); }
+
+        .row {
+            display: grid;
+            grid-template-columns: 50px 1fr 70px;
+            gap: 10px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .time-label { font-size: 0.85rem; color: var(--text-sub); font-weight: 600; }
+
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid #F0F2F5;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            background: #F8F9FA;
+            color: #555;
+            outline: none;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            border: 2px solid #F0F2F5;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        input[type="number"]:focus { border-color: var(--secondary); }
+
+        .btn-save {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 16px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+            margin-top: 10px;
+        }
+
+        /* ประวัติ */
+        .history-section { margin-top: 20px; }
+        .history-card {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 5px solid var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .h-date { font-weight: bold; font-size: 0.9rem; color: var(--text-main); display: block; margin-bottom: 5px; }
+        .h-detail { font-size: 0.8rem; color: var(--text-sub); line-height: 1.5; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <input id="date" type="date" onchange="checkTodayStatus()">
-    
-    <div class="random-btn-box" id="randomBox">
-        <div id="statusLabel" style="margin-bottom:12px; font-weight:bold;">✨ เลือกวันที่เพื่อเริ่มสุ่มทรัพย์</div>
-        <button class="btn-main" id="btnRandom" onclick="startRandom()">🎲 กดสุ่มทรัพย์ของวันนี้</button>
+<div class="main-container">
+    <div class="header-section">
+        <h2>📊 บันทึกโพสต์รายวัน</h2>
+        <input id="date" type="date" onchange="checkTodayStatus()">
     </div>
 
-    <div id="inputSection" class="input-section">
-        <span class="person-title" style="color:var(--primary);">👤 พี่ขวัญ</span>
-        <div class="row"><span class="time-label">เช้า</span><input id="kw_m_name" type="text" readonly><input id="kw_m_num" type="number" placeholder="0"></div>
-        <div class="row"><span class="time-label">เที่ยง</span><input id="kw_n_name" type="text" readonly><input id="kw_n_num" type="number" placeholder="0"></div>
-        <div class="row"><span class="time-label">เย็น</span><input id="kw_e_name" type="text" readonly><input id="kw_e_num" type="number" placeholder="0"></div>
-        <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
-        <span class="person-title" style="color:var(--orange);">👤 พี่สุ</span>
-        <div class="row"><span class="time-label">เช้า</span><input id="su_m_name" type="text" readonly><input id="su_m_num" type="number" placeholder="0"></div>
-        <div class="row"><span class="time-label">เที่ยง</span><input id="su_n_name" type="text" readonly><input id="su_n_num" type="number" placeholder="0"></div>
-        <div class="row"><span class="time-label">เย็น</span><input id="su_e_name" type="text" readonly><input id="su_e_num" type="number" placeholder="0"></div>
+    <div class="random-box" id="randomBox">
+        <p id="statusLabel" style="margin:0 0 15px 0; font-size: 0.9rem;">วันนี้ยังไม่ได้สุ่มทรัพย์</p>
+        <button class="btn-random" onclick="startRandom()">🎲 กดสุ่มทรัพย์ (1 ครั้ง/วัน)</button>
+    </div>
+
+    <div id="inputSection" class="input-card">
+        <div class="person-group">
+            <div class="person-badge kw-badge">👤 พี่ขวัญ</div>
+            <div class="row"><span class="time-label">เช้า</span><input id="kw_m_name" type="text" readonly><input id="kw_m_num" type="number" placeholder="0"></div>
+            <div class="row"><span class="time-label">เที่ยง</span><input id="kw_n_name" type="text" readonly><input id="kw_n_num" type="number" placeholder="0"></div>
+            <div class="row"><span class="time-label">เย็น</span><input id="kw_e_name" type="text" readonly><input id="kw_e_num" type="number" placeholder="0"></div>
+        </div>
+
+        <div class="person-group">
+            <div class="person-badge su-badge">👤 พี่สุ</div>
+            <div class="row"><span class="time-label">เช้า</span><input id="su_m_name" type="text" readonly><input id="su_m_num" type="number" placeholder="0"></div>
+            <div class="row"><span class="time-label">เที่ยง</span><input id="su_n_name" type="text" readonly><input id="su_n_num" type="number" placeholder="0"></div>
+            <div class="row"><span class="time-label">เย็น</span><input id="su_e_name" type="text" readonly><input id="su_e_num" type="number" placeholder="0"></div>
+        </div>
+        
         <button class="btn-save" onclick="updateNumbers()">💾 บันทึกจำนวนโพสต์</button>
     </div>
-</div>
 
-<div id="historyList" style="width:100%; max-width:480px;"></div>
+    <div class="history-section" id="historyList"></div>
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-// Firebase Config ของคุณ
 const firebaseConfig = {
   apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI",
   authDomain: "save-data-92eca.firebaseapp.com",
@@ -70,63 +223,48 @@ const allAssets = ["บ้านพี่แดง อรัญนคร3", "แ
 
 let currentDocId = null;
 
-// ฟังก์ชันหลักในการเช็คสถานะตามวันที่ที่เลือก
 async function checkTodayStatus() {
     const dateVal = document.getElementById("date").value;
     if (!dateVal) return;
-
     const snap = await db.collection("posts").where("date", "==", dateVal).limit(1).get();
-    
     if (!snap.empty) {
-        // ถ้าวันที่มีข้อมูลแล้ว -> โชว์ช่องกรอกเลข
-        const doc = snap.docs[0];
-        const d = doc.data();
-        currentDocId = doc.id;
-        
+        const doc = snap.docs[0]; const d = doc.data(); currentDocId = doc.id;
         document.getElementById("randomBox").style.display = "none";
         document.getElementById("inputSection").style.display = "block";
-        
         document.getElementById("kw_m_name").value = d.kw.m.name;
         document.getElementById("kw_n_name").value = d.kw.n.name;
         document.getElementById("kw_e_name").value = d.kw.e.name;
-        document.getElementById("kw_m_num").value = d.kw.m.num || "";
-        document.getElementById("kw_n_num").value = d.kw.n.num || "";
-        document.getElementById("kw_e_num").value = d.kw.e.num || "";
-
         document.getElementById("su_m_name").value = d.su.m.name;
         document.getElementById("su_n_name").value = d.su.n.name;
         document.getElementById("su_e_name").value = d.su.e.name;
+        document.getElementById("kw_m_num").value = d.kw.m.num || "";
+        document.getElementById("kw_n_num").value = d.kw.n.num || "";
+        document.getElementById("kw_e_num").value = d.kw.e.num || "";
         document.getElementById("su_m_num").value = d.su.m.num || "";
         document.getElementById("su_n_num").value = d.su.n.num || "";
         document.getElementById("su_e_num").value = d.su.e.num || "";
     } else {
-        // ถ้าวันที่ยังไม่มีข้อมูล -> โชว์ปุ่มสุ่ม
         document.getElementById("randomBox").style.display = "block";
         document.getElementById("inputSection").style.display = "none";
-        document.getElementById("statusLabel").innerText = "✨ วันนี้ยังไม่ได้สุ่มทรัพย์ กดเพื่อเริ่ม!";
+        document.getElementById("statusLabel").innerText = "วันที่เลือกยังไม่มีข้อมูล กดสุ่มได้เลย ✨";
     }
 }
 
 async function startRandom() {
     const dateVal = document.getElementById("date").value;
-    if (!dateVal) return alert("กรุณาเลือกวันที่ก่อนสุ่มครับ");
-
-    let temp = [...allAssets]; 
-    let chosen = [];
+    let temp = [...allAssets]; let chosen = [];
     for (let i = 0; i < 3; i++) {
         const idx = Math.floor(Math.random() * temp.length);
         chosen.push(temp.splice(idx, 1)[0]);
     }
-    
     const data = {
         date: dateVal,
         kw: { m: {name: chosen[0], num: ""}, n: {name: chosen[1], num: ""}, e: {name: chosen[2], num: ""} },
         su: { m: {name: chosen[1], num: ""}, n: {name: chosen[2], num: ""}, e: {name: chosen[0], num: ""} },
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
     };
-    
     await db.collection("posts").add(data);
-    checkTodayStatus(); 
+    checkTodayStatus();
 }
 
 async function updateNumbers() {
@@ -139,20 +277,21 @@ async function updateNumbers() {
         "su.n.num": document.getElementById("su_n_num").value,
         "su.e.num": document.getElementById("su_e_num").value
     });
-    alert("บันทึกจำนวนโพสต์เรียบร้อย!");
+    alert("บันทึกสำเร็จ!");
     loadHistory();
 }
 
 function loadHistory() {
-    db.collection("posts").orderBy("date", "desc").limit(7).get().then(snap => {
+    db.collection("posts").orderBy("date", "desc").limit(5).get().then(snap => {
         let html = "";
         snap.forEach(doc => {
             const d = doc.data();
-            html += `
-            <div class="history-card">
-                <span class="h-date">🗓 วันที่ ${d.date}</span>
-                <div class="h-item"><span>ขวัญ: ${d.kw.m.name}(${d.kw.m.num||0}), ${d.kw.n.name}(${d.kw.n.num||0}), ${d.kw.e.name}(${d.kw.e.num||0})</span></div>
-                <div class="h-item"><span>สุ: ${d.su.m.name}(${d.su.m.num||0}), ${d.su.n.name}(${d.su.n.num||0}), ${d.su.e.name}(${d.su.e.num||0})</span></div>
+            html += `<div class="history-card">
+                <span class="h-date">🗓 ${d.date}</span>
+                <div class="h-detail">
+                    <b>ขวัญ:</b> ${d.kw.m.num||0}, ${d.kw.n.num||0}, ${d.kw.e.num||0}<br>
+                    <b>สุ:</b> ${d.su.m.num||0}, ${d.su.n.num||0}, ${d.su.e.num||0}
+                </div>
             </div>`;
         });
         document.getElementById("historyList").innerHTML = html;
@@ -160,8 +299,7 @@ function loadHistory() {
 }
 
 window.onload = () => {
-    // เซ็ตวันที่เป็นวันนี้เป็นค่าเริ่มต้น และเช็คสถานะ
-    document.getElementById("date").value = new Date().toISOString().split('T')[0];
+    document.getElementById("date").value = new Date().toLocaleDateString('en-CA');
     checkTodayStatus();
     loadHistory();
 };
