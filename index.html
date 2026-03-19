@@ -14,47 +14,49 @@
         body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; color: var(--text-main); }
         .main-container { width: 100%; max-width: 480px; }
 
-        /* Card ส่วนหัว - ปรับขนาดวันที่ให้เล็กลง */
         .header-section { background: var(--card-bg); padding: 15px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; text-align: center; }
-        h2 { margin: 0 0 12px 0; font-size: 1.1rem; color: var(--primary); } /* หัวข้อเล็กลงเล็กน้อย */
+        h2 { margin: 0 0 12px 0; font-size: 1.1rem; color: var(--primary); }
         
-        input[type="date"] { 
-            width: 80%; /* ลดความกว้างลง */
-            padding: 8px; /* ลดความหนาลง */
-            border-radius: 10px; 
-            border: 2px solid #E0E6ED; 
-            font-family: inherit; 
-            font-size: 0.9rem; /* ปรับตัวเลขวันที่ให้เล็กลงตามที่ต้องการ */
-            text-align: center; 
-            outline: none; 
-        }
+        input[type="date"] { width: 80%; padding: 8px; border-radius: 10px; border: 2px solid #E0E6ED; font-family: inherit; font-size: 0.9rem; text-align: center; outline: none; }
 
-        /* ส่วนอื่นคงเดิมทั้งหมด */
         .random-box { background: linear-gradient(135deg, #6e8efb, #a777e3); padding: 25px; border-radius: 20px; color: white; text-align: center; margin-bottom: 15px; box-shadow: 0 8px 20px rgba(110, 142, 251, 0.3); }
         .btn-random { background: white; color: #6e8efb; border: none; padding: 14px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; font-size: 1rem; }
+
         .input-card { background: var(--card-bg); border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: none; border: 1px solid #E0E6ED; margin-bottom: 20px;}
         .person-badge { display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; margin-bottom: 15px; }
         .kw-badge { background: #EBF5FF; color: var(--primary); }
         .su-badge { background: #FFF4E5; color: var(--orange); }
         .row { display: grid; grid-template-columns: 50px 1fr 70px; gap: 10px; margin-bottom: 12px; align-items: center; }
         .time-label { font-size: 0.85rem; color: var(--text-sub); font-weight: 600; }
-        input[type="text"] { padding: 10px; border: 1px solid #F0F2F5; border-radius: 10px; font-size: 0.85rem; background: #F8F9FA; color: #555; }
-        input[type="number"] { padding: 10px; border: 2px solid #F0F2F5; border-radius: 10px; text-align: center; font-weight: bold; font-size: 1rem; }
+        
+        /* แก้ไขให้ช่องชื่อทรัพย์สามารถพิมพ์ได้กรณีต้องการแก้ไข */
+        input[type="text"] { padding: 10px; border: 1px solid #F0F2F5; border-radius: 10px; font-size: 0.85rem; background: #F8F9FA; color: #555; outline: none; }
+        input[type="text"]:focus { border-color: var(--primary); background: #fff; }
+
+        input[type="number"] { padding: 10px; border: 2px solid #F0F2F5; border-radius: 10px; text-align: center; font-weight: bold; font-size: 1rem; outline: none; }
+        input[type="number"]:focus { border-color: var(--secondary); }
+
         .btn-save { background: var(--secondary); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
         .history-title { font-weight: bold; margin: 10px 0; color: var(--text-sub); font-size: 0.9rem; }
         .history-card { background: white; border-radius: 20px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; }
         .h-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; margin-bottom: 12px; }
         .h-date { font-weight: bold; color: var(--primary); font-size: 1rem; }
+        
+        .h-controls { display: flex; gap: 10px; }
+        .btn-edit { background: none; border: none; color: var(--primary); font-size: 0.8rem; cursor: pointer; font-weight: bold; }
+        .btn-delete { background: none; border: none; color: var(--danger); font-size: 0.8rem; cursor: pointer; }
+        
         .h-person-section { margin-bottom: 15px; }
         .h-person-name { font-weight: bold; font-size: 0.9rem; margin-bottom: 8px; display: block; }
         .h-item { display: grid; grid-template-columns: 50px 1fr 40px; font-size: 0.85rem; padding: 5px 0; border-bottom: 1px solid #fafafa; }
         .h-time { color: var(--text-sub); }
-        .h-asset { color: #555; }
+        .h-asset { color: #555; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 5px; }
         .h-num { text-align: right; font-weight: bold; color: var(--secondary); }
-        .btn-delete { background: none; border: none; color: var(--danger); font-size: 0.8rem; cursor: pointer; padding: 5px; }
     </style>
 </head>
 <body>
+
 <div class="main-container">
     <div class="header-section">
         <h2>📊 ระบบบันทึกโพสต์</h2>
@@ -68,16 +70,16 @@
 
     <div id="inputSection" class="input-card">
         <div class="person-badge kw-badge">👤 พี่ขวัญ</div>
-        <div class="row"><span class="time-label">เช้า</span><input id="kw_m_name" type="text" readonly><input id="kw_m_num" type="number" placeholder="0"></div>
-        <div class="row"><span class="time-label">เที่ยง</span><input id="kw_n_name" type="text" readonly><input id="kw_n_num" type="number" placeholder="0"></div>
-        <div class="row"><span class="time-label">เย็น</span><input id="kw_e_name" type="text" readonly><input id="kw_e_num" type="number" placeholder="0"></div>
+        <div class="row"><span class="time-label">เช้า</span><input id="kw_m_name" type="text"><input id="kw_m_num" type="number" placeholder="0"></div>
+        <div class="row"><span class="time-label">เที่ยง</span><input id="kw_n_name" type="text"><input id="kw_n_num" type="number" placeholder="0"></div>
+        <div class="row"><span class="time-label">เย็น</span><input id="kw_e_name" type="text"><input id="kw_e_num" type="number" placeholder="0"></div>
         
         <div style="margin-top:20px;" class="person-badge su-badge">👤 พี่สุ</div>
-        <div class="row"><span class="time-label">เช้า</span><input id="su_m_name" type="text" readonly><input id="su_m_num" type="number" placeholder="0"></div>
-        <div class="row"><span class="time-label">เที่ยง</span><input id="su_n_name" type="text" readonly><input id="su_n_num" type="number" placeholder="0"></div>
-        <div class="row"><span class="time-label">เย็น</span><input id="su_e_name" type="text" readonly><input id="su_e_num" type="number" placeholder="0"></div>
+        <div class="row"><span class="time-label">เช้า</span><input id="su_m_name" type="text"><input id="su_m_num" type="number" placeholder="0"></div>
+        <div class="row"><span class="time-label">เที่ยง</span><input id="su_n_name" type="text"><input id="su_n_num" type="number" placeholder="0"></div>
+        <div class="row"><span class="time-label">เย็น</span><input id="su_e_name" type="text"><input id="su_e_num" type="number" placeholder="0"></div>
         
-        <button class="btn-save" onclick="updateNumbers()">💾 บันทึกจำนวนโพสต์</button>
+        <button class="btn-save" onclick="updateNumbers()">💾 บันทึกการเปลี่ยนแปลง</button>
     </div>
 
     <div class="history-title">📋 ประวัติการบันทึกล่าสุด</div>
@@ -109,16 +111,21 @@ async function checkTodayStatus() {
     const snap = await db.collection("posts").where("date", "==", dateVal).limit(1).get();
     if (!snap.empty) {
         const doc = snap.docs[0]; const d = doc.data(); currentDocId = doc.id;
-        document.getElementById("randomBox").style.display = "none";
-        document.getElementById("inputSection").style.display = "block";
-        document.getElementById("kw_m_name").value = d.kw.m.name; document.getElementById("kw_n_name").value = d.kw.n.name; document.getElementById("kw_e_name").value = d.kw.e.name;
-        document.getElementById("su_m_name").value = d.su.m.name; document.getElementById("su_n_name").value = d.su.n.name; document.getElementById("su_e_name").value = d.su.e.name;
-        document.getElementById("kw_m_num").value = d.kw.m.num || ""; document.getElementById("kw_n_num").value = d.kw.n.num || ""; document.getElementById("kw_e_num").value = d.kw.e.num || "";
-        document.getElementById("su_m_num").value = d.su.m.num || ""; document.getElementById("su_n_num").value = d.su.n.num || ""; document.getElementById("su_e_num").value = d.su.e.num || "";
+        showInputArea(d);
     } else {
         document.getElementById("randomBox").style.display = "block";
         document.getElementById("inputSection").style.display = "none";
     }
+}
+
+function showInputArea(d) {
+    document.getElementById("randomBox").style.display = "none";
+    document.getElementById("inputSection").style.display = "block";
+    document.getElementById("kw_m_name").value = d.kw.m.name; document.getElementById("kw_n_name").value = d.kw.n.name; document.getElementById("kw_e_name").value = d.kw.e.name;
+    document.getElementById("su_m_name").value = d.su.m.name; document.getElementById("su_n_name").value = d.su.n.name; document.getElementById("su_e_name").value = d.su.e.name;
+    document.getElementById("kw_m_num").value = d.kw.m.num || ""; document.getElementById("kw_n_num").value = d.kw.n.num || ""; document.getElementById("kw_e_num").value = d.kw.e.num || "";
+    document.getElementById("su_m_num").value = d.su.m.num || ""; document.getElementById("su_n_num").value = d.su.n.num || ""; document.getElementById("su_e_num").value = d.su.e.num || "";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 async function startRandom() {
@@ -142,11 +149,25 @@ async function startRandom() {
 async function updateNumbers() {
     if (!currentDocId) return;
     await db.collection("posts").doc(currentDocId).update({
-        "kw.m.num": document.getElementById("kw_m_num").value, "kw.n.num": document.getElementById("kw_n_num").value, "kw.e.num": document.getElementById("kw_e_num").value,
-        "su.m.num": document.getElementById("su_m_num").value, "su.n.num": document.getElementById("su_n_num").value, "su.e.num": document.getElementById("su_e_num").value
+        "kw.m.name": document.getElementById("kw_m_name").value, "kw.m.num": document.getElementById("kw_m_num").value,
+        "kw.n.name": document.getElementById("kw_n_name").value, "kw.n.num": document.getElementById("kw_n_num").value,
+        "kw.e.name": document.getElementById("kw_e_name").value, "kw.e.num": document.getElementById("kw_e_num").value,
+        "su.m.name": document.getElementById("su_m_name").value, "su.m.num": document.getElementById("su_m_num").value,
+        "su.n.name": document.getElementById("su_n_name").value, "su.n.num": document.getElementById("su_n_num").value,
+        "su.e.name": document.getElementById("su_e_name").value, "su.e.num": document.getElementById("su_e_num").value
     });
-    alert("บันทึกจำนวนเรียบร้อย!");
+    alert("บันทึกข้อมูลเรียบร้อย!");
     loadHistory();
+}
+
+// ฟังก์ชันดึงข้อมูลเก่ามาแก้ไข
+async function editData(id, date) {
+    document.getElementById("date").value = date;
+    const doc = await db.collection("posts").doc(id).get();
+    if (doc.exists) {
+        currentDocId = id;
+        showInputArea(doc.data());
+    }
 }
 
 async function deleteData(id) {
@@ -166,7 +187,10 @@ function loadHistory() {
             <div class="history-card">
                 <div class="h-header">
                     <span class="h-date">🗓 ${d.date}</span>
-                    <button class="btn-delete" onclick="deleteData('${doc.id}')">ลบ</button>
+                    <div class="h-controls">
+                        <button class="btn-edit" onclick="editData('${doc.id}', '${d.date}')">แก้ไข</button>
+                        <button class="btn-delete" onclick="deleteData('${doc.id}')">ลบ</button>
+                    </div>
                 </div>
                 
                 <div class="h-person-section">
