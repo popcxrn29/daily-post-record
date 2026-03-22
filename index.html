@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Post Record Pro - Smart Random</title>
+    <title>Post Record Pro - Anti-Repeat 5 Days</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -20,6 +20,8 @@
 
         .random-box { background: linear-gradient(135deg, #6e8efb, #a777e3); padding: 25px; border-radius: 20px; color: white; text-align: center; margin-bottom: 15px; box-shadow: 0 8px 20px rgba(110, 142, 251, 0.3); }
         .btn-random { background: white; color: #6e8efb; border: none; padding: 14px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; font-size: 1rem; }
+        
+        #queueStatus { font-size: 0.75rem; margin-top: 10px; background: rgba(0,0,0,0.1); padding: 5px 10px; border-radius: 10px; display: inline-block; }
 
         .input-card { background: var(--card-bg); border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: none; border: 1px solid #E0E6ED; margin-bottom: 20px;}
         .person-badge { display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; margin-bottom: 15px; }
@@ -55,9 +57,9 @@
     </div>
 
     <div class="random-box" id="randomBox">
-        <p id="statusLabel" style="margin:0 0 15px 0; font-size: 0.9rem;">วันนี้ยังไม่ได้สุ่มทรัพย์</p>
-        <button class="btn-random" onclick="startRandom()">🎲 กดสุ่มทรัพย์ (วนจนครบ)</button>
-        <div id="queueStatus" style="font-size: 0.7rem; margin-top: 10px; opacity: 0.8;"></div>
+        <p id="statusLabel" style="margin:0 0 10px 0; font-size: 0.9rem;">เตรียมสุ่มทรัพย์สำหรับวันที่เลือก</p>
+        <button class="btn-random" onclick="startRandom()">🎲 กดสุ่มทรัพย์ (ป้องกันซ้ำ 5 วัน)</button>
+        <div id="queueStatus">กำลังโหลดสถานะคิว...</div>
     </div>
 
     <div id="inputSection" class="input-card">
@@ -102,7 +104,6 @@ async function checkTodayStatus() {
     if (!dateVal) return;
     const snap = await db.collection("posts").where("date", "==", dateVal).limit(1).get();
     
-    // แสดงจำนวนทรัพย์ที่เหลือในคิว
     updateQueueLabel();
 
     if (!snap.empty) {
@@ -116,12 +117,8 @@ async function checkTodayStatus() {
 
 async function updateQueueLabel() {
     const qSnap = await db.collection("settings").doc("queue").get();
-    if (qSnap.exists) {
-        const remaining = qSnap.data().list.length;
-        document.getElementById("queueStatus").innerText = `เหลือทรัพย์อีก ${remaining} รายการก่อนเริ่มสุ่มรอบใหม่`;
-    } else {
-        document.getElementById("queueStatus").innerText = `พร้อมเริ่มสุ่มรอบแรก (26 รายการ)`;
-    }
+    const count = qSnap.exists ? qSnap.data().list.length : allAssets.length;
+    document.getElementById("queueStatus").innerText = `เหลือทรัพย์ที่ยังไม่ได้สุ่ม ${count} รายการ`;
 }
 
 function showInputArea(d) {
@@ -133,32 +130,46 @@ function showInputArea(d) {
     document.getElementById("su_m_num").value = d.su.m.num || ""; document.getElementById("su_n_num").value = d.su.n.num || ""; document.getElementById("su_e_num").value = d.su.e.num || "";
 }
 
+// ฟังก์ชันดึงรายการทรัพย์ที่ใช้ไปแล้วใน 5 วันล่าสุด
+async function getRecentAssets() {
+    const recentList = new Set();
+    const snap = await db.collection("posts").orderBy("date", "desc").limit(5).get();
+    snap.forEach(doc => {
+        const d = doc.data();
+        recentList.add(d.kw.m.name); recentList.add(d.kw.n.name); recentList.add(d.kw.e.name);
+    });
+    return recentList;
+}
+
 async function startRandom() {
     const dateVal = document.getElementById("date").value;
+    const recentAssets = await getRecentAssets();
     
-    // 1. ดึงคิวมาจาก Firebase
     let qSnap = await db.collection("settings").doc("queue").get();
-    let currentQueue = [];
+    let currentQueue = (qSnap.exists && qSnap.data().list.length >= 3) ? qSnap.data().list : [...allAssets];
 
-    if (!qSnap.exists || qSnap.data().list.length < 3) {
-        // ถ้าคิวหมด หรือเหลือน้อยกว่า 3 ให้รีเซ็ตคิวใหม่จากทรัพย์ทั้งหมด
-        currentQueue = [...allAssets];
-        console.log("รีเซ็ตคิวใหม่");
-    } else {
-        currentQueue = qSnap.data().list;
-    }
-
-    // 2. สุ่ม 3 ทรัพย์จากคิวปัจจุบัน
     let chosen = [];
-    for (let i = 0; i < 3; i++) {
+    let attempts = 0;
+
+    // พยายามสุ่ม 3 ทรัพย์ โดยต้องไม่ซ้ำกับ 5 วันล่าสุด
+    while (chosen.length < 3 && attempts < 100) {
         const idx = Math.floor(Math.random() * currentQueue.length);
-        chosen.push(currentQueue.splice(idx, 1)[0]);
+        const candidate = currentQueue[idx];
+
+        // เงื่อนไข: ต้องไม่ซ้ำกับที่เพิ่งเลือกในรอบนี้ และไม่ซ้ำกับ 5 วันที่ผ่านมา
+        if (!chosen.includes(candidate) && !recentAssets.has(candidate)) {
+            chosen.push(candidate);
+            currentQueue.splice(idx, 1);
+        } else if (recentAssets.has(candidate) && currentQueue.length <= 3) {
+            // กรณีพิเศษ: ถ้าทรัพย์ที่เหลือในคิว ดันไปซ้ำกับ 5 วันล่าสุดทั้งหมด ให้ยอมใช้เพื่อให้ระบบเดินต่อได้
+            chosen.push(candidate);
+            currentQueue.splice(idx, 1);
+        }
+        attempts++;
     }
 
-    // 3. บันทึกคิวที่เหลือกลับลง Firebase
     await db.collection("settings").doc("queue").set({ list: currentQueue });
 
-    // 4. บันทึกข้อมูลการสุ่มของวัน
     const data = {
         date: dateVal,
         kw: { m: {name: chosen[0], num: ""}, n: {name: chosen[1], num: ""}, e: {name: chosen[2], num: ""} },
@@ -181,26 +192,18 @@ async function updateNumbers() {
         "su.n.name": document.getElementById("su_n_name").value, "su.n.num": document.getElementById("su_n_num").value,
         "su.e.name": document.getElementById("su_e_name").value, "su.e.num": document.getElementById("su_e_num").value
     });
-    alert("บันทึกข้อมูลเรียบร้อย!");
+    alert("บันทึกเรียบร้อย!");
     loadHistory();
 }
 
 async function editData(id, date) {
     document.getElementById("date").value = date;
     const doc = await db.collection("posts").doc(id).get();
-    if (doc.exists) {
-        currentDocId = id;
-        showInputArea(doc.data());
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    if (doc.exists) { currentDocId = id; showInputArea(doc.data()); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 }
 
 async function deleteData(id) {
-    if(confirm("ยืนยันการลบข้อมูลนี้หรือไม่?")) {
-        await db.collection("posts").doc(id).delete();
-        loadHistory();
-        checkTodayStatus();
-    }
+    if(confirm("ยืนยันการลบ?")) { await db.collection("posts").doc(id).delete(); loadHistory(); checkTodayStatus(); }
 }
 
 function loadHistory() {
@@ -212,10 +215,7 @@ function loadHistory() {
             <div class="history-card">
                 <div class="h-header">
                     <span class="h-date">🗓 ${d.date}</span>
-                    <div class="h-controls">
-                        <button class="btn-edit" onclick="editData('${doc.id}', '${d.date}')">แก้ไข</button>
-                        <button class="btn-delete" onclick="deleteData('${doc.id}')">ลบ</button>
-                    </div>
+                    <div class="h-controls"><button class="btn-edit" onclick="editData('${doc.id}', '${d.date}')">แก้ไข</button><button class="btn-delete" onclick="deleteData('${doc.id}')">ลบ</button></div>
                 </div>
                 <div class="h-person-section">
                     <span class="h-person-name" style="color:var(--primary)">👤 พี่ขวัญ</span>
