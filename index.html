@@ -1,80 +1,164 @@
-async function startRandom() {
-    const btn = document.querySelector('.btn-random');
-    const dateVal = document.getElementById("date").value;
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Post Record Pro - Fixed Version</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #4A90E2; --secondary: #27ae60; --orange: #f39c12; --danger: #e74c3c; --bg: #F0F2F5; --card-bg: #ffffff; }
+        body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .main-container { width: 100%; max-width: 480px; }
+        .header-section { background: var(--card-bg); padding: 15px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; text-align: center; }
+        input[type="date"] { width: 80%; padding: 10px; border-radius: 10px; border: 2px solid #E0E6ED; font-size: 1rem; text-align: center; }
+        .random-box { background: linear-gradient(135deg, #6e8efb, #a777e3); padding: 25px; border-radius: 20px; color: white; text-align: center; margin-bottom: 15px; }
+        .btn-random { background: white; color: #6e8efb; border: none; padding: 15px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; font-size: 1.1rem; }
+        .input-card { background: var(--card-bg); border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: none; margin-bottom: 20px; }
+        .row { display: grid; grid-template-columns: 60px 1fr 70px; gap: 10px; margin-bottom: 12px; align-items: center; }
+        input[type="text"], input[type="number"] { padding: 10px; border: 1px solid #E0E6ED; border-radius: 10px; width: 100%; box-sizing: border-box; }
+        .btn-save { background: var(--secondary); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+        .history-card { background: white; border-radius: 20px; padding: 15px; margin-bottom: 10px; border-left: 5px solid var(--primary); }
+    </style>
+</head>
+<body>
 
-    if (!dateVal) {
-        alert("กรุณาเลือกวันที่ก่อนครับ");
-        return;
-    }
+<div class="main-container">
+    <div class="header-section">
+        <h2 style="color:var(--primary)">📊 ระบบบันทึกโพสต์</h2>
+        <input id="date" type="date" onchange="checkTodayStatus()">
+    </div>
+
+    <div id="randomBox" class="random-box">
+        <button class="btn-random" onclick="startRandom()">🎲 กดสุ่มทรัพย์เดี๋ยวนี้</button>
+        <p id="queueInfo" style="margin-top:10px; font-size:0.8rem;"></p>
+    </div>
+
+    <div id="inputSection" class="input-card">
+        <h3 style="color:var(--primary); margin-top:0;">👤 พี่ขวัญ</h3>
+        <div class="row"><span>เช้า</span><input id="kw_m_name" type="text" readonly><input id="kw_m_num" type="number"></div>
+        <div class="row"><span>เที่ยง</span><input id="kw_n_name" type="text" readonly><input id="kw_n_num" type="number"></div>
+        <div class="row"><span>เย็น</span><input id="kw_e_name" type="text" readonly><input id="kw_e_num" type="number"></div>
+        <hr>
+        <h3 style="color:var(--orange)">👤 พี่สุ</h3>
+        <div class="row"><span>เช้า</span><input id="su_m_name" type="text" readonly><input id="su_m_num" type="number"></div>
+        <div class="row"><span>เที่ยง</span><input id="su_n_name" type="text" readonly><input id="su_n_num" type="number"></div>
+        <div class="row"><span>เย็น</span><input id="su_e_name" type="text" readonly><input id="su_e_num" type="number"></div>
+        <button class="btn-save" onclick="saveData()">💾 บันทึกจำนวนโพสต์</button>
+    </div>
+
+    <div id="historyList"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI",
+  authDomain: "save-data-92eca.firebaseapp.com",
+  projectId: "save-data-92eca",
+  storageBucket: "save-data-92eca.firebasestorage.app",
+  messagingSenderId: "661096454777",
+  appId: "1:661096454777:web:d8b4297db798e14b76d2a8"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+const allAssets = ["บ้านพี่แดง อรัญนคร3", "แม่ย่าพี่ปลา 14 ไร่", "แม่ย่าพี่ปลา 11 ไร่", "พี่ศรีไพร (คอนสาย)", "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1 (คุณแคท )", "คอนโดชีวาทัย ฮอล์มาร์ค ลาดพร้าว-โชคชัย4(ฝน)", "ที่ดิน หลังอรัญนคร 1 ซ.ประสบโชค", "บ้านพี่หนึ่ง อรัญวิลล์", "ที่ดินราชพัสดุ พี่แอน", "บ้านเอื้อ 214/278", "บ้านเอื้ื้อ 214/381", "บ้านเอื้อ 214/293", "โกดัง 1 ไร่ (พี่แอน)", "คอนโด The Base Park East Sukhumvit 77", "คอนโด Aston", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "แฮปปี้คอนโด", "บ้านทาวน์โฮมพฤกษา9", "BANGKOK HORIZON รามคำแหง", "THE IRIS ศรีนครินทร์ - พระราม 9", "กรี เน่ คอนโดดอนเมือง-สรงประภา เฟส1"];
+
+let currentDocId = null;
+
+async function checkTodayStatus() {
+    const dateVal = document.getElementById("date").value;
+    if(!dateVal) return;
 
     try {
-        btn.disabled = true;
-        btn.innerText = "กำลังประมวลผล...";
-
-        // 1. ดึงทรัพย์ที่ใช้ไปล่าสุด 5 วันมาเก็บไว้ (Blacklist)
-        const recentAssets = new Set();
-        const historySnap = await db.collection("posts").orderBy("date", "desc").limit(10).get();
-        historySnap.forEach(doc => {
-            const d = doc.data();
-            // เก็บชื่อทรัพย์ของทุกคนใน 5 วันล่าสุด
-            if(d.kw) { recentAssets.add(d.kw.m.name); recentAssets.add(d.kw.n.name); recentAssets.add(d.kw.e.name); }
-            if(d.su) { recentAssets.add(d.su.m.name); recentAssets.add(d.su.n.name); recentAssets.add(d.su.e.name); }
-        });
-
-        // 2. ดึงคิวทรัพย์ที่เหลือ
-        let qSnap = await db.collection("settings").doc("queue").get();
-        let currentQueue = (qSnap.exists && qSnap.data().list && qSnap.data().list.length >= 3) 
-                           ? qSnap.data().list 
-                           : [...allAssets];
-
-        let chosen = [];
-        let pool = currentQueue.filter(item => !recentAssets.has(item));
-
-        // 💡 จุดสำคัญ: ถ้า pool ว่าง (แปลว่าทรัพย์ที่เหลือซ้ำกับ 5 วันล่าสุดหมดเลย) 
-        // ให้กลับไปใช้ currentQueue ปกติ เพื่อไม่ให้ปุ่มค้าง
-        if (pool.length < 3) {
-            pool = [...currentQueue];
+        const snap = await db.collection("posts").where("date", "==", dateVal).get();
+        if (!snap.empty) {
+            const doc = snap.docs[0];
+            currentDocId = doc.id;
+            showEditor(doc.data());
+        } else {
+            currentDocId = null;
+            document.getElementById("randomBox").style.display = "block";
+            document.getElementById("inputSection").style.display = "none";
         }
-
-        // 3. เริ่มสุ่มเลือก 3 ทรัพย์
-        for (let i = 0; i < 3; i++) {
-            const idx = Math.floor(Math.random() * pool.length);
-            const item = pool.splice(idx, 1)[0];
-            chosen.push(item);
-            
-            // ลบออกจากคิวหลัก
-            const qIdx = currentQueue.indexOf(item);
-            if (qIdx > -1) currentQueue.splice(qIdx, 1);
-        }
-
-        // 4. บันทึกคิวที่เหลือกลับไป
-        await db.collection("settings").doc("queue").set({ list: currentQueue });
-
-        // 5. บันทึกข้อมูลลงในประวัติ
-        await db.collection("posts").add({
-            date: dateVal,
-            kw: { 
-                m: {name: chosen[0], num: ""}, 
-                n: {name: chosen[1], num: ""}, 
-                e: {name: chosen[2], num: ""} 
-            },
-            su: { 
-                m: {name: chosen[1], num: ""}, 
-                n: {name: chosen[2], num: ""}, 
-                e: {name: chosen[0], num: ""} 
-            },
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        alert("🎲 สุ่มและจองเวลาสำเร็จ!");
-        checkTodayStatus(); 
         loadHistory();
-
-    } catch (error) {
-        console.error("Random Error:", error);
-        alert("เกิดข้อผิดพลาด: " + error.message);
-    } finally {
-        btn.disabled = false;
-        btn.innerText = "🎲 กดสุ่มทรัพย์ (ป้องกันซ้ำ 5 วัน)";
-    }
+    } catch(e) { alert("Error เช็คสถานะ: " + e.message); }
 }
+
+function showEditor(d) {
+    document.getElementById("randomBox").style.display = "none";
+    document.getElementById("inputSection").style.display = "block";
+    document.getElementById("kw_m_name").value = d.kw.m.name; document.getElementById("kw_m_num").value = d.kw.m.num || 0;
+    document.getElementById("kw_n_name").value = d.kw.n.name; document.getElementById("kw_n_num").value = d.kw.n.num || 0;
+    document.getElementById("kw_e_name").value = d.kw.e.name; document.getElementById("kw_e_num").value = d.kw.e.num || 0;
+    document.getElementById("su_m_name").value = d.su.m.name; document.getElementById("su_m_num").value = d.su.m.num || 0;
+    document.getElementById("su_n_name").value = d.su.n.name; document.getElementById("su_n_num").value = d.su.n.num || 0;
+    document.getElementById("su_e_name").value = d.su.e.name; document.getElementById("su_e_num").value = d.su.e.num || 0;
+}
+
+async function startRandom() {
+    const dateVal = document.getElementById("date").value;
+    const btn = document.querySelector(".btn-random");
+    btn.disabled = true; btn.innerText = "กำลังสุ่ม...";
+
+    try {
+        // ดึงคิว
+        let qSnap = await db.collection("settings").doc("queue").get();
+        let q = (qSnap.exists && qSnap.data().list.length >= 3) ? qSnap.data().list : [...allAssets];
+
+        // สุ่ม 3 ตัว
+        let chosen = [];
+        for(let i=0; i<3; i++) {
+            let idx = Math.floor(Math.random() * q.length);
+            chosen.push(q.splice(idx, 1)[0]);
+        }
+
+        // บันทึกคิวที่เหลือ และสร้าง Post ใหม่
+        await db.collection("settings").doc("queue").set({ list: q });
+        const newPost = {
+            date: dateVal,
+            kw: { m:{name:chosen[0], num:0}, n:{name:chosen[1], num:0}, e:{name:chosen[2], num:0} },
+            su: { m:{name:chosen[1], num:0}, n:{name:chosen[2], num:0}, e:{name:chosen[0], num:0} }
+        };
+        await db.collection("posts").add(newPost);
+        
+        checkTodayStatus(); // สั่งให้สลับไปหน้ากรอกทันที
+    } catch(e) { alert("Error ตอนสุ่ม: " + e.message); }
+    finally { btn.disabled = false; btn.innerText = "🎲 กดสุ่มทรัพย์เดี๋ยวนี้"; }
+}
+
+async function saveData() {
+    if(!currentDocId) return;
+    try {
+        await db.collection("posts").doc(currentDocId).update({
+            "kw.m.num": Number(document.getElementById("kw_m_num").value),
+            "kw.n.num": Number(document.getElementById("kw_n_num").value),
+            "kw.e.num": Number(document.getElementById("kw_e_num").value),
+            "su.m.num": Number(document.getElementById("su_m_num").value),
+            "su.n.num": Number(document.getElementById("su_n_num").value),
+            "su.e.num": Number(document.getElementById("su_e_num").value)
+        });
+        alert("บันทึกสำเร็จ!");
+        loadHistory();
+    } catch(e) { alert("บันทึกไม่ได้: " + e.message); }
+}
+
+async function loadHistory() {
+    const snap = await db.collection("posts").limit(10).get();
+    let html = "";
+    snap.forEach(doc => {
+        const d = doc.data();
+        html += `<div class="history-card"><b>🗓 ${d.date}</b><br>พี่ขวัญ: ${d.kw.m.num+d.kw.n.num+d.kw.e.num} โพสต์ | พี่สุ: ${d.su.m.num+d.su.n.num+d.su.e.num} โพสต์</div>`;
+    });
+    document.getElementById("historyList").innerHTML = html;
+}
+
+window.onload = () => {
+    document.getElementById("date").value = new Date().toISOString().split('T')[0];
+    checkTodayStatus();
+};
+</script>
+</body>
+</html>
