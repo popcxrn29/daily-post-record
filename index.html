@@ -9,25 +9,48 @@ async function startRandom() {
 
     try {
         btn.disabled = true;
-        btn.innerText = "กำลังสุ่ม...";
+        btn.innerText = "กำลังประมวลผล...";
 
-        // 1. ดึงคิวทรัพย์ที่เหลือ
+        // 1. ดึงทรัพย์ที่ใช้ไปล่าสุด 5 วันมาเก็บไว้ (Blacklist)
+        const recentAssets = new Set();
+        const historySnap = await db.collection("posts").orderBy("date", "desc").limit(10).get();
+        historySnap.forEach(doc => {
+            const d = doc.data();
+            // เก็บชื่อทรัพย์ของทุกคนใน 5 วันล่าสุด
+            if(d.kw) { recentAssets.add(d.kw.m.name); recentAssets.add(d.kw.n.name); recentAssets.add(d.kw.e.name); }
+            if(d.su) { recentAssets.add(d.su.m.name); recentAssets.add(d.su.n.name); recentAssets.add(d.su.e.name); }
+        });
+
+        // 2. ดึงคิวทรัพย์ที่เหลือ
         let qSnap = await db.collection("settings").doc("queue").get();
         let currentQueue = (qSnap.exists && qSnap.data().list && qSnap.data().list.length >= 3) 
                            ? qSnap.data().list 
                            : [...allAssets];
 
-        // 2. สุ่มเลือก 3 ทรัพย์ (แบบ Simple Random เพื่อลดการค้าง)
         let chosen = [];
-        for (let i = 0; i < 3; i++) {
-            let idx = Math.floor(Math.random() * currentQueue.length);
-            chosen.push(currentQueue.splice(idx, 1)[0]);
+        let pool = currentQueue.filter(item => !recentAssets.has(item));
+
+        // 💡 จุดสำคัญ: ถ้า pool ว่าง (แปลว่าทรัพย์ที่เหลือซ้ำกับ 5 วันล่าสุดหมดเลย) 
+        // ให้กลับไปใช้ currentQueue ปกติ เพื่อไม่ให้ปุ่มค้าง
+        if (pool.length < 3) {
+            pool = [...currentQueue];
         }
 
-        // 3. บันทึกคิวที่เหลือกลับไป
+        // 3. เริ่มสุ่มเลือก 3 ทรัพย์
+        for (let i = 0; i < 3; i++) {
+            const idx = Math.floor(Math.random() * pool.length);
+            const item = pool.splice(idx, 1)[0];
+            chosen.push(item);
+            
+            // ลบออกจากคิวหลัก
+            const qIdx = currentQueue.indexOf(item);
+            if (qIdx > -1) currentQueue.splice(qIdx, 1);
+        }
+
+        // 4. บันทึกคิวที่เหลือกลับไป
         await db.collection("settings").doc("queue").set({ list: currentQueue });
 
-        // 4. บันทึกข้อมูลลงในประวัติ
+        // 5. บันทึกข้อมูลลงในประวัติ
         await db.collection("posts").add({
             date: dateVal,
             kw: { 
@@ -43,15 +66,15 @@ async function startRandom() {
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        alert("สุ่มและบันทึกข้อมูลสำเร็จ!");
-        // รีโหลดหน้าจอเพื่อแสดงผล
-        location.reload(); 
+        alert("🎲 สุ่มและจองเวลาสำเร็จ!");
+        checkTodayStatus(); 
+        loadHistory();
 
     } catch (error) {
+        console.error("Random Error:", error);
         alert("เกิดข้อผิดพลาด: " + error.message);
-        console.error(error);
     } finally {
         btn.disabled = false;
-        btn.innerText = "🎲 กดสุ่มทรัพย์";
+        btn.innerText = "🎲 กดสุ่มทรัพย์ (ป้องกันซ้ำ 5 วัน)";
     }
 }
