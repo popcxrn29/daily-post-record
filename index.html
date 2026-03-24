@@ -1,71 +1,154 @@
-async function startRandom() {
-    const btn = document.querySelector('.btn-random');
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ระบบบันทึกโพสต์ (ละเอียด)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #4A90E2; --secondary: #27ae60; --orange: #f39c12; --danger: #e74c3c; --bg: #F0F2F5; --card-bg: #ffffff; }
+        body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .main-container { width: 100%; max-width: 480px; }
+        .header-section { background: var(--card-bg); padding: 15px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; text-align: center; }
+        input[type="date"] { width: 80%; padding: 10px; border-radius: 10px; border: 2px solid #E0E6ED; font-size: 1rem; text-align: center; }
+        .random-box { background: linear-gradient(135deg, #6e8efb, #a777e3); padding: 25px; border-radius: 20px; color: white; text-align: center; margin-bottom: 15px; }
+        .btn-random { background: white; color: #6e8efb; border: none; padding: 15px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; font-size: 1.1rem; }
+        .input-card { background: var(--card-bg); border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: none; margin-bottom: 20px; }
+        .row { display: grid; grid-template-columns: 55px 1fr 65px; gap: 8px; margin-bottom: 10px; align-items: center; }
+        input[readonly] { background-color: #f9f9f9; border: 1px solid #eee; padding: 8px; border-radius: 8px; font-size: 0.85rem; }
+        input[type="number"] { padding: 8px; border: 1px solid #E0E6ED; border-radius: 8px; text-align: center; }
+        .btn-save { background: var(--secondary); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+        .history-card { background: white; border-radius: 20px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .h-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; margin-bottom: 10px; }
+        .h-item { display: grid; grid-template-columns: 50px 1fr 40px; font-size: 0.85rem; padding: 4px 0; border-bottom: 1px solid #fafafa; }
+        .btn-edit { color: var(--primary); background:none; border:none; font-weight:bold; cursor:pointer; font-size: 0.8rem; }
+        .btn-delete { color: var(--danger); background:none; border:none; cursor:pointer; font-size: 0.8rem; margin-left:10px; }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="header-section">
+        <h2 style="color:var(--primary); margin:0 0 10px 0;">📊 บันทึกยอดโพสต์</h2>
+        <input id="date" type="date" onchange="checkTodayStatus()">
+    </div>
+
+    <div id="randomBox" class="random-box">
+        <button class="btn-random" onclick="startRandom()">🎲 สุ่มทรัพย์ตัวที่ 3 (ล็อค 2 ทรัพย์หลัก)</button>
+    </div>
+
+    <div id="inputSection" class="input-card">
+        <h3 style="color:var(--primary); margin:0 0 10px 0;">👤 พี่ขวัญ</h3>
+        <div class="row"><span>เช้า</span><input id="kw_m_name" readonly><input id="kw_m_num" type="number"></div>
+        <div class="row"><span>เที่ยง</span><input id="kw_n_name" readonly><input id="kw_n_num" type="number"></div>
+        <div class="row"><span>เย็น</span><input id="kw_e_name" readonly><input id="kw_e_num" type="number"></div>
+        <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
+        <h3 style="color:var(--orange); margin:0 0 10px 0;">👤 พี่สุ</h3>
+        <div class="row"><span>เช้า</span><input id="su_m_name" readonly><input id="su_m_num" type="number"></div>
+        <div class="row"><span>เที่ยง</span><input id="su_n_name" readonly><input id="su_n_num" type="number"></div>
+        <div class="row"><span>เย็น</span><input id="su_e_name" readonly><input id="su_e_num" type="number"></div>
+        <button class="btn-save" onclick="saveData()">💾 บันทึกจำนวนโพสต์</button>
+    </div>
+
+    <div id="historyList"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI",
+  authDomain: "save-data-92eca.firebaseapp.com",
+  projectId: "save-data-92eca",
+  storageBucket: "save-data-92eca.firebasestorage.app",
+  messagingSenderId: "661096454777",
+  appId: "1:661096454777:web:d8b4297db798e14b76d2a8"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+const allAssets = ["บ้านพี่แดง อรัญนคร3", "แม่ย่าพี่ปลา 14 ไร่", "แม่ย่าพี่ปลา 11 ไร่", "พี่ศรีไพร (คอนสาย)", "พี่แอน ห้องเช่า 3 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "คอนโดชีวาทัย", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์", "ที่ดินราชพัสดุ พี่แอน", "บ้านเอื้อ 214/278", "บ้านเอื้ื้อ 214/381", "บ้านเอื้อ 214/293", "โกดัง 1 ไร่", "คอนโด Aston", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "แฮปปี้คอนโด", "บ้านทาวน์โฮมพฤกษา9"];
+
+let currentDocId = null;
+
+async function checkTodayStatus() {
     const dateVal = document.getElementById("date").value;
-
-    if (!dateVal) {
-        alert("กรุณาเลือกวันที่ก่อนครับ");
-        return;
+    if(!dateVal) return;
+    const snap = await db.collection("posts").where("date", "==", dateVal).get();
+    
+    if (!snap.empty) {
+        currentDocId = snap.docs[0].id;
+        document.getElementById("randomBox").style.display = "none";
+        document.getElementById("inputSection").style.display = "block";
+        const d = snap.docs[0].data();
+        document.getElementById("kw_m_name").value = d.kw.m.name; document.getElementById("kw_m_num").value = d.kw.m.num || 0;
+        document.getElementById("kw_n_name").value = d.kw.n.name; document.getElementById("kw_n_num").value = d.kw.n.num || 0;
+        document.getElementById("kw_e_name").value = d.kw.e.name; document.getElementById("kw_e_num").value = d.kw.e.num || 0;
+        document.getElementById("su_m_name").value = d.su.m.name; document.getElementById("su_m_num").value = d.su.m.num || 0;
+        document.getElementById("su_n_name").value = d.su.n.name; document.getElementById("su_n_num").value = d.su.n.num || 0;
+        document.getElementById("su_e_name").value = d.su.e.name; document.getElementById("su_e_num").value = d.su.e.num || 0;
+    } else {
+        currentDocId = null;
+        document.getElementById("randomBox").style.display = "block";
+        document.getElementById("inputSection").style.display = "none";
     }
-
-    try {
-        btn.disabled = true;
-        btn.innerText = "กำลังจัดเตรียมทรัพย์...";
-
-        // 1. กำหนดทรัพย์หลักที่ต้องมีทุกวัน
-        const fixAssets = [
-            "บ้านเอื้อ 214/278", // หรือสุ่มจากกลุ่มบ้านเอื้อก็ได้
-            "แฮปปี้คอนโด"
-        ];
-
-        // 2. ดึงคิวทรัพย์ทั้งหมด เพื่อหาทรัพย์ตัวที่ 3
-        let qSnap = await db.collection("settings").doc("queue").get();
-        let currentQueue = (qSnap.exists && qSnap.data().list.length > 0) 
-                           ? qSnap.data().list 
-                           : [...allAssets];
-
-        // กรองเอาทรัพย์หลักออกก่อนเพื่อไม่ให้สุ่มตัวที่ 3 มาซ้ำกับตัวที่ล็อคไว้
-        let availablePool = currentQueue.filter(item => !fixAssets.includes(item));
-        
-        // ถ้าคิวหมด ให้รีเซ็ตใหม่
-        if (availablePool.length === 0) {
-            availablePool = allAssets.filter(item => !fixAssets.includes(item));
-        }
-
-        // 3. สุ่มทรัพย์ตัวที่ 3 มา 1 อย่าง
-        let randomIndex = Math.floor(Math.random() * availablePool.length);
-        let thirdAsset = availablePool.splice(randomIndex, 1)[0];
-
-        // รวมเป็น 3 ทรัพย์ (2 ตัวล็อค + 1 ตัวสุ่ม)
-        let chosen = [fixAssets[0], fixAssets[1], thirdAsset];
-
-        // 4. อัปเดตคิว (เอาเฉพาะตัวที่ถูกสุ่มตัวที่ 3 ออกจากคิว)
-        let newQueue = currentQueue.filter(item => item !== thirdAsset);
-        await db.collection("settings").doc("queue").set({ list: newQueue });
-
-        // 5. บันทึกข้อมูลลง Firebase
-        await db.collection("posts").add({
-            date: dateVal,
-            kw: { 
-                m: {name: chosen[0], num: 0}, 
-                n: {name: chosen[1], num: 0}, 
-                e: {name: chosen[2], num: 0} 
-            },
-            su: { 
-                m: {name: chosen[1], num: 0}, 
-                n: {name: chosen[2], num: 0}, 
-                e: {name: chosen[0], num: 0} 
-            },
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        alert("🎲 สุ่มทรัพย์ตัวที่ 3 สำเร็จ! (ล็อคบ้านเอื้อ+Happy เรียบร้อย)");
-        checkTodayStatus(); 
-        loadHistory();
-
-    } catch (error) {
-        alert("เกิดข้อผิดพลาด: " + error.message);
-    } finally {
-        btn.disabled = false;
-        btn.innerText = "🎲 กดสุ่มทรัพย์ (ตัวที่ 3)";
-    }
+    loadHistory();
 }
+
+async function startRandom() {
+    const dateVal = document.getElementById("date").value;
+    if(!dateVal) return alert("เลือกวันที่ก่อน!");
+    
+    const fixed = ["บ้านเอื้อ 214/278", "แฮปปี้คอนโด"];
+    const pool = allAssets.filter(a => !fixed.includes(a));
+    const third = pool[Math.floor(Math.random() * pool.length)];
+    const chosen = [fixed[0], fixed[1], third];
+
+    await db.collection("posts").add({
+        date: dateVal,
+        kw: { m:{name:chosen[0], num:0}, n:{name:chosen[1], num:0}, e:{name:chosen[2], num:0} },
+        su: { m:{name:chosen[1], num:0}, n:{name:chosen[2], num:0}, e:{name:chosen[0], num:0} }
+    });
+    checkTodayStatus();
+}
+
+async function saveData() {
+    await db.collection("posts").doc(currentDocId).update({
+        "kw.m.num": Number(document.getElementById("kw_m_num").value), "kw.n.num": Number(document.getElementById("kw_n_num").value), "kw.e.num": Number(document.getElementById("kw_e_num").value),
+        "su.m.num": Number(document.getElementById("su_m_num").value), "su.n.num": Number(document.getElementById("su_n_num").value), "su.e.num": Number(document.getElementById("su_e_num").value)
+    });
+    alert("บันทึกสำเร็จ!"); loadHistory();
+}
+
+async function loadHistory() {
+    const snap = await db.collection("posts").orderBy("date", "desc").limit(10).get();
+    let html = "";
+    snap.forEach(doc => {
+        const d = doc.data();
+        html += `<div class="history-card">
+            <div class="h-header"><span style="font-weight:bold; color:var(--primary);">🗓 ${d.date}</span>
+            <div><button class="btn-edit" onclick="setEdit('${d.date}')">แก้ไข</button><button class="btn-delete" onclick="delDoc('${doc.id}')">ลบ</button></div></div>
+            <div style="color:var(--primary); font-size:0.85rem; font-weight:bold;">👤 พี่ขวัญ</div>
+            <div class="h-item"><span>เช้า</span><span>${d.kw.m.name}</span><span style="text-align:right; font-weight:bold;">${d.kw.m.num}</span></div>
+            <div class="h-item"><span>เที่ยง</span><span>${d.kw.n.name}</span><span style="text-align:right; font-weight:bold;">${d.kw.n.num}</span></div>
+            <div class="h-item"><span>เย็น</span><span>${d.kw.e.name}</span><span style="text-align:right; font-weight:bold;">${d.kw.e.num}</span></div>
+            <div style="color:var(--orange); font-size:0.85rem; font-weight:bold; margin-top:8px;">👤 พี่สุ</div>
+            <div class="h-item"><span>เช้า</span><span>${d.su.m.name}</span><span style="text-align:right; font-weight:bold;">${d.su.m.num}</span></div>
+            <div class="h-item"><span>เที่ยง</span><span>${d.su.n.name}</span><span style="text-align:right; font-weight:bold;">${d.su.n.num}</span></div>
+            <div class="h-item"><span>เย็น</span><span>${d.su.e.name}</span><span style="text-align:right; font-weight:bold;">${d.su.e.num}</span></div>
+        </div>`;
+    });
+    document.getElementById("historyList").innerHTML = html;
+}
+
+function setEdit(date) { document.getElementById("date").value = date; checkTodayStatus(); window.scrollTo(0,0); }
+async function delDoc(id) { if(confirm("ลบประวัตินี้?")) { await db.collection("posts").doc(id).delete(); loadHistory(); checkTodayStatus(); } }
+
+window.onload = () => {
+    document.getElementById("date").value = new Date().toISOString().split('T')[0];
+    checkTodayStatus();
+};
+</script>
+</body>
+</html>
