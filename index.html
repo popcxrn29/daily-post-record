@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ระบบบันทึกโพสต์ (อัปเดต 7 เม.ย.)</title>
+    <title>ระบบบันทึกโพสต์ (ล็อคพิเศษ)</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #4A90E2; --secondary: #27ae60; --orange: #f39c12; --danger: #e74c3c; --bg: #F0F2F5; --card-bg: #ffffff; }
@@ -34,7 +34,7 @@
     </div>
 
     <div id="randomBox" class="random-box">
-        <button class="btn-random" onclick="startRandom()">🎲 สุ่มทรัพย์ (ล็อคบ้านเอื้อทุกวัน)</button>
+        <button class="btn-random" onclick="startRandom()">🎲 กดสุ่มเพื่อเริ่มบันทึก</button>
     </div>
 
     <div id="inputSection" class="input-card">
@@ -45,7 +45,7 @@
         <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
         <h3 style="color:var(--orange); margin:0 0 10px 0;">👤 พี่สุ</h3>
         <div class="row"><span>เช้า</span><input id="su_m_name" readonly><input id="su_m_num" type="number"></div>
-        <div class="row :nth-child(2)"><span>เที่ยง</span><input id="su_n_name" readonly><input id="su_n_num" type="number"></div>
+        <div class="row"><span>เที่ยง</span><input id="su_n_name" readonly><input id="su_n_num" type="number"></div>
         <div class="row"><span>เย็น</span><input id="su_e_name" readonly><input id="su_e_num" type="number"></div>
         <button class="btn-save" onclick="saveData()">💾 บันทึกจำนวนโพสต์</button>
     </div>
@@ -68,8 +68,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// รายชื่อทรัพย์ (นำ ที่ดินราชพัสดุ และ คอนโด Aston ออกแล้ว)
-const allAssets = ["บ้านพี่แดง อรัญนคร3", "แม่ย่าพี่ปลา 14 ไร่", "แม่ย่าพี่ปลา 11 ไร่", "พี่ศรีไพร (คอนสาย)", "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "คอนโดชีวาทัย ฮอล์มาร์ค", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์", "บ้านเอื้อ 214/278", "บ้านเอื้ื้อ 214/381", "บ้านเอื้อ 214/293", "โกดัง 1 ไร่", "คอนโด The Base Park East", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง"];
+const allAssets = ["บ้านพี่แดง อรัญนคร3", "แม่ย่าพี่ปลา 14 ไร่", "แม่ย่าพี่ปลา 11 ไร่", "พี่ศรีไพร (คอนสาย)", "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "คอนโดชีวาทัย ฮอล์มาร์ค", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์", "ที่ดินราชพัสดุ พี่แอน", "บ้านเอื้อ 214/278", "บ้านเอื้ื้อ 214/381", "บ้านเอื้อ 214/293", "โกดัง 1 ไร่", "คอนโด The Base Park East", "คอนโด Aston", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง"];
 
 let currentDocId = null;
 
@@ -101,15 +100,21 @@ async function startRandom() {
     const dateVal = document.getElementById("date").value;
     if(!dateVal) return alert("เลือกวันที่ก่อน!");
     
-    const fixed = ["บ้านเอื้อ 214/278"];
-    let pool = allAssets.filter(a => !fixed.includes(a));
-    let chosenRandom = [];
-    for(let i=0; i<2; i++) {
-        const idx = Math.floor(Math.random() * pool.length);
-        chosenRandom.push(pool.splice(idx, 1)[0]);
-    }
+    let finalAssets = [];
 
-    const finalAssets = [fixed[0], chosenRandom[0], chosenRandom[1]];
+    // --- ล็อคพิเศษวันที่ 7 เมษายน 2569 (2026-04-07) ---
+    if (dateVal === "2026-04-07") {
+        finalAssets = ["บ้านเอื้อ 214/278", "บ้านพรสิริ ขอนแก่น", "BANGKOK HORIZON รามคำแหง"];
+    } else {
+        const fixed = ["บ้านเอื้อ 214/278"];
+        let pool = allAssets.filter(a => !fixed.includes(a));
+        let chosenRandom = [];
+        for(let i=0; i<2; i++) {
+            const idx = Math.floor(Math.random() * pool.length);
+            chosenRandom.push(pool.splice(idx, 1)[0]);
+        }
+        finalAssets = [fixed[0], chosenRandom[0], chosenRandom[1]];
+    }
 
     await db.collection("posts").add({
         date: dateVal,
@@ -153,8 +158,7 @@ function setEdit(date) { document.getElementById("date").value = date; checkToda
 async function delDoc(id) { if(confirm("ลบประวัตินี้?")) { await db.collection("posts").doc(id).delete(); loadHistory(); checkTodayStatus(); } }
 
 window.onload = () => {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById("date").value = today;
+    document.getElementById("date").value = new Date().toISOString().split('T')[0];
     checkTodayStatus();
 };
 </script>
