@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ระบบบันทึกโพสต์ V.Final Logic</title>
+    <title>ระบบบันทึกโพสต์ (กรีเน่ยังอยู่)</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #4A90E2; --secondary: #27ae60; --pink: #FF69B4; --orange: #f39c12; --danger: #e74c3c; --bg: #F0F2F5; --card-bg: #ffffff; }
@@ -11,20 +11,16 @@
         .main-container { width: 100%; max-width: 480px; }
         .card { background: var(--card-bg); border-radius: 20px; padding: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; border: 1px solid transparent; }
         input[type="date"] { width: 80%; padding: 10px; border-radius: 10px; border: 2px solid #E0E6ED; font-size: 1rem; text-align: center; outline: none; }
-        
         .dashboard { background: white; border: 2px solid var(--pink); color: #333; }
         .dash-grid { display: grid; grid-template-columns: 1fr auto; gap: 5px; font-size: 0.82rem; margin-top: 10px; }
         .dash-item { border-bottom: 1px solid #ffe4f1; padding: 4px 0; }
         .dash-title { color: var(--pink); font-weight: bold; font-size: 1rem; margin: 0; }
-
         .random-box { background: linear-gradient(135deg, #6e8efb, #a777e3); padding: 25px; border-radius: 20px; color: white; text-align: center; margin-bottom: 15px; }
         .btn-random { background: white; color: #6e8efb; border: none; padding: 15px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; font-size: 1.1rem; }
-        
         .row { display: grid; grid-template-columns: 55px 1fr 65px; gap: 8px; margin-bottom: 8px; align-items: center; }
         input[readonly] { background-color: #f9f9f9; border: 1px solid #eee; padding: 8px; border-radius: 8px; font-size: 0.8rem; }
         input[type="number"] { padding: 8px; border: 1px solid #E0E6ED; border-radius: 8px; text-align: center; font-weight: bold; }
         .btn-save { background: var(--secondary); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
-        
         .history-card { background: white; border-radius: 20px; padding: 15px; margin-bottom: 12px; border-left: 5px solid var(--pink); }
         .h-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .h-item { display: grid; grid-template-columns: 45px 1fr 35px; font-size: 0.8rem; padding: 3px 0; border-bottom: 1px solid #f9f9f9; }
@@ -40,7 +36,7 @@
     </div>
 
     <div id="randomBox" class="random-box">
-        <button class="btn-random" onclick="startRandom()">🎲 สุ่มทรัพย์ (บ้านเอื้อ 1 + อื่นๆ 2)</button>
+        <button class="btn-random" onclick="startRandom()">🎲 สุ่มทรัพย์ (บ้านเอื้ออาทร + กรีเน่ + อื่นๆ)</button>
     </div>
 
     <div id="inputSection" class="card" style="display: none;">
@@ -80,7 +76,8 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-const allAssets = ["บ้านพี่แดง อรัญนคร3", "แม่ย่าพี่ปลา 14 ไร่", "แม่ย่าพี่ปลา 11 ไร่", "พี่ศรีไพร (คอนสาย)", "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "คอนโดชีวาทัย ฮอล์มาร์ค", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์", "ที่ดินราชพัสดุ พี่แอน", "บ้านเอื้อ 214/278", "บ้านเอื้ื้อ 214/381", "บ้านเอื้อ 214/293", "โกดัง 1 ไร่", "คอนโด The Base Park East", "คอนโด Aston", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49"];
+// ฐานข้อมูล (นำ กรี เน่ กลับมาแล้ว)
+const allAssets = ["บ้านพี่แดง อรัญนคร3", "แม่ย่าพี่ปลา 14 ไร่", "แม่ย่าพี่ปลา 11 ไร่", "พี่ศรีไพร (คอนสาย)", "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "คอนโดชีวาทัย ฮอล์มาร์ค", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์", "บ้านเอื้ออาทร", "โกดัง 1 ไร่", "คอนโด The Base Park East", "คอนโด Aston", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49"];
 
 let currentDocId = null;
 
@@ -114,9 +111,8 @@ function fillForm(d) {
 async function startRandom() {
     const dateVal = document.getElementById("date").value;
     const currentMonth = dateVal.substring(0, 7);
-    const fixed = "บ้านเอื้อ 214/278";
+    const fixed = "บ้านเอื้ออาทร";
 
-    // 1. ดึงสถิติเดือนนี้
     const monthSnap = await db.collection("posts").where("date", ">=", currentMonth + "-01").get();
     let stats = {}; allAssets.forEach(a => stats[a] = 0);
     monthSnap.forEach(doc => {
@@ -124,7 +120,6 @@ async function startRandom() {
         [d.kw.m.name, d.kw.n.name, d.kw.e.name, d.su.m.name, d.su.n.name, d.su.e.name].forEach(n => { if(stats[n]!==undefined) stats[n]++; });
     });
 
-    // 2. ดึงประวัติ 7 วัน (Blacklist)
     const historySnap = await db.collection("posts").orderBy("date", "desc").limit(7).get();
     let blackList = new Set();
     historySnap.forEach(doc => {
@@ -132,20 +127,18 @@ async function startRandom() {
         [d.kw.m.name, d.kw.n.name, d.kw.e.name, d.su.m.name, d.su.n.name, d.su.e.name].forEach(n => { if(n !== fixed) blackList.add(n); });
     });
 
-    // 3. กรองทรัพย์อื่นๆ (ห้ามเป็นบ้านเอื้อ และ ไม่ซ้ำ 7 วัน)
+    // กรองทรัพย์อื่น (ห้ามเป็นบ้านเอื้อ และไม่ซ้ำ 7 วัน)
     let pool = allAssets.filter(a => a !== fixed && !blackList.has(a));
-    pool.sort((a, b) => stats[a] - stats[b]); // เรียงโพสต์น้อยที่สุดขึ้นก่อน
+    pool.sort((a, b) => stats[a] - stats[b]);
 
-    // 4. สุ่มทรัพย์อื่นมา 2 ตัว
-    let chosenPool = pool.slice(0, 5); // เลือกกลุ่มที่โพสต์น้อยมา 5 ตัวแล้วสุ่ม
+    let chosenPool = pool.slice(0, 5); 
     let final2 = [];
     for(let i=0; i<2; i++) {
         const idx = Math.floor(Math.random() * chosenPool.length);
         final2.push(chosenPool.splice(idx, 1)[0]);
     }
 
-    // 5. ลำดับผลลัพธ์: ล็อคบ้านเอื้อ 1 ที่ อีก 2 ที่เป็นของสุ่ม
-    // ตัวอย่าง: บ้านเอื้อ (เช้า), สุ่ม1 (เที่ยง), สุ่ม2 (เย็น)
+    // จัดชุดให้พี่ขวัญล็อคบ้านเอื้ออาทรที่เช้า | พี่สุสุ่มใหม่หมด
     const assets = [fixed, final2[0], final2[1]];
 
     await db.collection("posts").add({
@@ -191,6 +184,7 @@ async function loadHistory(showAll) {
             <div class="section-title" style="color:var(--orange)">พี่สุ</div>
             <div class="h-item"><span>เช้า</span><span>${d.su.m.name}</span><span style="text-align:right"><b>${d.su.m.num}</b></span></div>
             <div class="h-item"><span>เที่ยง</span><span>${d.su.n.name}</span><span style="text-align:right"><b>${d.su.n.num}</b></span></div>
+            <div class="section-title" style="color:var(--pink); font-size: 0.7rem;">(เย็น-สุ่มซ้ำเพื่อกระจายยอด)</div>
             <div class="h-item"><span>เย็น</span><span>${d.su.e.name}</span><span style="text-align:right"><b>${d.su.e.num}</b></span></div>
         </div>`;
     });
