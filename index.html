@@ -3,67 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ระบบบันทึกโพสต์ + สรุปรายเดือน</title>
+    <title>ระบบบันทึกโพสต์ V.Smart</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #4A90E2; --secondary: #27ae60; --orange: #f39c12; --danger: #e74c3c; --bg: #F0F2F5; --card-bg: #ffffff; }
         body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         .main-container { width: 100%; max-width: 480px; }
-        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        .header-section { text-align: center; }
+        .card { background: var(--card-bg); border-radius: 20px; padding: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; }
         input[type="date"] { width: 80%; padding: 10px; border-radius: 10px; border: 2px solid #E0E6ED; font-size: 1rem; text-align: center; outline: none; }
         
-        /* Dashboard Style */
         .dashboard { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; }
-        .dash-grid { display: grid; grid-template-columns: 1fr auto; gap: 5px; font-size: 0.85rem; margin-top: 10px; }
-        .dash-item { border-bottom: 1px solid rgba(255,255,255,0.1); padding: 5px 0; }
+        .dash-grid { display: grid; grid-template-columns: 1fr auto; gap: 5px; font-size: 0.82rem; margin-top: 10px; }
+        .dash-item { border-bottom: 1px solid rgba(255,255,255,0.1); padding: 4px 0; }
 
         .random-box { background: linear-gradient(135deg, #6e8efb, #a777e3); padding: 25px; border-radius: 20px; color: white; text-align: center; margin-bottom: 15px; }
         .btn-random { background: white; color: #6e8efb; border: none; padding: 15px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; font-size: 1.1rem; }
         
-        .row { display: grid; grid-template-columns: 55px 1fr 65px; gap: 8px; margin-bottom: 10px; align-items: center; }
-        input[readonly] { background-color: #f9f9f9; border: 1px solid #eee; padding: 8px; border-radius: 8px; font-size: 0.85rem; }
+        .row { display: grid; grid-template-columns: 55px 1fr 65px; gap: 8px; margin-bottom: 8px; align-items: center; }
+        input[readonly] { background-color: #f9f9f9; border: 1px solid #eee; padding: 8px; border-radius: 8px; font-size: 0.8rem; }
         input[type="number"] { padding: 8px; border: 1px solid #E0E6ED; border-radius: 8px; text-align: center; font-weight: bold; }
         .btn-save { background: var(--secondary); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
         
-        .history-card { background: white; border-radius: 20px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .h-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; margin-bottom: 10px; }
-        .h-item { display: grid; grid-template-columns: 50px 1fr 40px; font-size: 0.85rem; padding: 4px 0; }
+        .history-card { background: white; border-radius: 20px; padding: 15px; margin-bottom: 12px; border-left: 5px solid var(--primary); }
+        .h-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .h-item { display: grid; grid-template-columns: 45px 1fr 35px; font-size: 0.8rem; padding: 3px 0; border-bottom: 1px solid #f9f9f9; }
+        .section-title { font-size: 0.85rem; font-weight: bold; margin-top: 5px; color: #555; }
     </style>
 </head>
 <body>
 
 <div class="main-container">
-    <div class="card header-section">
+    <div class="card" style="text-align:center">
         <h2 style="color:var(--primary); margin:0 0 10px 0;">📊 บันทึกยอดโพสต์</h2>
         <input id="date" type="date" onchange="checkTodayStatus()">
     </div>
 
     <div id="dashCard" class="card dashboard">
-        <h3 style="margin: 0; font-size: 1.1rem;">📈 สรุปยอดเดือนนี้</h3>
-        <div id="dashContent" class="dash-grid">
-            <div class="dash-item">กำลังคำนวณ...</div>
-        </div>
+        <h3 style="margin: 0; font-size: 1rem;">📈 สถิติทรัพย์เดือนนี้ (โพสต์น้อยที่สุดจะถูกสุ่มก่อน)</h3>
+        <div id="dashContent" class="dash-grid"></div>
     </div>
 
     <div id="randomBox" class="random-box">
-        <button class="btn-random" onclick="startRandom()">🎲 สุ่มทรัพย์ (ไม่ซ้ำ 7 วัน)</button>
+        <button class="btn-random" onclick="startRandom()">🎲 สุ่มทรัพย์ที่โพสต์น้อย</button>
     </div>
 
     <div id="inputSection" class="card" style="display: none;">
-        <h3 style="color:var(--primary); margin:0 0 10px 0;">👤 พี่ขวัญ</h3>
+        <div class="section-title" style="color:var(--primary)">👤 พี่ขวัญ</div>
         <div class="row"><span>เช้า</span><input id="kw_m_name" readonly><input id="kw_m_num" type="number"></div>
         <div class="row"><span>เที่ยง</span><input id="kw_n_name" readonly><input id="kw_n_num" type="number"></div>
         <div class="row"><span>เย็น</span><input id="kw_e_name" readonly><input id="kw_e_num" type="number"></div>
-        <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
-        <h3 style="color:var(--orange); margin:0 0 10px 0;">👤 พี่สุ</h3>
+        <hr style="border:0; border-top:1px solid #eee; margin:10px 0;">
+        <div class="section-title" style="color:var(--orange)">👤 พี่สุ</div>
         <div class="row"><span>เช้า</span><input id="su_m_name" readonly><input id="su_m_num" type="number"></div>
         <div class="row"><span>เที่ยง</span><input id="su_n_name" readonly><input id="su_n_num" type="number"></div>
         <div class="row"><span>เย็น</span><input id="su_e_name" readonly><input id="su_e_num" type="number"></div>
         <button class="btn-save" onclick="saveData()">💾 บันทึกจำนวนโพสต์</button>
     </div>
 
+    <h3 id="historyTitle" style="color:#555; margin-left: 10px;">📋 ประวัติเดือนนี้</h3>
     <div id="historyList"></div>
+    <button id="loadAllBtn" style="width:100%; padding:15px; background:#ddd; border:none; border-radius:15px; color:#444; font-weight:bold; cursor:pointer; margin-bottom:50px;" onclick="loadHistory(true)">📜 ดูประวัติย้อนหลังทั้งหมด</button>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -89,56 +88,129 @@ async function checkTodayStatus() {
     const dateVal = document.getElementById("date").value;
     if(!dateVal) return;
     const snap = await db.collection("posts").where("date", "==", dateVal).get();
-    
     if (!snap.empty) {
         currentDocId = snap.docs[0].id;
         document.getElementById("randomBox").style.display = "none";
         document.getElementById("inputSection").style.display = "block";
-        const d = snap.docs[0].data();
-        document.getElementById("kw_m_name").value = d.kw.m.name; document.getElementById("kw_m_num").value = d.kw.m.num || 0;
-        document.getElementById("kw_n_name").value = d.kw.n.name; document.getElementById("kw_n_num").value = d.kw.n.num || 0;
-        document.getElementById("kw_e_name").value = d.kw.e.name; document.getElementById("kw_e_num").value = d.kw.e.num || 0;
-        document.getElementById("su_m_name").value = d.su.m.name; document.getElementById("su_m_num").value = d.su.m.num || 0;
-        document.getElementById("su_n_name").value = d.su.n.name; document.getElementById("su_n_num").value = d.su.n.num || 0;
-        document.getElementById("su_e_name").value = d.su.e.name; document.getElementById("su_e_num").value = d.su.e.num || 0;
+        fillForm(snap.docs[0].data());
     } else {
         currentDocId = null;
         document.getElementById("randomBox").style.display = "block";
         document.getElementById("inputSection").style.display = "none";
     }
-    loadHistory();
     updateDashboard();
+    loadHistory(false);
+}
+
+function fillForm(d) {
+    document.getElementById("kw_m_name").value = d.kw.m.name; document.getElementById("kw_m_num").value = d.kw.m.num || 0;
+    document.getElementById("kw_n_name").value = d.kw.n.name; document.getElementById("kw_n_num").value = d.kw.n.num || 0;
+    document.getElementById("kw_e_name").value = d.kw.e.name; document.getElementById("kw_e_num").value = d.kw.e.num || 0;
+    document.getElementById("su_m_name").value = d.su.m.name; document.getElementById("su_m_num").value = d.su.m.num || 0;
+    document.getElementById("su_n_name").value = d.su.n.name; document.getElementById("su_n_num").value = d.su.n.num || 0;
+    document.getElementById("su_e_name").value = d.su.e.name; document.getElementById("su_e_num").value = d.su.e.num || 0;
 }
 
 async function startRandom() {
     const dateVal = document.getElementById("date").value;
-    let finalAssets = [];
+    if(!dateVal) return;
+    const currentMonth = dateVal.substring(0, 7);
+    
+    // 1. ล็อคพิเศษ 7 เมษา
     if (dateVal === "2026-04-07") {
-        finalAssets = ["บ้านเอื้อ 214/278", "บ้านพรสิริ ขอนแก่น", "BANGKOK HORIZON รามคำแหง"];
-    } else {
-        const fixed = "บ้านเอื้อ 214/278";
-        const historySnap = await db.collection("posts").orderBy("date", "desc").limit(7).get();
-        let usedAssets = new Set();
-        historySnap.forEach(doc => {
-            const data = doc.data();
-            [data.kw.m.name, data.kw.n.name, data.kw.e.name].forEach(name => { if(name !== fixed) usedAssets.add(name); });
-        });
-        let pool = allAssets.filter(asset => asset !== fixed && !usedAssets.has(asset));
-        if (pool.length < 2) pool = allAssets.filter(asset => asset !== fixed);
-        let chosenRandom = [];
-        for(let i=0; i<2; i++) {
-            const idx = Math.floor(Math.random() * pool.length);
-            chosenRandom.push(pool.splice(idx, 1)[0]);
-        }
-        finalAssets = [fixed, chosenRandom[0], chosenRandom[1]];
+        saveRandom(dateVal, ["บ้านเอื้อ 214/278", "บ้านพรสิริ ขอนแก่น", "BANGKOK HORIZON รามคำแหง"]);
+        return;
     }
+
+    // 2. ดึงสถิติเดือนนี้เพื่อนับยอดโพสต์แต่ละทรัพย์
+    const monthSnap = await db.collection("posts").where("date", ">=", currentMonth + "-01").get();
+    let stats = {};
+    allAssets.forEach(a => stats[a] = 0);
+    monthSnap.forEach(doc => {
+        const d = doc.data();
+        [d.kw.m.name, d.kw.n.name, d.kw.e.name].forEach(n => stats[n]++);
+    });
+
+    // 3. ดึงประวัติ 7 วันล่าสุดเพื่อคัดออก (ไม่ซ้ำ 7 วัน)
+    const historySnap = await db.collection("posts").orderBy("date", "desc").limit(7).get();
+    let usedIn7Days = new Set();
+    historySnap.forEach(doc => {
+        const d = doc.data();
+        [d.kw.m.name, d.kw.n.name, d.kw.e.name].forEach(n => { if(n !== "บ้านเอื้อ 214/278") usedIn7Days.add(n); });
+    });
+
+    // 4. กรองทรัพย์ที่สุ่มได้ (ไม่ใช่บ้านเอื้อ และ ไม่ซ้ำ 7 วัน)
+    let pool = allAssets.filter(a => a !== "บ้านเอื้อ 214/278" && !usedIn7Days.has(a));
+    
+    // 5. เรียงลำดับ pool ตามจำนวนที่โพสต์ไปแล้วในเดือนนี้ (น้อยไปมาก)
+    pool.sort((a, b) => stats[a] - stats[b]);
+
+    // เลือก 2 ทรัพย์ที่โพสต์น้อยที่สุดจาก pool (ถ้า pool เหลือตัวเดียวให้ใช้ตัวที่มีทั้งหมด)
+    let chosen = pool.slice(0, 5); // หยิบกลุ่มที่น้อยที่สุดมา 5 ตัวแล้วสุ่มในกลุ่มนั้นอีกทีเพื่อความไม่จำเจ
+    let final2 = [];
+    for(let i=0; i<2; i++) {
+        const idx = Math.floor(Math.random() * chosen.length);
+        final2.push(chosen.splice(idx, 1)[0]);
+    }
+
+    saveRandom(dateVal, ["บ้านเอื้อ 214/278", final2[0], final2[1]]);
+}
+
+async function saveRandom(date, assets) {
     await db.collection("posts").add({
-        date: dateVal,
-        kw: { m:{name:finalAssets[0], num:0}, n:{name:finalAssets[1], num:0}, e:{name:finalAssets[2], num:0} },
-        su: { m:{name:finalAssets[1], num:0}, n:{name:finalAssets[2], num:0}, e:{name:finalAssets[0], num:0} },
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        date: date,
+        kw: { m:{name:assets[0], num:0}, n:{name:assets[1], num:0}, e:{name:assets[2], num:0} },
+        su: { m:{name:assets[1], num:0}, n:{name:assets[2], num:0}, e:{name:assets[0], num:0} }
     });
     checkTodayStatus();
+}
+
+async function updateDashboard() {
+    const currentMonth = document.getElementById("date").value.substring(0, 7);
+    const snap = await db.collection("posts").where("date", ">=", currentMonth + "-01").get();
+    let stats = {};
+    snap.forEach(doc => {
+        const d = doc.data();
+        [d.kw, d.su].forEach(p => ['m','n','e'].forEach(t => { 
+            const n = p[t].name; stats[n] = (stats[n] || 0) + (p[t].num || 0); 
+        }));
+    });
+    let html = Object.entries(stats).sort((a,b) => b[1]-a[1])
+        .map(([n, c]) => `<div class="dash-item">${n}</div><div class="dash-item" style="text-align:right"><b>${c}</b></div>`).join('');
+    document.getElementById("dashContent").innerHTML = html || "ยังไม่มีข้อมูลเดือนนี้";
+}
+
+async function loadHistory(showAll) {
+    const dateVal = document.getElementById("date").value;
+    const currentMonth = dateVal.substring(0, 7);
+    let query = db.collection("posts").orderBy("date", "desc");
+    
+    if (!showAll) {
+        query = query.where("date", ">=", currentMonth + "-01");
+        document.getElementById("historyTitle").innerText = "📋 ประวัติเดือนนี้";
+    } else {
+        document.getElementById("historyTitle").innerText = "📜 ประวัติทั้งหมด";
+        document.getElementById("loadAllBtn").style.display = "none";
+    }
+
+    const snap = await query.get();
+    let html = "";
+    snap.forEach(doc => {
+        const d = doc.data();
+        html += `<div class="history-card">
+            <div class="h-header"><strong>🗓 ${d.date}</strong> 
+            <button class="btn-edit" style="color:var(--primary); border:none; background:none; font-weight:bold;" onclick="setEdit('${d.date}')">แก้ไข</button></div>
+            <div style="color:var(--primary); font-size:0.75rem; font-weight:bold;">พี่ขวัญ</div>
+            <div class="h-item"><span>เช้า</span><span>${d.kw.m.name}</span><span style="text-align:right"><b>${d.kw.m.num}</b></span></div>
+            <div class="h-item"><span>เที่ยง</span><span>${d.kw.n.name}</span><span style="text-align:right"><b>${d.kw.n.num}</b></span></div>
+            <div class="h-item"><span>เย็น</span><span>${d.kw.e.name}</span><span style="text-align:right"><b>${d.kw.e.num}</b></span></div>
+            <div style="color:var(--orange); font-size:0.75rem; font-weight:bold; margin-top:5px;">พี่สุ</div>
+            <div class="h-item"><span>เช้า</span><span>${d.su.m.name}</span><span style="text-align:right"><b>${d.su.m.num}</b></span></div>
+            <div class="h-item"><span>เที่ยง</span><span>${d.su.n.name}</span><span style="text-align:right"><b>${d.su.n.num}</b></span></div>
+            <div class="h-item"><span>เย็น</span><span>${d.su.e.name}</span><span style="text-align:right"><b>${d.su.e.num}</b></span></div>
+        </div>`;
+    });
+    document.getElementById("historyList").innerHTML = html;
 }
 
 async function saveData() {
@@ -147,53 +219,10 @@ async function saveData() {
         "su.m.num": Number(document.getElementById("su_m_num").value), "su.n.num": Number(document.getElementById("su_n_num").value), "su.e.num": Number(document.getElementById("su_e_num").value)
     });
     alert("บันทึกเรียบร้อย!");
-    updateDashboard();
-    loadHistory();
-}
-
-// 🚩 ฟังก์ชันคำนวณยอดรวมรายเดือน
-async function updateDashboard() {
-    const dateVal = document.getElementById("date").value;
-    const currentMonth = dateVal.substring(0, 7); // จะได้ YYYY-MM
-    const snap = await db.collection("posts").where("date", ">=", currentMonth + "-01").where("date", "<=", currentMonth + "-31").get();
-    
-    let stats = {};
-    snap.forEach(doc => {
-        const d = doc.data();
-        [d.kw, d.su].forEach(person => {
-            ['m','n','e'].forEach(time => {
-                const item = person[time];
-                stats[item.name] = (stats[item.name] || 0) + (item.num || 0);
-            });
-        });
-    });
-
-    let html = "";
-    // เรียงลำดับทรัพย์ที่โพสต์เยอะสุดขึ้นก่อน
-    const sorted = Object.entries(stats).sort((a,b) => b[1] - a[1]);
-    sorted.forEach(([name, count]) => {
-        html += `<div class="dash-item">${name}</div><div class="dash-item" style="text-align:right;"><b>${count}</b></div>`;
-    });
-    document.getElementById("dashContent").innerHTML = html || "ยังไม่มีข้อมูลเดือนนี้";
-}
-
-async function loadHistory() {
-    const snap = await db.collection("posts").orderBy("date", "desc").limit(20).get();
-    let html = "";
-    snap.forEach(doc => {
-        const d = doc.data();
-        html += `<div class="history-card">
-            <div class="h-header"><strong>🗓 ${d.date}</strong>
-            <div><button class="btn-edit" onclick="setEdit('${d.date}')">แก้ไข</button><button class="btn-delete" onclick="delDoc('${doc.id}')">ลบ</button></div></div>
-            <div class="h-item"><span>พี่ขวัญ</span><span>${d.kw.m.name}, ${d.kw.n.name}, ${d.kw.e.name}</span><span style="text-align:right;">${(d.kw.m.num+d.kw.n.num+d.kw.e.num)}</span></div>
-            <div class="h-item"><span>พี่สุ</span><span>${d.su.m.name}, ${d.su.n.name}, ${d.su.e.name}</span><span style="text-align:right;">${(d.su.m.num+d.su.n.num+d.su.e.num)}</span></div>
-        </div>`;
-    });
-    document.getElementById("historyList").innerHTML = html;
+    checkTodayStatus();
 }
 
 function setEdit(date) { document.getElementById("date").value = date; checkTodayStatus(); window.scrollTo(0,0); }
-async function delDoc(id) { if(confirm("ลบข้อมูล?")) { await db.collection("posts").doc(id).delete(); checkTodayStatus(); } }
 
 window.onload = () => {
     document.getElementById("date").value = new Date().toISOString().split('T')[0];
