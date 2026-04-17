@@ -4,17 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Post Diary</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --bg: #F9FBFC; 
+            --bg: #FDFEFF; 
             --card: #FFFFFF; 
-            --text-main: #454545; 
-            --text-sub: #888888;
-            --soft-pink: #FFB6C1; /* ชมพูพาสเทล */
-            --accent-blue: #AEC6CF; 
-            --soft-green: #B2D8B2;
-            --border-color: #F1F1F1;
+            --text-main: #2D3436; 
+            --kw-color: #3867D6; /* น้ำเงินสดใส */
+            --su-color: #8854D0; /* ม่วงสดใส */
+            --save-btn: #45AAF2; /* ฟ้ากระจ่าง */
+            --fresh-pink: #FD79A8; /* ชมพูสดชื่น */
+            --border-soft: #F1F2F6;
         }
 
         body { 
@@ -30,135 +30,141 @@
 
         .main-container { width: 100%; max-width: 480px; }
 
-        /* การ์ดสไตล์ Minimal */
         .card { 
             background: var(--card); 
-            border-radius: 24px; 
-            padding: 20px; 
-            box-shadow: 0 8px 24px rgba(149, 157, 165, 0.1); 
+            border-radius: 25px; 
+            padding: 22px; 
+            box-shadow: 0 10px 25px rgba(108, 117, 125, 0.08); 
             margin-bottom: 20px; 
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border-soft);
         }
 
-        h2, h3 { font-weight: 500; color: var(--text-main); margin-top: 0; }
+        h2 { font-weight: 700; color: var(--text-main); letter-spacing: 0.5px; }
         
         input[type="date"] { 
             width: 90%; 
             padding: 12px; 
-            border-radius: 12px; 
-            border: 1px solid var(--border-color); 
-            background: #FAFAFA;
+            border-radius: 15px; 
+            border: 2px solid var(--border-soft); 
+            background: #FFFFFF;
             font-size: 1rem; 
             text-align: center; 
             color: var(--text-main);
             outline: none; 
+            transition: border-color 0.3s;
         }
+        input[type="date"]:focus { border-color: var(--fresh-pink); }
 
-        /* ปุ่มสุ่มแบบ Minimal */
         .random-box { 
             background: #FFFFFF; 
-            border: 1px dashed var(--soft-pink);
+            border: 2px dashed var(--fresh-pink);
             padding: 25px; 
-            border-radius: 24px; 
+            border-radius: 25px; 
             text-align: center; 
             margin-bottom: 20px; 
         }
 
         .btn-random { 
-            background: var(--soft-pink); 
+            background: var(--fresh-pink); 
             color: white; 
             border: none; 
-            padding: 14px; 
-            border-radius: 14px; 
-            font-weight: 500; 
+            padding: 15px; 
+            border-radius: 16px; 
+            font-weight: 600; 
             width: 100%; 
             cursor: pointer; 
-            font-size: 1rem; 
-            transition: opacity 0.2s;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px rgba(253, 121, 168, 0.3);
         }
 
-        .btn-random:active { opacity: 0.8; }
+        .row { display: grid; grid-template-columns: 55px 1fr 65px; gap: 10px; margin-bottom: 12px; align-items: center; }
+        .row span { font-weight: 500; font-size: 0.85rem; color: #636E72; }
 
-        /* ส่วนบันทึกข้อมูล */
-        .row { display: grid; grid-template-columns: 50px 1fr 60px; gap: 10px; margin-bottom: 10px; align-items: center; }
-        input[readonly] { background: transparent; border: none; color: var(--text-main); font-size: 0.9rem; }
+        input[readonly] { background: transparent; border: none; color: var(--text-main); font-weight: 500; font-size: 0.95rem; }
         input[type="number"] { 
             padding: 8px; 
-            border: 1px solid var(--border-color); 
-            border-radius: 10px; 
+            border: 2px solid var(--border-soft); 
+            border-radius: 12px; 
             text-align: center; 
-            font-size: 0.9rem;
+            font-size: 1rem;
+            font-weight: 600;
             background: #FAFAFA;
         }
 
         .btn-save { 
-            background: var(--soft-green); 
+            background: var(--save-btn); 
             color: white; 
             border: none; 
             width: 100%; 
-            padding: 15px; 
-            border-radius: 16px; 
-            font-size: 1rem; 
-            font-weight: 500; 
+            padding: 16px; 
+            border-radius: 18px; 
+            font-size: 1.1rem; 
+            font-weight: 600; 
             cursor: pointer; 
             margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(69, 170, 242, 0.3);
         }
 
-        /* Dashboard สีขาวตัดเส้นชมพูพาสเทล */
-        .dashboard { border: 1.5px solid var(--soft-pink); }
-        .dash-title { color: var(--soft-pink); font-weight: 600; margin-bottom: 12px; font-size: 0.95rem; }
-        .dash-grid { display: grid; grid-template-columns: 1fr auto; gap: 8px; font-size: 0.85rem; }
-        .dash-item { border-bottom: 1px solid #FFF0F5; padding: 6px 0; color: var(--text-main); }
+        /* Dashboard สดใส */
+        .dashboard { border-top: 5px solid var(--fresh-pink); }
+        .dash-title { color: var(--fresh-pink); font-weight: 700; margin-bottom: 15px; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+        .dash-grid { display: grid; grid-template-columns: 1fr auto; gap: 8px; font-size: 0.9rem; }
+        .dash-item { border-bottom: 1px solid #FFF5F7; padding: 8px 0; }
 
-        /* ประวัติ */
+        /* ประวัติการสุ่ม */
         .history-card { 
             background: white; 
-            border-radius: 20px; 
-            padding: 18px; 
+            border-radius: 22px; 
+            padding: 20px; 
             margin-bottom: 15px; 
-            border-left: 4px solid var(--soft-pink);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border-left: 6px solid var(--fresh-pink);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
         }
-        .h-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.85rem; }
-        .h-item { display: grid; grid-template-columns: 45px 1fr 35px; font-size: 0.8rem; padding: 4px 0; border-bottom: 1px solid #F9F9F9; color: var(--text-sub); }
-        .h-num { color: var(--text-main); font-weight: 600; text-align: right; }
+        .h-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .h-header strong { color: #2D3436; font-size: 0.95rem; }
+        .h-item { display: grid; grid-template-columns: 35px 1fr 35px; font-size: 0.85rem; padding: 5px 0; border-bottom: 1px solid #FDFDFD; }
+        .h-item span:first-child { font-weight: 700; }
+        .h-num { color: #2D3436; font-weight: 700; text-align: right; }
         
-        .btn-edit-h { color: var(--accent-blue); background: none; border: none; cursor: pointer; font-size: 0.75rem; }
-        .btn-del-h { color: #EFA7A7; background: none; border: none; cursor: pointer; font-size: 0.75rem; margin-left: 10px; }
+        .btn-edit-h { color: var(--save-btn); background: none; border: none; cursor: pointer; font-size: 0.8rem; font-weight: 600; }
+        .btn-del-h { color: #FF7675; background: none; border: none; cursor: pointer; font-size: 0.8rem; font-weight: 600; margin-left: 10px; }
     </style>
 </head>
 <body>
 
 <div class="main-container">
     <div class="card" style="text-align:center">
-        <h2 style="margin-bottom:15px; letter-spacing: 1px;">📔 Post Diary</h2>
+        <h2 style="margin-bottom:15px; color: var(--text-main);">📔 Post Diary</h2>
         <input id="date" type="date" onchange="checkTodayStatus()">
     </div>
 
     <div id="randomBox" class="random-box">
-        <button class="btn-random" onclick="startRandom()">✨ สุ่มทรัพย์ประจำวัน</button>
+        <button class="btn-random" onclick="startRandom()">✨ สุ่มทรัพย์ใหม่วันนี้</button>
     </div>
 
     <div id="inputSection" class="card" style="display: none;">
-        <p style="color:var(--accent-blue); font-weight:600; font-size:0.9rem;">👤 พี่ขวัญ</p>
+        <p style="color: var(--kw-color); font-weight: 700; font-size: 1.05rem; margin-top: 0;">👤 พี่ขวัญ</p>
         <div class="row"><span>เช้า</span><input id="kw_m_name" readonly><input id="kw_m_num" type="number"></div>
         <div class="row"><span>เที่ยง</span><input id="kw_n_name" readonly><input id="kw_n_num" type="number"></div>
         <div class="row"><span>เย็น</span><input id="kw_e_name" readonly><input id="kw_e_num" type="number"></div>
-        <hr style="border:0; border-top:1px solid var(--border-color); margin:15px 0;">
-        <p style="color:var(--soft-pink); font-weight:600; font-size:0.9rem;">👤 พี่สุ</p>
+        
+        <hr style="border: 0; border-top: 2px solid var(--border-soft); margin: 20px 0;">
+        
+        <p style="color: var(--su-color); font-weight: 700; font-size: 1.05rem; margin-top: 0;">👤 พี่สุ</p>
         <div class="row"><span>เช้า</span><input id="su_m_name" readonly><input id="su_m_num" type="number"></div>
         <div class="row"><span>เที่ยง</span><input id="su_n_name" readonly><input id="su_n_num" type="number"></div>
         <div class="row"><span>เย็น</span><input id="su_e_name" readonly><input id="su_e_num" type="number"></div>
-        <button class="btn-save" onclick="saveData()">💾 บันทึกข้อมูล</button>
+        
+        <button class="btn-save" onclick="saveData()">💾 บันทึกยอดโพสต์</button>
     </div>
 
     <div id="dashCard" class="card dashboard">
-        <div class="dash-title">📊 สถิติทรัพย์เดือนนี้</div>
+        <div class="dash-title">💖 สถิติทรัพย์เดือนนี้</div>
         <div id="dashContent" class="dash-grid"></div>
     </div>
 
     <div id="historyList"></div>
-    <button id="loadAllBtn" style="width:100%; padding:15px; background:none; border:1px solid var(--border-color); border-radius:15px; color:var(--text-sub); font-size:0.8rem; cursor:pointer; margin-bottom:50px;" onclick="loadHistory(true)">📜 ดูประวัติทั้งหมด</button>
+    <button id="loadAllBtn" style="width:100%; padding:15px; background:white; border:2px solid var(--border-soft); border-radius:20px; color:#B2BEC3; font-size:0.9rem; font-weight:600; cursor:pointer; margin-bottom:50px;" onclick="loadHistory(true)">📜 ดูประวัติทั้งหมด</button>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -177,7 +183,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ฐานข้อมูล (เพิ่ม แฮปปี้คอนโด)
+// ฐานข้อมูล
 const fixedName = "บ้านเอื้ออาทรอรัญประเทศ";
 const allAssets = ["บ้านพี่แดง อรัญนคร3", "แม่ย่าพี่ปลา 14 ไร่", "แม่ย่าพี่ปลา 11 ไร่", "พี่ศรีไพร (คอนสาย)", "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "คอนโดชีวาทัย ฮอล์มาร์ค", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์", fixedName, "โกดัง 1 ไร่", "คอนโด The Base Park East", "คอนโด Aston", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "แฮปปี้คอนโด"];
 
@@ -272,19 +278,19 @@ async function loadHistory(showAll) {
         const d = doc.data();
         html += `<div class="history-card">
             <div class="h-header">
-                <strong>${d.date}</strong> 
+                <strong>🗓 ${d.date}</strong> 
                 <div>
                     <button class="btn-edit-h" onclick="setEdit('${d.date}')">แก้ไข</button>
                     <button class="btn-del-h" onclick="deleteEntry('${doc.id}', '${d.date}')">ลบ</button>
                 </div>
             </div>
-            <div class="h-item"><span>kw</span><span>${d.kw.m.name}</span><span class="h-num">${d.kw.m.num}</span></div>
-            <div class="h-item"><span>kw</span><span>${d.kw.n.name}</span><span class="h-num">${d.kw.n.num}</span></div>
-            <div class="h-item"><span>kw</span><span>${d.kw.e.name}</span><span class="h-num">${d.kw.e.num}</span></div>
-            <div style="margin-top:5px;"></div>
-            <div class="h-item"><span>su</span><span>${d.su.m.name}</span><span class="h-num">${d.su.m.num}</span></div>
-            <div class="h-item"><span>su</span><span>${d.su.n.name}</span><span class="h-num">${d.su.n.num}</span></div>
-            <div class="h-item"><span>su</span><span>${d.su.e.name}</span><span class="h-num">${d.su.e.num}</span></div>
+            <div class="h-item"><span style="color:var(--kw-color)">KW</span><span>${d.kw.m.name}</span><span class="h-num">${d.kw.m.num}</span></div>
+            <div class="h-item"><span style="color:var(--kw-color)">KW</span><span>${d.kw.n.name}</span><span class="h-num">${d.kw.n.num}</span></div>
+            <div class="h-item"><span style="color:var(--kw-color)">KW</span><span>${d.kw.e.name}</span><span class="h-num">${d.kw.e.num}</span></div>
+            <div style="margin:8px 0; border-top:1px solid #F9F9F9;"></div>
+            <div class="h-item"><span style="color:var(--su-color)">SU</span><span>${d.su.m.name}</span><span class="h-num">${d.su.m.num}</span></div>
+            <div class="h-item"><span style="color:var(--su-color)">SU</span><span>${d.su.n.name}</span><span class="h-num">${d.su.n.num}</span></div>
+            <div class="h-item"><span style="color:var(--su-color)">SU</span><span>${d.su.e.name}</span><span class="h-num">${d.su.e.num}</span></div>
         </div>`;
     });
     document.getElementById("historyList").innerHTML = html;
@@ -302,7 +308,7 @@ async function saveData() {
         "kw.m.num": Number(document.getElementById("kw_m_num").value), "kw.n.num": Number(document.getElementById("kw_n_num").value), "kw.e.num": Number(document.getElementById("kw_e_num").value),
         "su.m.num": Number(document.getElementById("su_m_num").value), "su.n.num": Number(document.getElementById("su_n_num").value), "su.e.num": Number(document.getElementById("su_e_num").value)
     });
-    alert("บันทึกสำเร็จ");
+    alert("✨ บันทึกเรียบร้อย!");
     checkTodayStatus();
 }
 
