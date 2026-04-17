@@ -4,70 +4,168 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Post Diary</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #4A90E2; --secondary: #27ae60; --pink: #FF69B4; --orange: #f39c12; --danger: #e74c3c; --bg: #F0F2F5; --card-bg: #ffffff; }
-        body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        :root { 
+            --bg: #F9FBFC; 
+            --card: #FFFFFF; 
+            --text-main: #454545; 
+            --text-sub: #888888;
+            --soft-pink: #FFB6C1; /* ชมพูพาสเทล */
+            --accent-blue: #AEC6CF; 
+            --soft-green: #B2D8B2;
+            --border-color: #F1F1F1;
+        }
+
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            background-color: var(--bg); 
+            margin: 0; 
+            padding: 15px; 
+            color: var(--text-main);
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+
         .main-container { width: 100%; max-width: 480px; }
-        .card { background: var(--card-bg); border-radius: 20px; padding: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; border: 1px solid transparent; }
-        input[type="date"] { width: 80%; padding: 10px; border-radius: 10px; border: 2px solid #E0E6ED; font-size: 1rem; text-align: center; outline: none; }
-        .dashboard { background: white; border: 2px solid var(--pink); color: #333; }
-        .dash-grid { display: grid; grid-template-columns: 1fr auto; gap: 5px; font-size: 0.82rem; margin-top: 10px; }
-        .dash-item { border-bottom: 1px solid #ffe4f1; padding: 4px 0; }
-        .dash-title { color: var(--pink); font-weight: bold; font-size: 1rem; margin: 0; }
-        .random-box { background: linear-gradient(135deg, #6e8efb, #a777e3); padding: 25px; border-radius: 20px; color: white; text-align: center; margin-bottom: 15px; }
-        .btn-random { background: white; color: #6e8efb; border: none; padding: 15px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; font-size: 1.1rem; }
-        .row { display: grid; grid-template-columns: 55px 1fr 65px; gap: 8px; margin-bottom: 8px; align-items: center; }
-        input[readonly] { background-color: #f9f9f9; border: 1px solid #eee; padding: 8px; border-radius: 8px; font-size: 0.8rem; }
-        input[type="number"] { padding: 8px; border: 1px solid #E0E6ED; border-radius: 8px; text-align: center; font-weight: bold; }
-        .btn-save { background: var(--secondary); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
-        .history-card { background: white; border-radius: 20px; padding: 15px; margin-bottom: 12px; border-left: 5px solid var(--pink); }
-        .h-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .h-item { display: grid; grid-template-columns: 45px 1fr 35px; font-size: 0.8rem; padding: 3px 0; border-bottom: 1px solid #f9f9f9; }
-        .action-btns { display: flex; gap: 10px; }
-        .btn-edit-h { color: var(--primary); font-size: 0.8rem; cursor: pointer; font-weight: bold; background: none; border: none; }
-        .btn-del-h { color: var(--danger); font-size: 0.8rem; cursor: pointer; font-weight: bold; background: none; border: none; }
+
+        /* การ์ดสไตล์ Minimal */
+        .card { 
+            background: var(--card); 
+            border-radius: 24px; 
+            padding: 20px; 
+            box-shadow: 0 8px 24px rgba(149, 157, 165, 0.1); 
+            margin-bottom: 20px; 
+            border: 1px solid var(--border-color);
+        }
+
+        h2, h3 { font-weight: 500; color: var(--text-main); margin-top: 0; }
+        
+        input[type="date"] { 
+            width: 90%; 
+            padding: 12px; 
+            border-radius: 12px; 
+            border: 1px solid var(--border-color); 
+            background: #FAFAFA;
+            font-size: 1rem; 
+            text-align: center; 
+            color: var(--text-main);
+            outline: none; 
+        }
+
+        /* ปุ่มสุ่มแบบ Minimal */
+        .random-box { 
+            background: #FFFFFF; 
+            border: 1px dashed var(--soft-pink);
+            padding: 25px; 
+            border-radius: 24px; 
+            text-align: center; 
+            margin-bottom: 20px; 
+        }
+
+        .btn-random { 
+            background: var(--soft-pink); 
+            color: white; 
+            border: none; 
+            padding: 14px; 
+            border-radius: 14px; 
+            font-weight: 500; 
+            width: 100%; 
+            cursor: pointer; 
+            font-size: 1rem; 
+            transition: opacity 0.2s;
+        }
+
+        .btn-random:active { opacity: 0.8; }
+
+        /* ส่วนบันทึกข้อมูล */
+        .row { display: grid; grid-template-columns: 50px 1fr 60px; gap: 10px; margin-bottom: 10px; align-items: center; }
+        input[readonly] { background: transparent; border: none; color: var(--text-main); font-size: 0.9rem; }
+        input[type="number"] { 
+            padding: 8px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 10px; 
+            text-align: center; 
+            font-size: 0.9rem;
+            background: #FAFAFA;
+        }
+
+        .btn-save { 
+            background: var(--soft-green); 
+            color: white; 
+            border: none; 
+            width: 100%; 
+            padding: 15px; 
+            border-radius: 16px; 
+            font-size: 1rem; 
+            font-weight: 500; 
+            cursor: pointer; 
+            margin-top: 10px;
+        }
+
+        /* Dashboard สีขาวตัดเส้นชมพูพาสเทล */
+        .dashboard { border: 1.5px solid var(--soft-pink); }
+        .dash-title { color: var(--soft-pink); font-weight: 600; margin-bottom: 12px; font-size: 0.95rem; }
+        .dash-grid { display: grid; grid-template-columns: 1fr auto; gap: 8px; font-size: 0.85rem; }
+        .dash-item { border-bottom: 1px solid #FFF0F5; padding: 6px 0; color: var(--text-main); }
+
+        /* ประวัติ */
+        .history-card { 
+            background: white; 
+            border-radius: 20px; 
+            padding: 18px; 
+            margin-bottom: 15px; 
+            border-left: 4px solid var(--soft-pink);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .h-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.85rem; }
+        .h-item { display: grid; grid-template-columns: 45px 1fr 35px; font-size: 0.8rem; padding: 4px 0; border-bottom: 1px solid #F9F9F9; color: var(--text-sub); }
+        .h-num { color: var(--text-main); font-weight: 600; text-align: right; }
+        
+        .btn-edit-h { color: var(--accent-blue); background: none; border: none; cursor: pointer; font-size: 0.75rem; }
+        .btn-del-h { color: #EFA7A7; background: none; border: none; cursor: pointer; font-size: 0.75rem; margin-left: 10px; }
     </style>
 </head>
 <body>
 
 <div class="main-container">
     <div class="card" style="text-align:center">
-        <h2 style="color:var(--primary); margin:0 0 10px 0;">📔 Post Diary</h2>
+        <h2 style="margin-bottom:15px; letter-spacing: 1px;">📔 Post Diary</h2>
         <input id="date" type="date" onchange="checkTodayStatus()">
-        <button onclick="renameOldData()" style="margin-top:10px; font-size:10px; background:none; border:none; color:#ccc;">Update Old Names</button>
     </div>
 
     <div id="randomBox" class="random-box">
-        <button class="btn-random" onclick="startRandom()">🎲 สุ่มทรัพย์ประจำวัน</button>
+        <button class="btn-random" onclick="startRandom()">✨ สุ่มทรัพย์ประจำวัน</button>
     </div>
 
     <div id="inputSection" class="card" style="display: none;">
-        <div style="color:var(--primary); font-weight:bold;">👤 พี่ขวัญ</div>
+        <p style="color:var(--accent-blue); font-weight:600; font-size:0.9rem;">👤 พี่ขวัญ</p>
         <div class="row"><span>เช้า</span><input id="kw_m_name" readonly><input id="kw_m_num" type="number"></div>
         <div class="row"><span>เที่ยง</span><input id="kw_n_name" readonly><input id="kw_n_num" type="number"></div>
         <div class="row"><span>เย็น</span><input id="kw_e_name" readonly><input id="kw_e_num" type="number"></div>
-        <hr style="border:0; border-top:1px solid #eee; margin:10px 0;">
-        <div style="color:var(--orange); font-weight:bold;">👤 พี่สุ</div>
+        <hr style="border:0; border-top:1px solid var(--border-color); margin:15px 0;">
+        <p style="color:var(--soft-pink); font-weight:600; font-size:0.9rem;">👤 พี่สุ</p>
         <div class="row"><span>เช้า</span><input id="su_m_name" readonly><input id="su_m_num" type="number"></div>
         <div class="row"><span>เที่ยง</span><input id="su_n_name" readonly><input id="su_n_num" type="number"></div>
         <div class="row"><span>เย็น</span><input id="su_e_name" readonly><input id="su_e_num" type="number"></div>
-        <button class="btn-save" onclick="saveData()">💾 บันทึกจำนวนโพสต์</button>
+        <button class="btn-save" onclick="saveData()">💾 บันทึกข้อมูล</button>
     </div>
 
     <div id="dashCard" class="card dashboard">
-        <p class="dash-title">📈 สถิติทรัพย์เดือนนี้</p>
+        <div class="dash-title">📊 สถิติทรัพย์เดือนนี้</div>
         <div id="dashContent" class="dash-grid"></div>
     </div>
 
     <div id="historyList"></div>
-    <button id="loadAllBtn" style="width:100%; padding:15px; background:#ddd; border:none; border-radius:15px; color:#444; font-weight:bold; cursor:pointer; margin-bottom:50px;" onclick="loadHistory(true)">📜 ดูประวัติทั้งหมด</button>
+    <button id="loadAllBtn" style="width:100%; padding:15px; background:none; border:1px solid var(--border-color); border-radius:15px; color:var(--text-sub); font-size:0.8rem; cursor:pointer; margin-bottom:50px;" onclick="loadHistory(true)">📜 ดูประวัติทั้งหมด</button>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
+// Firebase Config (คงเดิม)
 const firebaseConfig = {
   apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI",
   authDomain: "save-data-92eca.firebaseapp.com",
@@ -79,9 +177,9 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// เปลี่ยนชื่อในฐานข้อมูลหลัก
+// ฐานข้อมูล (เพิ่ม แฮปปี้คอนโด)
 const fixedName = "บ้านเอื้ออาทรอรัญประเทศ";
-const allAssets = ["บ้านพี่แดง อรัญนคร3", "แม่ย่าพี่ปลา 14 ไร่", "แม่ย่าพี่ปลา 11 ไร่", "พี่ศรีไพร (คอนสาย)", "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "คอนโดชีวาทัย ฮอล์มาร์ค", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์", fixedName, "โกดัง 1 ไร่", "คอนโด The Base Park East", "คอนโด Aston", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49"];
+const allAssets = ["บ้านพี่แดง อรัญนคร3", "แม่ย่าพี่ปลา 14 ไร่", "แม่ย่าพี่ปลา 11 ไร่", "พี่ศรีไพร (คอนสาย)", "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "คอนโดชีวาทัย ฮอล์มาร์ค", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์", fixedName, "โกดัง 1 ไร่", "คอนโด The Base Park East", "คอนโด Aston", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "แฮปปี้คอนโด"];
 
 let currentDocId = null;
 
@@ -148,25 +246,6 @@ async function startRandom() {
     checkTodayStatus();
 }
 
-// ฟังก์ชันพิเศษสำหรับล้างชื่อเก่าใน Database ให้เป็นชื่อใหม่ทั้งหมด
-async function renameOldData() {
-    if(!confirm("ต้องการเปลี่ยนชื่อ 'บ้านเอื้อ...' ทั้งหมดในอดีตให้เป็น '" + fixedName + "' หรือไม่?")) return;
-    const snap = await db.collection("posts").get();
-    let count = 0;
-    const oldNames = ["บ้านเอื้อ 214/278", "บ้านเอื้อ 214/381", "บ้านเอื้อ 214/293", "บ้านเอื้ออาทร"];
-    
-    snap.forEach(async (doc) => {
-        let d = doc.data();
-        let changed = false;
-        ['kw','su'].forEach(p => ['m','n','e'].forEach(t => {
-            if(oldNames.includes(d[p][t].name)) { d[p][t].name = fixedName; changed = true; }
-        }));
-        if(changed) { await db.collection("posts").doc(doc.id).update(d); count++; }
-    });
-    alert("ปรับปรุงชื่อเก่าสำเร็จ " + count + " รายการ");
-    location.reload();
-}
-
 async function updateDashboard() {
     const currentMonth = document.getElementById("date").value.substring(0, 7);
     const snap = await db.collection("posts").where("date", ">=", currentMonth + "-01").get();
@@ -179,7 +258,7 @@ async function updateDashboard() {
     });
     let html = Object.entries(stats).sort((a,b) => b[1]-a[1])
         .map(([n, c]) => `<div class="dash-item">${n}</div><div class="dash-item" style="text-align:right"><b>${c}</b></div>`).join('');
-    document.getElementById("dashContent").innerHTML = html || "ยังไม่มีข้อมูลเดือนนี้";
+    document.getElementById("dashContent").innerHTML = html || "ยังไม่มีข้อมูล";
 }
 
 async function loadHistory(showAll) {
@@ -192,19 +271,20 @@ async function loadHistory(showAll) {
     snap.forEach(doc => {
         const d = doc.data();
         html += `<div class="history-card">
-            <div class="h-header"><strong>🗓 ${d.date}</strong> 
-            <div class="action-btns">
-                <button class="btn-edit-h" onclick="setEdit('${d.date}')">แก้ไข</button>
-                <button class="btn-del-h" onclick="deleteEntry('${doc.id}', '${d.date}')">ลบ</button>
-            </div></div>
-            <div style="color:var(--primary); font-size:0.8rem; font-weight:bold;">พี่ขวัญ</div>
-            <div class="h-item"><span>เช้า</span><span>${d.kw.m.name}</span><span style="text-align:right"><b>${d.kw.m.num}</b></span></div>
-            <div class="h-item"><span>เที่ยง</span><span>${d.kw.n.name}</span><span style="text-align:right"><b>${d.kw.n.num}</b></span></div>
-            <div class="h-item"><span>เย็น</span><span>${d.kw.e.name}</span><span style="text-align:right"><b>${d.kw.e.num}</b></span></div>
-            <div style="color:var(--orange); font-size:0.8rem; font-weight:bold; margin-top:5px;">พี่สุ</div>
-            <div class="h-item"><span>เช้า</span><span>${d.su.m.name}</span><span style="text-align:right"><b>${d.su.m.num}</b></span></div>
-            <div class="h-item"><span>เที่ยง</span><span>${d.su.n.name}</span><span style="text-align:right"><b>${d.su.n.num}</b></span></div>
-            <div class="h-item"><span>เย็น</span><span>${d.su.e.name}</span><span style="text-align:right"><b>${d.su.e.num}</b></span></div>
+            <div class="h-header">
+                <strong>${d.date}</strong> 
+                <div>
+                    <button class="btn-edit-h" onclick="setEdit('${d.date}')">แก้ไข</button>
+                    <button class="btn-del-h" onclick="deleteEntry('${doc.id}', '${d.date}')">ลบ</button>
+                </div>
+            </div>
+            <div class="h-item"><span>kw</span><span>${d.kw.m.name}</span><span class="h-num">${d.kw.m.num}</span></div>
+            <div class="h-item"><span>kw</span><span>${d.kw.n.name}</span><span class="h-num">${d.kw.n.num}</span></div>
+            <div class="h-item"><span>kw</span><span>${d.kw.e.name}</span><span class="h-num">${d.kw.e.num}</span></div>
+            <div style="margin-top:5px;"></div>
+            <div class="h-item"><span>su</span><span>${d.su.m.name}</span><span class="h-num">${d.su.m.num}</span></div>
+            <div class="h-item"><span>su</span><span>${d.su.n.name}</span><span class="h-num">${d.su.n.num}</span></div>
+            <div class="h-item"><span>su</span><span>${d.su.e.name}</span><span class="h-num">${d.su.e.num}</span></div>
         </div>`;
     });
     document.getElementById("historyList").innerHTML = html;
@@ -222,11 +302,15 @@ async function saveData() {
         "kw.m.num": Number(document.getElementById("kw_m_num").value), "kw.n.num": Number(document.getElementById("kw_n_num").value), "kw.e.num": Number(document.getElementById("kw_e_num").value),
         "su.m.num": Number(document.getElementById("su_m_num").value), "su.n.num": Number(document.getElementById("su_n_num").value), "su.e.num": Number(document.getElementById("su_e_num").value)
     });
-    alert("บันทึกเรียบร้อย!");
+    alert("บันทึกสำเร็จ");
     checkTodayStatus();
 }
 
-function setEdit(date) { document.getElementById("date").value = date; checkTodayStatus(); window.scrollTo({top:0, behavior:'smooth'}); }
+function setEdit(date) { 
+    document.getElementById("date").value = date; 
+    checkTodayStatus(); 
+    window.scrollTo({top: 0, behavior: 'smooth'}); 
+}
 
 window.onload = () => {
     document.getElementById("date").value = new Date().toISOString().split('T')[0];
