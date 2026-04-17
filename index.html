@@ -10,10 +10,10 @@
             --bg: #FDFEFF; 
             --card: #FFFFFF; 
             --text-main: #2D3436; 
-            --kw-color: #3867D6; /* น้ำเงินสดใส */
-            --su-color: #8854D0; /* ม่วงสดใส */
-            --save-btn: #45AAF2; /* ฟ้ากระจ่าง */
-            --fresh-pink: #FD79A8; /* ชมพูสดชื่น */
+            --kw-color: #3867D6; 
+            --su-color: #8854D0; 
+            --save-btn: #45AAF2; 
+            --fresh-pink: #FD79A8; 
             --border-soft: #F1F2F6;
         }
 
@@ -21,74 +21,78 @@
             font-family: 'Sarabun', sans-serif; 
             background-color: var(--bg); 
             margin: 0; 
-            padding: 15px; 
+            padding: 10px; 
             color: var(--text-main);
             display: flex; 
             flex-direction: column; 
             align-items: center; 
         }
 
-        .main-container { width: 100%; max-width: 480px; }
+        .main-container { width: 100%; max-width: 420px; }
 
+        /* การ์ดแบบกระชับ */
         .card { 
             background: var(--card); 
-            border-radius: 25px; 
-            padding: 22px; 
-            box-shadow: 0 10px 25px rgba(108, 117, 125, 0.08); 
-            margin-bottom: 20px; 
+            border-radius: 20px; 
+            padding: 15px; 
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05); 
+            margin-bottom: 12px; 
             border: 1px solid var(--border-soft);
         }
 
-        h2 { font-weight: 700; color: var(--text-main); letter-spacing: 0.5px; }
+        h2 { font-size: 1.2rem; font-weight: 700; margin: 5px 0 12px 0; display: flex; align-items: center; justify-content: center; gap: 8px; }
         
         input[type="date"] { 
-            width: 90%; 
-            padding: 12px; 
-            border-radius: 15px; 
-            border: 2px solid var(--border-soft); 
-            background: #FFFFFF;
+            width: 100%; 
+            padding: 10px; 
+            border-radius: 12px; 
+            border: 1px solid var(--border-soft); 
+            background: #F9FAFB;
             font-size: 1rem; 
             text-align: center; 
-            color: var(--text-main);
+            box-sizing: border-box;
             outline: none; 
-            transition: border-color 0.3s;
         }
-        input[type="date"]:focus { border-color: var(--fresh-pink); }
 
         .random-box { 
             background: #FFFFFF; 
             border: 2px dashed var(--fresh-pink);
-            padding: 25px; 
-            border-radius: 25px; 
+            padding: 15px; 
+            border-radius: 20px; 
             text-align: center; 
-            margin-bottom: 20px; 
+            margin-bottom: 12px; 
         }
 
         .btn-random { 
             background: var(--fresh-pink); 
             color: white; 
             border: none; 
-            padding: 15px; 
-            border-radius: 16px; 
+            padding: 12px; 
+            border-radius: 12px; 
             font-weight: 600; 
             width: 100%; 
             cursor: pointer; 
-            font-size: 1.1rem;
-            box-shadow: 0 4px 12px rgba(253, 121, 168, 0.3);
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(253, 121, 168, 0.2);
         }
 
-        .row { display: grid; grid-template-columns: 55px 1fr 65px; gap: 10px; margin-bottom: 12px; align-items: center; }
-        .row span { font-weight: 500; font-size: 0.85rem; color: #636E72; }
+        /* ส่วนบันทึก (Compact Row) */
+        .section-header { font-weight: 700; font-size: 1rem; margin: 5px 0 10px 0; display: flex; align-items: center; gap: 6px; }
+        
+        .row { display: grid; grid-template-columns: 40px 1fr 55px; gap: 8px; margin-bottom: 8px; align-items: center; }
+        .row span { font-size: 0.85rem; color: #636E72; }
 
-        input[readonly] { background: transparent; border: none; color: var(--text-main); font-weight: 500; font-size: 0.95rem; }
+        input[readonly] { background: transparent; border: none; color: var(--text-main); font-weight: 500; font-size: 0.9rem; padding: 0; }
         input[type="number"] { 
-            padding: 8px; 
-            border: 2px solid var(--border-soft); 
-            border-radius: 12px; 
+            padding: 6px; 
+            border: 1px solid var(--border-soft); 
+            border-radius: 8px; 
             text-align: center; 
-            font-size: 1rem;
-            font-weight: 600;
-            background: #FAFAFA;
+            font-size: 0.95rem;
+            font-weight: 700;
+            background: #FDFDFD;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .btn-save { 
@@ -96,61 +100,50 @@
             color: white; 
             border: none; 
             width: 100%; 
-            padding: 16px; 
-            border-radius: 18px; 
-            font-size: 1.1rem; 
-            font-weight: 600; 
+            padding: 14px; 
+            border-radius: 15px; 
+            font-size: 1rem; 
+            font-weight: 700; 
             cursor: pointer; 
             margin-top: 10px;
-            box-shadow: 0 4px 15px rgba(69, 170, 242, 0.3);
+            box-shadow: 0 4px 12px rgba(69, 170, 242, 0.2);
         }
 
-        /* Dashboard สดใส */
-        .dashboard { border-top: 5px solid var(--fresh-pink); }
-        .dash-title { color: var(--fresh-pink); font-weight: 700; margin-bottom: 15px; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
-        .dash-grid { display: grid; grid-template-columns: 1fr auto; gap: 8px; font-size: 0.9rem; }
-        .dash-item { border-bottom: 1px solid #FFF5F7; padding: 8px 0; }
+        /* Dashboard & History */
+        .dash-title { color: var(--fresh-pink); font-weight: 700; margin-bottom: 10px; font-size: 0.9rem; }
+        .dash-grid { display: grid; grid-template-columns: 1fr auto; gap: 5px; font-size: 0.85rem; }
+        .dash-item { border-bottom: 1px solid #FDF2F5; padding: 6px 0; }
 
-        /* ประวัติการสุ่ม */
         .history-card { 
-            background: white; 
-            border-radius: 22px; 
-            padding: 20px; 
-            margin-bottom: 15px; 
-            border-left: 6px solid var(--fresh-pink);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+            background: white; border-radius: 18px; padding: 15px; margin-bottom: 10px; 
+            border-left: 5px solid var(--fresh-pink); box-shadow: 0 3px 10px rgba(0,0,0,0.02);
         }
-        .h-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .h-header strong { color: #2D3436; font-size: 0.95rem; }
-        .h-item { display: grid; grid-template-columns: 35px 1fr 35px; font-size: 0.85rem; padding: 5px 0; border-bottom: 1px solid #FDFDFD; }
-        .h-item span:first-child { font-weight: 700; }
-        .h-num { color: #2D3436; font-weight: 700; text-align: right; }
-        
-        .btn-edit-h { color: var(--save-btn); background: none; border: none; cursor: pointer; font-size: 0.8rem; font-weight: 600; }
-        .btn-del-h { color: #FF7675; background: none; border: none; cursor: pointer; font-size: 0.8rem; font-weight: 600; margin-left: 10px; }
+        .h-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.85rem; }
+        .h-item { display: grid; grid-template-columns: 30px 1fr 30px; font-size: 0.8rem; padding: 3px 0; border-bottom: 1px solid #FAFAFA; }
+        .h-num { font-weight: 700; text-align: right; }
     </style>
 </head>
 <body>
 
 <div class="main-container">
     <div class="card" style="text-align:center">
-        <h2 style="margin-bottom:15px; color: var(--text-main);">📔 Post Diary</h2>
+        <h2>📂 Post Diary</h2>
         <input id="date" type="date" onchange="checkTodayStatus()">
     </div>
 
     <div id="randomBox" class="random-box">
-        <button class="btn-random" onclick="startRandom()">✨ สุ่มทรัพย์ใหม่วันนี้</button>
+        <button class="btn-random" onclick="startRandom()">✨ สุ่มทรัพย์วันนี้</button>
     </div>
 
     <div id="inputSection" class="card" style="display: none;">
-        <p style="color: var(--kw-color); font-weight: 700; font-size: 1.05rem; margin-top: 0;">👤 พี่ขวัญ</p>
+        <div class="section-header" style="color: var(--kw-color);">👤 พี่ขวัญ</div>
         <div class="row"><span>เช้า</span><input id="kw_m_name" readonly><input id="kw_m_num" type="number"></div>
         <div class="row"><span>เที่ยง</span><input id="kw_n_name" readonly><input id="kw_n_num" type="number"></div>
         <div class="row"><span>เย็น</span><input id="kw_e_name" readonly><input id="kw_e_num" type="number"></div>
         
-        <hr style="border: 0; border-top: 2px solid var(--border-soft); margin: 20px 0;">
+        <hr style="border: 0; border-top: 1px solid var(--border-soft); margin: 12px 0;">
         
-        <p style="color: var(--su-color); font-weight: 700; font-size: 1.05rem; margin-top: 0;">👤 พี่สุ</p>
+        <div class="section-header" style="color: var(--su-color);">👤 พี่สุ</div>
         <div class="row"><span>เช้า</span><input id="su_m_name" readonly><input id="su_m_num" type="number"></div>
         <div class="row"><span>เที่ยง</span><input id="su_n_name" readonly><input id="su_n_num" type="number"></div>
         <div class="row"><span>เย็น</span><input id="su_e_name" readonly><input id="su_e_num" type="number"></div>
@@ -158,20 +151,20 @@
         <button class="btn-save" onclick="saveData()">💾 บันทึกยอดโพสต์</button>
     </div>
 
-    <div id="dashCard" class="card dashboard">
-        <div class="dash-title">💖 สถิติทรัพย์เดือนนี้</div>
+    <div id="dashCard" class="card" style="border-top: 4px solid var(--fresh-pink);">
+        <div class="dash-title">💖 สถิติเดือนนี้</div>
         <div id="dashContent" class="dash-grid"></div>
     </div>
 
     <div id="historyList"></div>
-    <button id="loadAllBtn" style="width:100%; padding:15px; background:white; border:2px solid var(--border-soft); border-radius:20px; color:#B2BEC3; font-size:0.9rem; font-weight:600; cursor:pointer; margin-bottom:50px;" onclick="loadHistory(true)">📜 ดูประวัติทั้งหมด</button>
+    <button id="loadAllBtn" style="width:100%; padding:12px; background:none; border:none; color:#B2BEC3; font-size:0.8rem; cursor:pointer; margin-bottom:40px;" onclick="loadHistory(true)">📜 ดูประวัติทั้งหมด</button>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-// Firebase Config (คงเดิม)
+// Firebase Config (คงเดิมตามระบบคุณ)
 const firebaseConfig = {
   apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI",
   authDomain: "save-data-92eca.firebaseapp.com",
@@ -183,7 +176,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ฐานข้อมูล
 const fixedName = "บ้านเอื้ออาทรอรัญประเทศ";
 const allAssets = ["บ้านพี่แดง อรัญนคร3", "แม่ย่าพี่ปลา 14 ไร่", "แม่ย่าพี่ปลา 11 ไร่", "พี่ศรีไพร (คอนสาย)", "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "คอนโดชีวาทัย ฮอล์มาร์ค", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์", fixedName, "โกดัง 1 ไร่", "คอนโด The Base Park East", "คอนโด Aston", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "แฮปปี้คอนโด"];
 
@@ -219,21 +211,18 @@ function fillForm(d) {
 async function startRandom() {
     const dateVal = document.getElementById("date").value;
     const currentMonth = dateVal.substring(0, 7);
-
     const monthSnap = await db.collection("posts").where("date", ">=", currentMonth + "-01").get();
     let stats = {}; allAssets.forEach(a => stats[a] = 0);
     monthSnap.forEach(doc => {
         const d = doc.data();
         [d.kw.m.name, d.kw.n.name, d.kw.e.name, d.su.m.name, d.su.n.name, d.su.e.name].forEach(n => { if(stats[n]!==undefined) stats[n]++; });
     });
-
     const historySnap = await db.collection("posts").orderBy("date", "desc").limit(7).get();
     let blackList = new Set();
     historySnap.forEach(doc => {
         const d = doc.data();
         [d.kw.m.name, d.kw.n.name, d.kw.e.name, d.su.m.name, d.su.n.name, d.su.e.name].forEach(n => { if(n !== fixedName) blackList.add(n); });
     });
-
     let pool = allAssets.filter(a => a !== fixedName && !blackList.has(a));
     pool.sort((a, b) => stats[a] - stats[b]);
     let chosenPool = pool.slice(0, 5); 
@@ -243,7 +232,6 @@ async function startRandom() {
         final2.push(chosenPool.splice(idx, 1)[0]);
     }
     const assets = [fixedName, final2[0], final2[1]];
-
     await db.collection("posts").add({
         date: dateVal,
         kw: { m:{name:assets[0], num:0}, n:{name:assets[1], num:0}, e:{name:assets[2], num:0} },
@@ -264,7 +252,7 @@ async function updateDashboard() {
     });
     let html = Object.entries(stats).sort((a,b) => b[1]-a[1])
         .map(([n, c]) => `<div class="dash-item">${n}</div><div class="dash-item" style="text-align:right"><b>${c}</b></div>`).join('');
-    document.getElementById("dashContent").innerHTML = html || "ยังไม่มีข้อมูล";
+    document.getElementById("dashContent").innerHTML = html || "ไม่มีข้อมูล";
 }
 
 async function loadHistory(showAll) {
@@ -280,14 +268,13 @@ async function loadHistory(showAll) {
             <div class="h-header">
                 <strong>🗓 ${d.date}</strong> 
                 <div>
-                    <button class="btn-edit-h" onclick="setEdit('${d.date}')">แก้ไข</button>
+                    <button class="btn-edit-h" onclick="setEdit('${d.date}')">แก้</button>
                     <button class="btn-del-h" onclick="deleteEntry('${doc.id}', '${d.date}')">ลบ</button>
                 </div>
             </div>
             <div class="h-item"><span style="color:var(--kw-color)">KW</span><span>${d.kw.m.name}</span><span class="h-num">${d.kw.m.num}</span></div>
             <div class="h-item"><span style="color:var(--kw-color)">KW</span><span>${d.kw.n.name}</span><span class="h-num">${d.kw.n.num}</span></div>
             <div class="h-item"><span style="color:var(--kw-color)">KW</span><span>${d.kw.e.name}</span><span class="h-num">${d.kw.e.num}</span></div>
-            <div style="margin:8px 0; border-top:1px solid #F9F9F9;"></div>
             <div class="h-item"><span style="color:var(--su-color)">SU</span><span>${d.su.m.name}</span><span class="h-num">${d.su.m.num}</span></div>
             <div class="h-item"><span style="color:var(--su-color)">SU</span><span>${d.su.n.name}</span><span class="h-num">${d.su.n.num}</span></div>
             <div class="h-item"><span style="color:var(--su-color)">SU</span><span>${d.su.e.name}</span><span class="h-num">${d.su.e.num}</span></div>
@@ -297,10 +284,7 @@ async function loadHistory(showAll) {
 }
 
 async function deleteEntry(id, date) {
-    if (confirm(`ลบข้อมูลวันที่ ${date}?`)) {
-        await db.collection("posts").doc(id).delete();
-        checkTodayStatus();
-    }
+    if (confirm(`ลบวันที่ ${date}?`)) { await db.collection("posts").doc(id).delete(); checkTodayStatus(); }
 }
 
 async function saveData() {
@@ -308,7 +292,7 @@ async function saveData() {
         "kw.m.num": Number(document.getElementById("kw_m_num").value), "kw.n.num": Number(document.getElementById("kw_n_num").value), "kw.e.num": Number(document.getElementById("kw_e_num").value),
         "su.m.num": Number(document.getElementById("su_m_num").value), "su.n.num": Number(document.getElementById("su_n_num").value), "su.e.num": Number(document.getElementById("su_e_num").value)
     });
-    alert("✨ บันทึกเรียบร้อย!");
+    alert("บันทึกแล้ว!");
     checkTodayStatus();
 }
 
