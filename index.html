@@ -2,6 +2,7 @@ async function startRandom() {
     const dateVal = document.getElementById("date").value;
     
     // เงื่อนไขล็อคทรัพย์สำหรับวันที่ 22 เมษายน 2026
+    // ตรวจสอบชื่อให้ตรงกับที่อยู่ใน allAssets เป๊ะๆ
     if (dateVal === "2026-04-22") {
         const assets = ["บ้านเอื้ออาทรอรัญประเทศ", "แฮปปี้คอนโด", "บ้านพี่หนึ่ง อรัญวิลล์"];
         
@@ -11,22 +12,39 @@ async function startRandom() {
             su: { m:{name:assets[1], num:0}, n:{name:assets[2], num:0}, e:{name:assets[0], num:0} }
         });
     } else {
-        // ส่วนของการสุ่มปกติ (กรณีไม่ใช่ 22 เมษายน)
+        // ส่วนของการสุ่มปกติ
         const currentMonth = dateVal.substring(0, 7);
         const monthSnap = await db.collection("posts").where("date", ">=", currentMonth + "-01").get();
         let stats = {}; allAssets.forEach(a => stats[a] = 0);
-        monthSnap.forEach(doc => { const d = doc.data(); [d.kw.m.name, d.kw.n.name, d.kw.e.name, d.su.m.name, d.su.n.name, d.su.e.name].forEach(n => { if(stats[n]!==undefined) stats[n]++; }); });
+        monthSnap.forEach(doc => { 
+            const d = doc.data(); 
+            [d.kw.m.name, d.kw.n.name, d.kw.e.name, d.su.m.name, d.su.n.name, d.su.e.name].forEach(n => { if(stats[n]!==undefined) stats[n]++; }); 
+        });
         
         const historySnap = await db.collection("posts").orderBy("date", "desc").limit(7).get();
-        let blackList = new Set(); historySnap.forEach(doc => { const d = doc.data(); [d.kw.m.name, d.kw.n.name, d.kw.e.name, d.su.m.name, d.su.n.name, d.su.e.name].forEach(n => { if(n !== fixedName) blackList.add(n); }); });
+        let blackList = new Set(); 
+        historySnap.forEach(doc => { 
+            const d = doc.data(); 
+            [d.kw.m.name, d.kw.n.name, d.kw.e.name, d.su.m.name, d.su.n.name, d.su.e.name].forEach(n => { if(n !== fixedName) blackList.add(n); }); 
+        });
         
         let pool = allAssets.filter(a => a !== fixedName && !blackList.has(a));
         pool.sort((a, b) => stats[a] - stats[b]);
-        let chosenPool = pool.slice(0, 5); let final2 = [];
-        for(let i=0; i<2; i++) { const idx = Math.floor(Math.random() * chosenPool.length); final2.push(chosenPool.splice(idx, 1)[0]); }
+        let chosenPool = pool.slice(0, 5); 
+        let final2 = [];
+        for(let i=0; i<2; i++) { 
+            const idx = Math.floor(Math.random() * chosenPool.length); 
+            final2.push(chosenPool.splice(idx, 1)[0]); 
+        }
         const assets = [fixedName, final2[0], final2[1]];
         
-        await db.collection("posts").add({ date: dateVal, kw: { m:{name:assets[0], num:0}, n:{name:assets[1], num:0}, e:{name:assets[2], num:0} }, su: { m:{name:assets[1], num:0}, n:{name:assets[2], num:0}, e:{name:assets[0], num:0} } });
+        await db.collection("posts").add({ 
+            date: dateVal, 
+            kw: { m:{name:assets[0], num:0}, n:{name:assets[1], num:0}, e:{name:assets[2], num:0} }, 
+            su: { m:{name:assets[1], num:0}, n:{name:assets[2], num:0}, e:{name:assets[0], num:0} } 
+        });
     }
+    
+    // รีเฟรชหน้าจอหลังจากบันทึก
     checkTodayStatus();
 }
