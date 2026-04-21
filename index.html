@@ -6,7 +6,11 @@
     <title>Post Diary</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #FFFFFF; --card: #FFFFFF; --text-main: #2D3436; --kw-color: #0984E3; --su-color: #74B9FF; --fresh-pink: #FFC0CB; }
+        :root { 
+            --bg: #FFFFFF; --card: #FFFFFF; --text-main: #2D3436; 
+            --kw-color: #0984E3; --su-color: #74B9FF; 
+            --save-btn: #FFDDE2; --fresh-pink: #FFC0CB; --border-soft: #F1F2F6;
+        }
         body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); margin: 0; padding: 10px; color: var(--text-main); display: flex; flex-direction: column; align-items: center; }
         .main-container { width: 100%; max-width: 420px; }
         .card { background: var(--card); border-radius: 20px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 12px; border: 1px solid #FDF0F3; }
@@ -16,9 +20,9 @@
         input[type="number"] { padding: 6px; border: 1px solid #FFE4E9; border-radius: 8px; text-align: center; font-size: 1rem; font-weight: 700; }
         .btn-save { background: #FFB6C1; color: white; border: none; width: 100%; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
         
-        /* กระดานสรุปยอด */
-        .dash-grid { display: grid; grid-template-columns: 1fr auto; gap: 5px; font-size: 0.85rem; margin-top: 10px; }
-        .dash-item { border-bottom: 1px solid #FFF5F7; padding: 4px 0; }
+        /* สไตล์สรุปยอด */
+        .dash-card { border: 2px solid var(--fresh-pink); }
+        .dash-item { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 0.9rem; }
         
         .history-card { background: #FFF9FA; border-radius: 15px; padding: 12px; margin-bottom: 10px; border-left: 5px solid var(--fresh-pink); font-size: 0.85rem; }
         .h-row { display: grid; grid-template-columns: 50px 1fr 40px; padding: 3px 0; }
@@ -31,12 +35,7 @@
         <h2 style="font-size:1.1rem; color:#FF69B4; margin-bottom:10px;">📂 Post Diary</h2>
         <input id="date" type="date" onchange="checkTodayStatus()">
     </div>
-
-    <div class="card" style="border-top:4px solid var(--fresh-pink)">
-        <div style="color:#FF69B4; font-weight:700;">📊 สรุปยอดรวม (พี่ขวัญ & พี่สุ)</div>
-        <div id="dashContent" class="dash-grid"></div>
-    </div>
-
+    
     <div id="randomBox" class="card" style="display:none; text-align:center;">
         <button class="btn-random" style="background:var(--fresh-pink); color:white; border:none; padding:10px; border-radius:10px; width:100%; cursor:pointer;" onclick="startRandom()">✨ สุ่มทรัพย์วันนี้</button>
     </div>
@@ -52,6 +51,11 @@
         <div class="row"><span>เที่ยง</span><input id="su_n_name" readonly><input id="su_n_num" type="number"></div>
         <div class="row"><span>เย็น</span><input id="su_e_name" readonly><input id="su_e_num" type="number"></div>
         <button class="btn-save" style="margin-top:10px" onclick="saveData()">💾 บันทึกยอดโพสต์</button>
+    </div>
+
+    <div id="dashBoard" class="card dash-card" style="display:none;">
+        <div style="color:#FF69B4; font-weight:700; margin-bottom:5px;">📊 สรุปยอดรวมเดือนนี้</div>
+        <div id="dashContent"></div>
     </div>
 
     <div id="historyList"></div>
@@ -90,24 +94,21 @@ async function checkTodayStatus() {
         document.getElementById("randomBox").style.display = "block";
         document.getElementById("inputSection").style.display = "none";
     }
-    updateDashboard(); loadHistory(false);
+    updateDashboard();
+    loadHistory(false);
 }
 
 async function updateDashboard() {
     const month = document.getElementById("date").value.substring(0, 7);
-    const snap = await db.collection("posts").get();
+    const snap = await db.collection("posts").where("date", ">=", month + "-01").where("date", "<=", month + "-31").get();
     let stats = {}; 
     snap.forEach(doc => { 
         const d = doc.data(); 
-        if(d.date.startsWith(month)) { 
-            [d.kw, d.su].forEach(p => ['m','n','e'].forEach(t => {
-                const n = p[t].name;
-                stats[n] = (stats[n] || 0) + (Number(p[t].num) || 0);
-            })); 
-        }
+        [d.kw, d.su].forEach(p => ['m','n','e'].forEach(t => stats[p[t].name] = (stats[p[t].name] || 0) + (Number(p[t].num) || 0)));
     });
-    let html = Object.entries(stats).sort((a,b) => b[1]-a[1]).map(([n, c]) => `<div class="dash-item">${n}</div><div class="dash-item" style="text-align:right"><b>${c}</b></div>`).join('');
+    let html = Object.entries(stats).sort((a,b) => b[1]-a[1]).map(([n, c]) => `<div class="dash-item"><span>${n}</span><span><b>${c}</b></span></div>`).join('');
     document.getElementById("dashContent").innerHTML = html || "ไม่มีข้อมูล";
+    document.getElementById("dashBoard").style.display = "block";
 }
 
 async function startRandom() {
@@ -121,10 +122,12 @@ async function loadHistory(showAll) {
     const snap = await db.collection("posts").orderBy("date", "desc").get();
     let html = ""; snap.forEach(doc => { const d = doc.data(); if(!showAll && !d.date.startsWith(document.getElementById("date").value.substring(0,7))) return; 
     html += `<div class="history-card"><strong>🗓 ${d.date}</strong>
+    <div style="font-size:0.75rem; color:#888; margin-top:5px;">👤 พี่ขวัญ</div>
     <div class="h-row" style="color:var(--kw-color)"><span>เช้า</span><span>${d.kw.m.name}</span><span>${d.kw.m.num}</span></div>
     <div class="h-row" style="color:var(--kw-color)"><span>เที่ยง</span><span>${d.kw.n.name}</span><span>${d.kw.n.num}</span></div>
     <div class="h-row" style="color:var(--kw-color)"><span>เย็น</span><span>${d.kw.e.name}</span><span>${d.kw.e.num}</span></div>
-    <div class="h-row" style="color:var(--su-color); margin-top:5px"><span>เช้า</span><span>${d.su.m.name}</span><span>${d.su.m.num}</span></div>
+    <div style="font-size:0.75rem; color:#888; margin-top:5px;">👤 พี่สุ</div>
+    <div class="h-row" style="color:var(--su-color)"><span>เช้า</span><span>${d.su.m.name}</span><span>${d.su.m.num}</span></div>
     <div class="h-row" style="color:var(--su-color)"><span>เที่ยง</span><span>${d.su.n.name}</span><span>${d.su.n.num}</span></div>
     <div class="h-row" style="color:var(--su-color)"><span>เย็น</span><span>${d.su.e.name}</span><span>${d.su.e.num}</span></div></div>`; });
     document.getElementById("historyList").innerHTML = html;
