@@ -1,142 +1,32 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Post Diary</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root { 
-            --bg: #FDFEFF; --card: #FFFFFF; --text-main: #2D3436; 
-            --kw-color: #3867D6; --su-color: #8854D0; 
-            --save-btn: #45AAF2; --fresh-pink: #FD79A8; --border-soft: #F1F2F6;
-        }
-        body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); margin: 0; padding: 10px; color: var(--text-main); display: flex; flex-direction: column; align-items: center; }
-        .main-container { width: 100%; max-width: 420px; }
-        .card { background: var(--card); border-radius: 20px; padding: 15px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05); margin-bottom: 12px; border: 1px solid var(--border-soft); }
-        h2 { font-size: 1.2rem; font-weight: 700; margin: 5px 0 12px 0; text-align: center; }
-        input[type="date"] { width: 100%; padding: 10px; border-radius: 12px; border: 1px solid var(--border-soft); background: #F9FAFB; font-size: 1rem; text-align: center; box-sizing: border-box; outline: none; }
-        .random-box { background: #FFFFFF; border: 2px dashed var(--fresh-pink); padding: 15px; border-radius: 20px; text-align: center; margin-bottom: 12px; }
-        .btn-random { background: var(--fresh-pink); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 600; width: 100%; cursor: pointer; font-size: 1rem; }
-        .section-header { font-weight: 700; font-size: 0.95rem; margin: 5px 0 10px 0; display: flex; align-items: center; gap: 6px; }
-        .row { display: grid; grid-template-columns: 40px 1fr 55px; gap: 8px; margin-bottom: 8px; align-items: center; }
-        .row span { font-size: 0.85rem; color: #636E72; }
-        input[readonly] { background: transparent; border: none; color: var(--text-main); font-weight: 500; font-size: 0.9rem; padding: 0; }
-        input[type="number"] { padding: 6px; border: 1px solid var(--border-soft); border-radius: 8px; text-align: center; font-size: 0.95rem; font-weight: 700; background: #FDFDFD; width: 100%; box-sizing: border-box; }
-        .btn-save { background: var(--save-btn); color: white; border: none; width: 100%; padding: 14px; border-radius: 15px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 10px; }
-        .dash-title { color: var(--fresh-pink); font-weight: 700; margin-bottom: 10px; font-size: 0.9rem; }
-        .dash-grid { display: grid; grid-template-columns: 1fr auto; gap: 5px; font-size: 0.85rem; }
-        .dash-item { border-bottom: 1px solid #FDF2F5; padding: 6px 0; }
-        .history-card { background: white; border-radius: 18px; padding: 15px; margin-bottom: 10px; border-left: 5px solid var(--fresh-pink); box-shadow: 0 3px 10px rgba(0,0,0,0.02); }
-        .h-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.85rem; }
-        .h-item { display: grid; grid-template-columns: 30px 1fr 30px; font-size: 0.8rem; padding: 3px 0; border-bottom: 1px solid #FAFAFA; }
-        .h-num { font-weight: 700; text-align: right; }
-    </style>
-</head>
-<body>
-
-<div class="main-container">
-    <div class="card"><h2>📂 Post Diary</h2><input id="date" type="date" onchange="checkTodayStatus()"></div>
-    <div id="randomBox" class="random-box"><button class="btn-random" onclick="startRandom()">✨ สุ่มทรัพย์วันนี้</button></div>
-
-    <div id="inputSection" class="card" style="display: none;">
-        <div class="section-header" style="color: var(--kw-color);">👤 พี่ขวัญ</div>
-        <div class="row"><span>เช้า</span><input id="kw_m_name" readonly><input id="kw_m_num" type="number"></div>
-        <div class="row"><span>เที่ยง</span><input id="kw_n_name" readonly><input id="kw_n_num" type="number"></div>
-        <div class="row"><span>เย็น</span><input id="kw_e_name" readonly><input id="kw_e_num" type="number"></div>
-        <hr style="border: 0; border-top: 1px solid var(--border-soft); margin: 12px 0;">
-        <div class="section-header" style="color: var(--su-color);">👤 พี่สุ</div>
-        <div class="row"><span>เช้า</span><input id="su_m_name" readonly><input id="su_m_num" type="number"></div>
-        <div class="row"><span>เที่ยง</span><input id="su_n_name" readonly><input id="su_n_num" type="number"></div>
-        <div class="row"><span>เย็น</span><input id="su_e_name" readonly><input id="su_e_num" type="number"></div>
-        <button class="btn-save" onclick="saveData()">💾 บันทึกยอดโพสต์</button>
-    </div>
-
-    <div id="dashCard" class="card" style="border-top: 4px solid var(--fresh-pink);"><div class="dash-title">💖 สถิติเดือนนี้</div><div id="dashContent" class="dash-grid"></div></div>
-    <div id="historyList"></div>
-    <button id="loadAllBtn" style="width:100%; padding:12px; background:none; border:none; color:#B2BEC3; font-size:0.8rem; cursor:pointer; margin-bottom:40px;" onclick="loadHistory(true)">📜 ดูประวัติทั้งหมด</button>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-<script>
-const firebaseConfig = { apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI", authDomain: "save-data-92eca.firebaseapp.com", projectId: "save-data-92eca", storageBucket: "save-data-92eca.firebasestorage.app", messagingSenderId: "661096454777", appId: "1:661096454777:web:d8b4297db798e14b76d2a8" };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-const fixedName = "บ้านเอื้ออาทรอรัญประเทศ";
-const allAssets = ["บ้านพี่แดง อรัญนคร3", "แม่ย่าพี่ปลา 14 ไร่", "พี่ศรีไพร (คอนสาย)", "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "คอนโดชีวาทัย ฮอล์มาร์ค", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์", fixedName, "โกดัง 1 ไร่", "คอนโด The Base Park East", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "แฮปปี้คอนโด"];
-
-let currentDocId = null;
-
-async function checkTodayStatus() {
-    const dateVal = document.getElementById("date").value;
-    if(!dateVal) return;
-    const snap = await db.collection("posts").where("date", "==", dateVal).get();
-    if (!snap.empty) {
-        currentDocId = snap.docs[0].id;
-        document.getElementById("randomBox").style.display = "none";
-        document.getElementById("inputSection").style.display = "block";
-        const d = snap.docs[0].data();
-        document.getElementById("kw_m_name").value = d.kw.m.name; document.getElementById("kw_m_num").value = d.kw.m.num || 0;
-        document.getElementById("kw_n_name").value = d.kw.n.name; document.getElementById("kw_n_num").value = d.kw.n.num || 0;
-        document.getElementById("kw_e_name").value = d.kw.e.name; document.getElementById("kw_e_num").value = d.kw.e.num || 0;
-        document.getElementById("su_m_name").value = d.su.m.name; document.getElementById("su_m_num").value = d.su.m.num || 0;
-        document.getElementById("su_n_name").value = d.su.n.name; document.getElementById("su_n_num").value = d.su.n.num || 0;
-        document.getElementById("su_e_name").value = d.su.e.name; document.getElementById("su_e_num").value = d.su.e.num || 0;
-    } else {
-        currentDocId = null;
-        document.getElementById("randomBox").style.display = "block";
-        document.getElementById("inputSection").style.display = "none";
-    }
-    updateDashboard(); loadHistory(false);
-}
-
 async function startRandom() {
     const dateVal = document.getElementById("date").value;
-    const currentMonth = dateVal.substring(0, 7);
-    const monthSnap = await db.collection("posts").where("date", ">=", currentMonth + "-01").get();
-    let stats = {}; allAssets.forEach(a => stats[a] = 0);
-    monthSnap.forEach(doc => { const d = doc.data(); [d.kw.m.name, d.kw.n.name, d.kw.e.name, d.su.m.name, d.su.n.name, d.su.e.name].forEach(n => { if(stats[n]!==undefined) stats[n]++; }); });
-    const historySnap = await db.collection("posts").orderBy("date", "desc").limit(7).get();
-    let blackList = new Set(); historySnap.forEach(doc => { const d = doc.data(); [d.kw.m.name, d.kw.n.name, d.kw.e.name, d.su.m.name, d.su.n.name, d.su.e.name].forEach(n => { if(n !== fixedName) blackList.add(n); }); });
-    let pool = allAssets.filter(a => a !== fixedName && !blackList.has(a));
-    pool.sort((a, b) => stats[a] - stats[b]);
-    let chosenPool = pool.slice(0, 5); let final2 = [];
-    for(let i=0; i<2; i++) { const idx = Math.floor(Math.random() * chosenPool.length); final2.push(chosenPool.splice(idx, 1)[0]); }
-    const assets = [fixedName, final2[0], final2[1]];
-    await db.collection("posts").add({ date: dateVal, kw: { m:{name:assets[0], num:0}, n:{name:assets[1], num:0}, e:{name:assets[2], num:0} }, su: { m:{name:assets[1], num:0}, n:{name:assets[2], num:0}, e:{name:assets[0], num:0} } });
+    
+    // เงื่อนไขล็อคทรัพย์สำหรับวันที่ 22 เมษายน 2026
+    if (dateVal === "2026-04-22") {
+        const assets = ["บ้านเอื้ออาทรอรัญประเทศ", "แฮปปี้คอนโด", "บ้านพี่หนึ่ง อรัญวิลล์"];
+        
+        await db.collection("posts").add({
+            date: dateVal,
+            kw: { m:{name:assets[0], num:0}, n:{name:assets[1], num:0}, e:{name:assets[2], num:0} },
+            su: { m:{name:assets[1], num:0}, n:{name:assets[2], num:0}, e:{name:assets[0], num:0} }
+        });
+    } else {
+        // ส่วนของการสุ่มปกติ (กรณีไม่ใช่ 22 เมษายน)
+        const currentMonth = dateVal.substring(0, 7);
+        const monthSnap = await db.collection("posts").where("date", ">=", currentMonth + "-01").get();
+        let stats = {}; allAssets.forEach(a => stats[a] = 0);
+        monthSnap.forEach(doc => { const d = doc.data(); [d.kw.m.name, d.kw.n.name, d.kw.e.name, d.su.m.name, d.su.n.name, d.su.e.name].forEach(n => { if(stats[n]!==undefined) stats[n]++; }); });
+        
+        const historySnap = await db.collection("posts").orderBy("date", "desc").limit(7).get();
+        let blackList = new Set(); historySnap.forEach(doc => { const d = doc.data(); [d.kw.m.name, d.kw.n.name, d.kw.e.name, d.su.m.name, d.su.n.name, d.su.e.name].forEach(n => { if(n !== fixedName) blackList.add(n); }); });
+        
+        let pool = allAssets.filter(a => a !== fixedName && !blackList.has(a));
+        pool.sort((a, b) => stats[a] - stats[b]);
+        let chosenPool = pool.slice(0, 5); let final2 = [];
+        for(let i=0; i<2; i++) { const idx = Math.floor(Math.random() * chosenPool.length); final2.push(chosenPool.splice(idx, 1)[0]); }
+        const assets = [fixedName, final2[0], final2[1]];
+        
+        await db.collection("posts").add({ date: dateVal, kw: { m:{name:assets[0], num:0}, n:{name:assets[1], num:0}, e:{name:assets[2], num:0} }, su: { m:{name:assets[1], num:0}, n:{name:assets[2], num:0}, e:{name:assets[0], num:0} } });
+    }
     checkTodayStatus();
 }
-
-async function updateDashboard() {
-    const currentMonth = document.getElementById("date").value.substring(0, 7);
-    const snap = await db.collection("posts").where("date", ">=", currentMonth + "-01").get();
-    let stats = {}; snap.forEach(doc => { const d = doc.data(); [d.kw, d.su].forEach(p => ['m','n','e'].forEach(t => { const n = p[t].name; stats[n] = (stats[n] || 0) + (p[t].num || 0); })); });
-    let html = Object.entries(stats).sort((a,b) => b[1]-a[1]).map(([n, c]) => `<div class="dash-item">${n}</div><div class="dash-item" style="text-align:right"><b>${c}</b></div>`).join('');
-    document.getElementById("dashContent").innerHTML = html || "ไม่มีข้อมูล";
-}
-
-async function loadHistory(showAll) {
-    const dateVal = document.getElementById("date").value; const currentMonth = dateVal.substring(0, 7);
-    let query = db.collection("posts").orderBy("date", "desc");
-    if (!showAll) query = query.where("date", ">=", currentMonth + "-01");
-    const snap = await query.get(); let html = "";
-    snap.forEach(doc => {
-        const d = doc.data();
-        html += `<div class="history-card"><div class="h-header"><strong>🗓 ${d.date}</strong> <div><button style="border:none;background:none;color:var(--save-btn);font-weight:600" onclick="setEdit('${d.date}')">แก้</button><button style="border:none;background:none;color:#FF7675;font-weight:600;margin-left:10px" onclick="deleteEntry('${doc.id}', '${d.date}')">ลบ</button></div></div>
-        <div class="h-item"><span style="color:var(--kw-color)">KW</span><span>${d.kw.m.name}</span><span class="h-num">${d.kw.m.num}</span></div><div class="h-item"><span style="color:var(--kw-color)">KW</span><span>${d.kw.n.name}</span><span class="h-num">${d.kw.n.num}</span></div><div class="h-item"><span style="color:var(--kw-color)">KW</span><span>${d.kw.e.name}</span><span class="h-num">${d.kw.e.num}</span></div>
-        <div class="h-item" style="margin-top:5px"><span style="color:var(--su-color)">SU</span><span>${d.su.m.name}</span><span class="h-num">${d.su.m.num}</span></div><div class="h-item"><span style="color:var(--su-color)">SU</span><span>${d.su.n.name}</span><span class="h-num">${d.su.n.num}</span></div><div class="h-item"><span style="color:var(--su-color)">SU</span><span>${d.su.e.name}</span><span class="h-num">${d.su.e.num}</span></div></div>`;
-    });
-    document.getElementById("historyList").innerHTML = html;
-}
-
-async function deleteEntry(id, date) { if (confirm(`ลบวันที่ ${date}?`)) { await db.collection("posts").doc(id).delete(); checkTodayStatus(); } }
-async function saveData() { await db.collection("posts").doc(currentDocId).update({ "kw.m.num": Number(document.getElementById("kw_m_num").value), "kw.n.num": Number(document.getElementById("kw_n_num").value), "kw.e.num": Number(document.getElementById("kw_e_num").value), "su.m.num": Number(document.getElementById("su_m_num").value), "su.n.num": Number(document.getElementById("su_n_num").value), "su.e.num": Number(document.getElementById("su_e_num").value) }); alert("บันทึกแล้ว!"); checkTodayStatus(); }
-function setEdit(date) { document.getElementById("date").value = date; checkTodayStatus(); window.scrollTo({top: 0, behavior: 'smooth'}); }
-window.onload = () => { document.getElementById("date").value = new Date().toISOString().split('T')[0]; checkTodayStatus(); };
-</script>
-</body>
-</html>
-
