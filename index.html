@@ -1,25 +1,101 @@
-async function startRandom() {
-    const dateInput = document.getElementById("date").value; // ดึงค่าจาก input
-    
-    // ตัดช่องว่างและแปลงเป็น String เพื่อความชัวร์
-    const dateVal = dateInput.trim(); 
-    
-    console.log("วันที่ที่ระบบอ่านได้คือ:", dateVal); // กด F12 ดูใน Console ว่าขึ้นว่าอะไร
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Diary - Production Ready</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #FDFEFF; --kw-color: #3867D6; --su-color: #8854D0; --save-btn: #45AAF2; --fresh-pink: #FD79A8; }
+        body { font-family: 'Sarabun', sans-serif; background: var(--bg); padding: 10px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 400px; }
+        .card { background: #FFF; border-radius: 20px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 10px; border: 1px solid #F1F1F1; }
+        .btn-random { background: var(--fresh-pink); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: 700; cursor: pointer; }
+        .row { display: grid; grid-template-columns: 40px 1fr 50px; gap: 8px; margin-bottom: 8px; align-items: center; }
+        input { border: 1px solid #EEE; border-radius: 8px; padding: 8px; text-align: center; }
+        .btn-save { background: var(--save-btn); color: white; border: none; width: 100%; padding: 12px; border-radius: 12px; font-weight: 700; margin-top: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
 
-    // เปลี่ยนจาก "2026-04-22" เป็น "2026-04-22" หรือตรวจสอบค่าที่ Console อ่านได้
-    if (dateVal === "2026-04-22") {
-        const assets = ["บ้านเอื้ออาทรอรัญประเทศ", "แฮปปี้คอนโด", "บ้านพี่หนึ่ง อรัญวิลล์"];
-        
+<div class="container">
+    <div class="card"><input type="date" id="date" onchange="checkTodayStatus()"></div>
+    <div id="randomBox" class="card" style="display:none"><button class="btn-random" onclick="startRandom()">✨ สุ่มทรัพย์วันนี้</button></div>
+    
+    <div id="inputSection" class="card" style="display:none">
+        <div style="color:var(--kw-color); font-weight:700">👤 พี่ขวัญ</div>
+        <div class="row"><span>เช้า</span><input id="kw_m_name" readonly><input id="kw_m_num" type="number"></div>
+        <div class="row"><span>เที่ยง</span><input id="kw_n_name" readonly><input id="kw_n_num" type="number"></div>
+        <div class="row"><span>เย็น</span><input id="kw_e_name" readonly><input id="kw_e_num" type="number"></div>
+        <hr>
+        <div style="color:var(--su-color); font-weight:700">👤 พี่สุ</div>
+        <div class="row"><span>เช้า</span><input id="su_m_name" readonly><input id="su_m_num" type="number"></div>
+        <div class="row"><span>เที่ยง</span><input id="su_n_name" readonly><input id="su_n_num" type="number"></div>
+        <div class="row"><span>เย็น</span><input id="su_e_name" readonly><input id="su_e_num" type="number"></div>
+        <button class="btn-save" onclick="saveData()">💾 บันทึกข้อมูล</button>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script>
+    const firebaseConfig = { apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI", authDomain: "save-data-92eca.firebaseapp.com", projectId: "save-data-92eca", storageBucket: "save-data-92eca.firebasestorage.app", messagingSenderId: "661096454777", appId: "1:661096454777:web:d8b4297db798e14b76d2a8" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const allAssets = ["บ้านเอื้ออาทรอรัญประเทศ", "บ้านพี่แดง อรัญนคร3", "แม่ย่าพี่ปลา 14 ไร่", "พี่ศรีไพร (คอนสาย)", "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "คอนโดชีวาทัย ฮอล์มาร์ค", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์", "โกดัง 1 ไร่", "คอนโด The Base Park East", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "แฮปปี้คอนโด"];
+
+    let currentDocId = null;
+
+    async function checkTodayStatus() {
+        const dateVal = document.getElementById("date").value;
+        const snap = await db.collection("posts").where("date", "==", dateVal).get();
+        if (!snap.empty) {
+            currentDocId = snap.docs[0].id;
+            const d = snap.docs[0].data();
+            document.getElementById("kw_m_name").value = d.kw.m.name; document.getElementById("kw_m_num").value = d.kw.m.num;
+            document.getElementById("kw_n_name").value = d.kw.n.name; document.getElementById("kw_n_num").value = d.kw.n.num;
+            document.getElementById("kw_e_name").value = d.kw.e.name; document.getElementById("kw_e_num").value = d.kw.e.num;
+            document.getElementById("su_m_name").value = d.su.m.name; document.getElementById("su_m_num").value = d.su.m.num;
+            document.getElementById("su_n_name").value = d.su.n.name; document.getElementById("su_n_num").value = d.su.n.num;
+            document.getElementById("su_e_name").value = d.su.e.name; document.getElementById("su_e_num").value = d.su.e.num;
+            document.getElementById("randomBox").style.display = "none";
+            document.getElementById("inputSection").style.display = "block";
+        } else {
+            document.getElementById("randomBox").style.display = "block";
+            document.getElementById("inputSection").style.display = "none";
+        }
+    }
+
+    async function startRandom() {
+        const dateVal = document.getElementById("date").value;
+        let assets;
+        if (dateVal === "2026-04-22") {
+            assets = ["บ้านเอื้ออาทรอรัญประเทศ", "แฮปปี้คอนโด", "บ้านพี่หนึ่ง อรัญวิลล์"];
+        } else {
+            assets = allAssets.sort(() => 0.5 - Math.random()).slice(0, 3);
+        }
         await db.collection("posts").add({
             date: dateVal,
             kw: { m:{name:assets[0], num:0}, n:{name:assets[1], num:0}, e:{name:assets[2], num:0} },
             su: { m:{name:assets[1], num:0}, n:{name:assets[2], num:0}, e:{name:assets[0], num:0} }
         });
-        alert("ล็อคทรัพย์วันที่ 22 เรียบร้อย!");
-    } else {
-        // ... (โค้ดสุ่มปกติของคุณที่เหลือ) ...
-        const currentMonth = dateVal.substring(0, 7);
-        // ... (ใส่โค้ดสุ่มปกติที่เหลือของคุณต่อตรงนี้ได้เลย)
+        checkTodayStatus();
     }
-    checkTodayStatus();
-}
+
+    async function saveData() {
+        await db.collection("posts").doc(currentDocId).update({
+            "kw.m.num": Number(document.getElementById("kw_m_num").value),
+            "kw.n.num": Number(document.getElementById("kw_n_num").value),
+            "kw.e.num": Number(document.getElementById("kw_e_num").value),
+            "su.m.num": Number(document.getElementById("su_m_num").value),
+            "su.n.num": Number(document.getElementById("su_n_num").value),
+            "su.e.num": Number(document.getElementById("su_e_num").value)
+        });
+        alert("บันทึกสำเร็จ!");
+    }
+
+    window.onload = () => { document.getElementById("date").value = new Date().toISOString().split('T')[0]; checkTodayStatus(); };
+</script>
+</body>
+</html>
