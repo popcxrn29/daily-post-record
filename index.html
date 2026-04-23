@@ -15,10 +15,8 @@
         .row { display: grid; grid-template-columns: 40px 1fr 50px; gap: 8px; margin-bottom: 8px; align-items: center; }
         input[type="number"] { padding: 6px; border: 1px solid #FFE4E9; border-radius: 8px; text-align: center; font-size: 1rem; font-weight: 700; }
         .btn-save { background: #FFB6C1; color: white; border: none; width: 100%; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
-        
         .dash-grid { display: grid; grid-template-columns: 1fr auto; gap: 5px; font-size: 0.85rem; margin-top: 10px; }
         .dash-item { border-bottom: 1px solid #FFF5F7; padding: 4px 0; }
-        
         .history-card { background: #FFF9FA; border-radius: 15px; padding: 12px; margin-bottom: 10px; border-left: 5px solid var(--fresh-pink); font-size: 0.85rem; position: relative; }
         .h-row { display: grid; grid-template-columns: 50px 1fr 40px; padding: 3px 0; }
         .btn-action { padding: 4px 8px; font-size: 0.7rem; border-radius: 6px; border: none; cursor: pointer; margin-left: 5px; }
@@ -30,11 +28,6 @@
     <div class="card" style="text-align:center;">
         <h2 style="font-size:1.1rem; color:#FF69B4; margin-bottom:10px;">📂 Post Diary</h2>
         <input id="date" type="date" onchange="checkTodayStatus()">
-    </div>
-
-    <div class="card" style="border-top:4px solid var(--fresh-pink)">
-        <div style="color:#FF69B4; font-weight:700;">📊 สรุปยอดรวม (พี่ขวัญ & พี่สุ)</div>
-        <div id="dashContent" class="dash-grid"></div>
     </div>
 
     <div id="randomBox" class="card" style="display:none; text-align:center;">
@@ -54,6 +47,11 @@
         <button class="btn-save" style="margin-top:10px" onclick="saveData()">💾 บันทึกยอดโพสต์</button>
     </div>
 
+    <div id="dashBoard" class="card" style="border-top:4px solid var(--fresh-pink); display:none;">
+        <div style="color:#FF69B4; font-weight:700;">📊 สรุปยอดรวมเดือนนี้</div>
+        <div id="dashContent" class="dash-grid"></div>
+    </div>
+
     <div id="historyList"></div>
     <button id="loadAllBtn" style="width:100%; padding:10px; background:none; border:none; color:#C0C0C0; cursor:pointer;" onclick="loadHistory(true)">📜 ดูประวัติทั้งหมด</button>
 </div>
@@ -65,7 +63,9 @@ const firebaseConfig = { apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI", auth
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ... (ฟังก์ชันเดิมทั้งหมด) ...
+const fixedName = "บ้านเอื้ออาทรอรัญประเทศ";
+const allAssets = ["บ้านพี่แดง อรัญนคร3", "พี่ศรีไพร (คอนสาย)", "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "คอนโดชีวาทัย ฮอล์มาร์ค", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์", fixedName, "โกดัง 1 ไร่", "คอนโด The Base Park East", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "แฮปปี้คอนโด"];
+
 let currentDocId = null;
 
 async function checkTodayStatus() {
@@ -91,6 +91,18 @@ async function checkTodayStatus() {
     updateDashboard(); loadHistory(false);
 }
 
+async function startRandom() {
+    const dateVal = document.getElementById("date").value;
+    let pool = allAssets.filter(a => a !== fixedName);
+    let selected = [fixedName, pool[Math.floor(Math.random()*pool.length)], pool[Math.floor(Math.random()*pool.length)]];
+    await db.collection("posts").add({ 
+        date: dateVal, 
+        kw: { m:{name:selected[0], num:0}, n:{name:selected[1], num:0}, e:{name:selected[2], num:0} }, 
+        su: { m:{name:selected[1], num:0}, n:{name:selected[2], num:0}, e:{name:selected[0], num:0} } 
+    });
+    checkTodayStatus();
+}
+
 async function updateDashboard() {
     const month = document.getElementById("date").value.substring(0, 7);
     const snap = await db.collection("posts").get();
@@ -98,12 +110,11 @@ async function updateDashboard() {
     snap.forEach(doc => { 
         const d = doc.data(); 
         if(d.date.startsWith(month)) { 
-            [d.kw, d.su].forEach(p => ['m','n','e'].forEach(t => {
-                const n = p[t].name; stats[n] = (stats[n] || 0) + (Number(p[t].num) || 0);
-            })); 
+            [d.kw, d.su].forEach(p => ['m','n','e'].forEach(t => stats[p[t].name] = (stats[p[t].name] || 0) + (Number(p[t].num) || 0))); 
         }
     });
     document.getElementById("dashContent").innerHTML = Object.entries(stats).sort((a,b) => b[1]-a[1]).map(([n, c]) => `<div class="dash-item">${n}</div><div class="dash-item" style="text-align:right"><b>${c}</b></div>`).join('') || "ไม่มีข้อมูล";
+    document.getElementById("dashBoard").style.display = "block";
 }
 
 async function loadHistory(showAll) {
@@ -112,10 +123,12 @@ async function loadHistory(showAll) {
     html += `<div class="history-card"><strong>🗓 ${d.date}</strong>
     <button class="btn-action" style="background:#ddd" onclick="editEntry('${doc.id}')">✏️</button>
     <button class="btn-action" style="background:#ff7675; color:white" onclick="deleteEntry('${doc.id}')">🗑️</button>
-    <div class="h-row" style="color:var(--kw-color); margin-top:5px"><span>เช้า</span><span>${d.kw.m.name}</span><span>${d.kw.m.num}</span></div>
+    <div style="font-size:0.75rem; color:#888; margin-top:5px;">👤 พี่ขวัญ</div>
+    <div class="h-row" style="color:var(--kw-color)"><span>เช้า</span><span>${d.kw.m.name}</span><span>${d.kw.m.num}</span></div>
     <div class="h-row" style="color:var(--kw-color)"><span>เที่ยง</span><span>${d.kw.n.name}</span><span>${d.kw.n.num}</span></div>
     <div class="h-row" style="color:var(--kw-color)"><span>เย็น</span><span>${d.kw.e.name}</span><span>${d.kw.e.num}</span></div>
-    <div class="h-row" style="color:var(--su-color); margin-top:5px"><span>เช้า</span><span>${d.su.m.name}</span><span>${d.su.m.num}</span></div>
+    <div style="font-size:0.75rem; color:#888; margin-top:5px;">👤 พี่สุ</div>
+    <div class="h-row" style="color:var(--su-color)"><span>เช้า</span><span>${d.su.m.name}</span><span>${d.su.m.num}</span></div>
     <div class="h-row" style="color:var(--su-color)"><span>เที่ยง</span><span>${d.su.n.name}</span><span>${d.su.n.num}</span></div>
     <div class="h-row" style="color:var(--su-color)"><span>เย็น</span><span>${d.su.e.name}</span><span>${d.su.e.num}</span></div></div>`; });
     document.getElementById("historyList").innerHTML = html;
@@ -123,20 +136,15 @@ async function loadHistory(showAll) {
 
 async function editEntry(id) {
     const doc = await db.collection("posts").doc(id).get();
-    const d = doc.data();
-    document.getElementById("date").value = d.date;
+    document.getElementById("date").value = doc.data().date;
     checkTodayStatus();
 }
 
 async function deleteEntry(id) {
-    if(confirm("ยืนยันการลบรายการนี้?")) {
-        await db.collection("posts").doc(id).delete();
-        checkTodayStatus();
-    }
+    if(confirm("ยืนยันการลบ?")) { await db.collection("posts").doc(id).delete(); checkTodayStatus(); }
 }
 
 async function saveData() { await db.collection("posts").doc(currentDocId).update({ "kw.m.num": Number(document.getElementById("kw_m_num").value), "kw.n.num": Number(document.getElementById("kw_n_num").value), "kw.e.num": Number(document.getElementById("kw_e_num").value), "su.m.num": Number(document.getElementById("su_m_num").value), "su.n.num": Number(document.getElementById("su_n_num").value), "su.e.num": Number(document.getElementById("su_e_num").value) }); alert("บันทึกแล้ว!"); checkTodayStatus(); }
-async function startRandom() { /* (โค้ดเดิม) */ }
 window.onload = () => { document.getElementById("date").value = new Date().toISOString().split('T')[0]; checkTodayStatus(); };
 </script>
 </body>
