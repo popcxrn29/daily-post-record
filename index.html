@@ -14,12 +14,13 @@
         input[readonly] { font-size: 1.1rem; font-weight: 700; color: #333; background: transparent; border: none; width: 100%; }
         .row { display: grid; grid-template-columns: 40px 1fr 50px; gap: 8px; margin-bottom: 8px; align-items: center; }
         input[type="number"] { padding: 6px; border: 1px solid #FFE4E9; border-radius: 8px; text-align: center; font-size: 1rem; font-weight: 700; }
-        .btn-save { background: #FFB6C1; color: white; border: none; width: 100%; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+        .btn-random, .btn-save { background: #FFFFFF; color: #FF69B4; border: 2px solid #FF69B4; padding: 10px; border-radius: 12px; width: 100%; font-weight: 700; cursor: pointer; }
+        .btn-action { padding: 4px 8px; font-size: 0.7rem; border-radius: 6px; cursor: pointer; margin-left: 5px; background: #FFFFFF; border: 1px solid #ddd; }
+        .btn-delete { border: 1px solid #ff7675; color: #ff7675; }
         .dash-grid { display: grid; grid-template-columns: 1fr auto; gap: 5px; font-size: 0.85rem; margin-top: 10px; }
         .dash-item { border-bottom: 1px solid #FFF5F7; padding: 4px 0; }
         .history-card { background: #FFF9FA; border-radius: 15px; padding: 12px; margin-bottom: 10px; border-left: 5px solid var(--fresh-pink); font-size: 0.85rem; position: relative; }
         .h-row { display: grid; grid-template-columns: 50px 1fr 40px; padding: 3px 0; }
-        .btn-action { padding: 4px 8px; font-size: 0.7rem; border-radius: 6px; border: none; cursor: pointer; margin-left: 5px; }
     </style>
 </head>
 <body>
@@ -31,7 +32,7 @@
     </div>
 
     <div id="randomBox" class="card" style="display:none; text-align:center;">
-        <button style="background:var(--fresh-pink); color:white; border:none; padding:10px; border-radius:10px; width:100%; cursor:pointer;" onclick="startRandom()">✨ สุ่มทรัพย์วันนี้</button>
+        <button class="btn-random" onclick="startRandom()">✨ สุ่มทรัพย์วันนี้</button>
     </div>
 
     <div id="inputSection" class="card" style="display: none;">
@@ -53,7 +54,6 @@
     </div>
 
     <div id="historyList"></div>
-    <button id="loadAllBtn" style="width:100%; padding:10px; background:none; border:none; color:#C0C0C0; cursor:pointer;" onclick="loadHistory(true)">📜 ดูประวัติทั้งหมด</button>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -63,8 +63,7 @@ const firebaseConfig = { apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI", auth
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-const fixedName = "บ้านเอื้ออาทรอรัญประเทศ";
-const allAssets = ["บ้านพี่แดง อรัญนคร3", "พี่ศรีไพร (คอนสาย)", "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "คอนโดชีวาทัย ฮอล์มาร์ค", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์", fixedName, "โกดัง 1 ไร่", "คอนโด The Base Park East", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "แฮปปี้คอนโด"];
+const allAssets = ["บ้านพี่แดง อรัญนคร3", "พี่ศรีไพร (คอนสาย)", "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "คอนโดชีวาทัย ฮอล์มาร์ค", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์", "บ้านเอื้ออาทรอรัญประเทศ", "โกดัง 1 ไร่", "คอนโด The Base Park East", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "แฮปปี้คอนโด", "แม่ย่าพี่ปลา 11 ไร่"];
 
 let currentDocId = null;
 
@@ -93,12 +92,17 @@ async function checkTodayStatus() {
 
 async function startRandom() {
     const dateVal = document.getElementById("date").value;
-    let pool = allAssets.filter(a => a !== fixedName);
-    let selected = [fixedName, pool[Math.floor(Math.random()*pool.length)], pool[Math.floor(Math.random()*pool.length)]];
+    let assets;
+    if (dateVal === "2029-04-27") {
+        assets = ["บ้านเอื้ออาทรอรัญประเทศ", "แม่ย่าพี่ปลา 11 ไร่", "ที่ดิน หลังอรัญนคร 1"];
+    } else {
+        let pool = allAssets.filter(a => a !== "บ้านเอื้ออาทรอรัญประเทศ");
+        assets = ["บ้านเอื้ออาทรอรัญประเทศ", pool[Math.floor(Math.random()*pool.length)], pool[Math.floor(Math.random()*pool.length)]];
+    }
     await db.collection("posts").add({ 
         date: dateVal, 
-        kw: { m:{name:selected[0], num:0}, n:{name:selected[1], num:0}, e:{name:selected[2], num:0} }, 
-        su: { m:{name:selected[1], num:0}, n:{name:selected[2], num:0}, e:{name:selected[0], num:0} } 
+        kw: { m:{name:assets[0], num:0}, n:{name:assets[1], num:0}, e:{name:assets[2], num:0} }, 
+        su: { m:{name:assets[1], num:0}, n:{name:assets[2], num:0}, e:{name:assets[0], num:0} } 
     });
     checkTodayStatus();
 }
@@ -121,29 +125,19 @@ async function loadHistory(showAll) {
     const snap = await db.collection("posts").orderBy("date", "desc").get();
     let html = ""; snap.forEach(doc => { const d = doc.data(); if(!showAll && !d.date.startsWith(document.getElementById("date").value.substring(0,7))) return; 
     html += `<div class="history-card"><strong>🗓 ${d.date}</strong>
-    <button class="btn-action" style="background:#ddd" onclick="editEntry('${doc.id}')">✏️</button>
-    <button class="btn-action" style="background:#ff7675; color:white" onclick="deleteEntry('${doc.id}')">🗑️</button>
-    <div style="font-size:0.75rem; color:#888; margin-top:5px;">👤 พี่ขวัญ</div>
-    <div class="h-row" style="color:var(--kw-color)"><span>เช้า</span><span>${d.kw.m.name}</span><span>${d.kw.m.num}</span></div>
+    <button class="btn-action" onclick="editEntry('${doc.id}')">✏️</button>
+    <button class="btn-action btn-delete" onclick="deleteEntry('${doc.id}')">🗑️</button>
+    <div class="h-row" style="color:var(--kw-color); margin-top:5px"><span>เช้า</span><span>${d.kw.m.name}</span><span>${d.kw.m.num}</span></div>
     <div class="h-row" style="color:var(--kw-color)"><span>เที่ยง</span><span>${d.kw.n.name}</span><span>${d.kw.n.num}</span></div>
     <div class="h-row" style="color:var(--kw-color)"><span>เย็น</span><span>${d.kw.e.name}</span><span>${d.kw.e.num}</span></div>
-    <div style="font-size:0.75rem; color:#888; margin-top:5px;">👤 พี่สุ</div>
-    <div class="h-row" style="color:var(--su-color)"><span>เช้า</span><span>${d.su.m.name}</span><span>${d.su.m.num}</span></div>
+    <div class="h-row" style="color:var(--su-color); margin-top:5px"><span>เช้า</span><span>${d.su.m.name}</span><span>${d.su.m.num}</span></div>
     <div class="h-row" style="color:var(--su-color)"><span>เที่ยง</span><span>${d.su.n.name}</span><span>${d.su.n.num}</span></div>
     <div class="h-row" style="color:var(--su-color)"><span>เย็น</span><span>${d.su.e.name}</span><span>${d.su.e.num}</span></div></div>`; });
     document.getElementById("historyList").innerHTML = html;
 }
 
-async function editEntry(id) {
-    const doc = await db.collection("posts").doc(id).get();
-    document.getElementById("date").value = doc.data().date;
-    checkTodayStatus();
-}
-
-async function deleteEntry(id) {
-    if(confirm("ยืนยันการลบ?")) { await db.collection("posts").doc(id).delete(); checkTodayStatus(); }
-}
-
+async function editEntry(id) { const doc = await db.collection("posts").doc(id).get(); document.getElementById("date").value = doc.data().date; checkTodayStatus(); }
+async function deleteEntry(id) { if(confirm("ยืนยันการลบ?")) { await db.collection("posts").doc(id).delete(); checkTodayStatus(); } }
 async function saveData() { await db.collection("posts").doc(currentDocId).update({ "kw.m.num": Number(document.getElementById("kw_m_num").value), "kw.n.num": Number(document.getElementById("kw_n_num").value), "kw.e.num": Number(document.getElementById("kw_e_num").value), "su.m.num": Number(document.getElementById("su_m_num").value), "su.n.num": Number(document.getElementById("su_n_num").value), "su.e.num": Number(document.getElementById("su_e_num").value) }); alert("บันทึกแล้ว!"); checkTodayStatus(); }
 window.onload = () => { document.getElementById("date").value = new Date().toISOString().split('T')[0]; checkTodayStatus(); };
 </script>
