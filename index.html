@@ -93,11 +93,12 @@ async function checkTodayStatus() {
 async function startRandom() {
     const dateVal = document.getElementById("date").value;
     let assets;
-    if (dateVal === "2029-04-27") {
+    if (dateVal === "2026-04-27") {
         assets = ["บ้านเอื้ออาทรอรัญประเทศ", "แม่ย่าพี่ปลา 11 ไร่", "ที่ดิน หลังอรัญนคร 1"];
     } else {
-        let pool = allAssets.filter(a => a !== "บ้านเอื้ออาทรอรัญประเทศ");
-        assets = ["บ้านเอื้ออาทรอรัญประเทศ", pool[Math.floor(Math.random()*pool.length)], pool[Math.floor(Math.random()*pool.length)]];
+        let pool = allAssets.filter(a => !["บ้านเอื้ออาทรอรัญประเทศ", "แม่ย่าพี่ปลา 11 ไร่", "ที่ดิน หลังอรัญนคร 1"].includes(a));
+        let selected = [allAssets[Math.floor(Math.random()*allAssets.length)], allAssets[Math.floor(Math.random()*allAssets.length)], allAssets[Math.floor(Math.random()*allAssets.length)]];
+        assets = selected;
     }
     await db.collection("posts").add({ 
         date: dateVal, 
