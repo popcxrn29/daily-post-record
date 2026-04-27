@@ -63,7 +63,8 @@ const firebaseConfig = { apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI", auth
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-const allAssets = ["บ้านพี่แดง อรัญนคร3", "พี่ศรีไพร (คอนสาย)", "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "คอนโดชีวาทัย ฮอล์มาร์ค", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์", "บ้านเอื้ออาทรอรัญประเทศ", "โกดัง 1 ไร่", "คอนโด The Base Park East", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "แฮปปี้คอนโด", "แม่ย่าพี่ปลา 11 ไร่"];
+const fixed = "บ้านเอื้ออาทรอรัญประเทศ";
+const allAssets = ["บ้านพี่แดง อรัญนคร3", "พี่ศรีไพร (คอนสาย)", "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "คอนโดชีวาทัย ฮอล์มาร์ค", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์", "โกดัง 1 ไร่", "คอนโด The Base Park East", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "แฮปปี้คอนโด", "แม่ย่าพี่ปลา 11 ไร่"];
 
 let currentDocId = null;
 
@@ -87,18 +88,17 @@ async function checkTodayStatus() {
         document.getElementById("randomBox").style.display = "block";
         document.getElementById("inputSection").style.display = "none";
     }
-    updateDashboard(); loadHistory(false);
+    updateDashboard(); loadHistory();
 }
 
 async function startRandom() {
     const dateVal = document.getElementById("date").value;
     let assets;
     if (dateVal === "2026-04-27") {
-        assets = ["บ้านเอื้ออาทรอรัญประเทศ", "แม่ย่าพี่ปลา 11 ไร่", "ที่ดิน หลังอรัญนคร 1"];
+        assets = [fixed, "แม่ย่าพี่ปลา 11 ไร่", "ที่ดิน หลังอรัญนคร 1"];
     } else {
-        let pool = allAssets.filter(a => !["บ้านเอื้ออาทรอรัญประเทศ", "แม่ย่าพี่ปลา 11 ไร่", "ที่ดิน หลังอรัญนคร 1"].includes(a));
-        let selected = [allAssets[Math.floor(Math.random()*allAssets.length)], allAssets[Math.floor(Math.random()*allAssets.length)], allAssets[Math.floor(Math.random()*allAssets.length)]];
-        assets = selected;
+        let pool = allAssets.filter(a => a !== fixed).sort(() => 0.5 - Math.random());
+        assets = [fixed, pool[0], pool[1]].sort(() => 0.5 - Math.random());
     }
     await db.collection("posts").add({ 
         date: dateVal, 
@@ -122,9 +122,9 @@ async function updateDashboard() {
     document.getElementById("dashBoard").style.display = "block";
 }
 
-async function loadHistory(showAll) {
+async function loadHistory() {
     const snap = await db.collection("posts").orderBy("date", "desc").get();
-    let html = ""; snap.forEach(doc => { const d = doc.data(); if(!showAll && !d.date.startsWith(document.getElementById("date").value.substring(0,7))) return; 
+    let html = ""; snap.forEach(doc => { const d = doc.data();
     html += `<div class="history-card"><strong>🗓 ${d.date}</strong>
     <button class="btn-action" onclick="editEntry('${doc.id}')">✏️</button>
     <button class="btn-action btn-delete" onclick="deleteEntry('${doc.id}')">🗑️</button>
