@@ -94,12 +94,23 @@ async function checkTodayStatus() {
 async function startRandom() {
     const dateVal = document.getElementById("date").value;
     let assets;
+    
     if (dateVal === "2026-04-27") {
         assets = [fixed, "แม่ย่าพี่ปลา 11 ไร่", "ที่ดิน หลังอรัญนคร 1"];
     } else {
-        let pool = allAssets.filter(a => a !== fixed).sort(() => 0.5 - Math.random());
-        assets = [fixed, pool[0], pool[1]].sort(() => 0.5 - Math.random());
+        // Logic: ล็อกบ้านเอื้ออาทรฯ แล้วสับเปลี่ยนทรัพย์ที่เหลือทั้งหมดเพื่อกระจายความหลากหลาย
+        let pool = allAssets.filter(a => a !== fixed);
+        // Shuffle (Fisher-Yates)
+        for (let i = pool.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+        // เลือก 2 ตัวแรกที่สลับแล้วมาผสมกับตัวหลัก (fixed)
+        let selected = [fixed, pool[0], pool[1]];
+        // สลับตำแหน่ง 3 ตัวนี้อีกครั้งให้ตำแหน่ง เช้า/เที่ยง/เย็น ไม่ซ้ำเดิม
+        assets = selected.sort(() => 0.5 - Math.random());
     }
+
     await db.collection("posts").add({ 
         date: dateVal, 
         kw: { m:{name:assets[0], num:0}, n:{name:assets[1], num:0}, e:{name:assets[2], num:0} }, 
@@ -144,4 +155,3 @@ window.onload = () => { document.getElementById("date").value = new Date().toISO
 </script>
 </body>
 </html>
-
