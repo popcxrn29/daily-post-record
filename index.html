@@ -63,9 +63,14 @@ const firebaseConfig = { apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI", auth
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-const fixed = "บ้านเอื้ออาทรอรัญประเทศ";
-const allAssets = ["บ้านพี่แดง อรัญนคร3", "พี่ศรีไพร (คอนสาย)", "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "คอนโดชีวาทัย ฮอล์มาร์ค", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์", "โกดัง 1 ไร่", "คอนโด The Base Park East", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "แฮปปี้คอนโด", "แม่ย่าพี่ปลา 11 ไร่", "ศรีวราห์การ์เด้น", "ลุมพินีรามอินทรา"];
+// ฐานข้อมูลทรัพย์สิน
+const groups = {
+    g1: ["แม่ย่าพี่ปลา 11 ไร่", "บ้านพี่แดง อรัญนคร3", "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์", "โกดัง 1 ไร่"],
+    g2: ["ศรีวราห์การ์เด้น", "ลุมพินีรามอินทรา", "แฮปปี้คอนโด", "คอนโดชีวาทัย ฮอล์มาร์ค", "คอนโด The Base Park East", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49"],
+    g3: ["พี่ศรีไพร (คอนสาย)", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9"]
+};
 
+const fixedAsset = "บ้านเอื้ออาทรอรัญประเทศ";
 let currentDocId = null;
 
 async function checkTodayStatus() {
@@ -93,28 +98,46 @@ async function checkTodayStatus() {
 
 async function startRandom() {
     const dateVal = document.getElementById("date").value;
-    let assets;
+    let finalAssets = [];
     
     if (dateVal === "2026-04-27") {
-        assets = [fixed, "แม่ย่าพี่ปลา 11 ไร่", "ที่ดิน หลังอรัญนคร 1"];
+        finalAssets = [fixedAsset, "แม่ย่าพี่ปลา 11 ไร่", "ที่ดิน หลังอรัญนคร 1"];
     } else {
-        // Logic: ล็อกบ้านเอื้ออาทรฯ แล้วสับเปลี่ยนทรัพย์ที่เหลือทั้งหมดเพื่อกระจายความหลากหลาย
-        let pool = allAssets.filter(a => a !== fixed);
-        // Shuffle (Fisher-Yates)
-        for (let i = pool.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [pool[i], pool[j]] = [pool[j], pool[i]];
-        }
-        // เลือก 2 ตัวแรกที่สลับแล้วมาผสมกับตัวหลัก (fixed)
-        let selected = [fixed, pool[0], pool[1]];
-        // สลับตำแหน่ง 3 ตัวนี้อีกครั้งให้ตำแหน่ง เช้า/เที่ยง/เย็น ไม่ซ้ำเดิม
-        assets = selected.sort(() => 0.5 - Math.random());
+        // ประวัติ 7 วันล่าสุด
+        const historySnap = await db.collection("posts").orderBy("date", "desc").limit(7).get();
+        let usedAssets = [];
+        let totalCount = 0;
+        historySnap.forEach(doc => {
+            const d = doc.data();
+            totalCount++;
+            [d.kw, d.su].forEach(p => ['m','n','e'].forEach(t => usedAssets.push(p[t].name)));
+        });
+
+        // Logic วนกลุ่ม: (จำนวนรายการที่มี % 3) เพื่อเลือกคู่กลุ่ม
+        // รอบ 0: g2, g3 | รอบ 1: g1, g2 | รอบ 2: g1, g3
+        const rotationIdx = totalCount % 3;
+        let selectedGroups = [];
+        if (rotationIdx === 0) selectedGroups = [groups.g2, groups.g3];
+        else if (rotationIdx === 1) selectedGroups = [groups.g1, groups.g2];
+        else selectedGroups = [groups.g1, groups.g3];
+
+        const getSmartRandom = (group) => {
+            let available = group.filter(a => !usedAssets.includes(a));
+            if (available.length === 0) available = group; 
+            return available[Math.floor(Math.random() * available.length)];
+        };
+
+        let res1 = fixedAsset;
+        let res2 = getSmartRandom(selectedGroups[0]);
+        let res3 = getSmartRandom(selectedGroups[1]);
+        
+        finalAssets = [res1, res2, res3].sort(() => 0.5 - Math.random());
     }
 
     await db.collection("posts").add({ 
         date: dateVal, 
-        kw: { m:{name:assets[0], num:0}, n:{name:assets[1], num:0}, e:{name:assets[2], num:0} }, 
-        su: { m:{name:assets[1], num:0}, n:{name:assets[2], num:0}, e:{name:assets[0], num:0} } 
+        kw: { m:{name:finalAssets[0], num:0}, n:{name:finalAssets[1], num:0}, e:{name:finalAssets[2], num:0} }, 
+        su: { m:{name:finalAssets[1], num:0}, n:{name:finalAssets[2], num:0}, e:{name:finalAssets[0], num:0} } 
     });
     checkTodayStatus();
 }
