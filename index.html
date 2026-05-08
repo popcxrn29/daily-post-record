@@ -63,7 +63,7 @@ const firebaseConfig = { apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI", auth
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ฐานข้อมูลทรัพย์สิน
+// ฐานข้อมูลกลุ่มทรัพย์สิน
 const groups = {
     g1: ["แม่ย่าพี่ปลา 11 ไร่", "บ้านพี่แดง อรัญนคร3", "พี่แอน ห้องเช่า 3 ห้อง", "พี่แอน ห้องเช่า 9 ห้อง", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์", "โกดัง 1 ไร่"],
     g2: ["ศรีวราห์การ์เด้น", "ลุมพินีรามอินทรา", "แฮปปี้คอนโด", "คอนโดชีวาทัย ฮอล์มาร์ค", "คอนโด The Base Park East", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49"],
@@ -103,19 +103,20 @@ async function startRandom() {
     if (dateVal === "2026-04-27") {
         finalAssets = [fixedAsset, "แม่ย่าพี่ปลา 11 ไร่", "ที่ดิน หลังอรัญนคร 1"];
     } else {
-        // ประวัติ 7 วันล่าสุด
+        // ใช้จำนวนรายการทั้งหมดในฐานข้อมูลมาเป็นตัวกำหนดรอบการสลับกลุ่ม (Sequence Rotation)
+        const historyCountSnap = await db.collection("posts").get();
+        const count = historyCountSnap.size;
+
+        // ดึงประวัติ 7 วันล่าสุดเพื่อเลี่ยงซ้ำภายในกลุ่ม
         const historySnap = await db.collection("posts").orderBy("date", "desc").limit(7).get();
         let usedAssets = [];
-        let totalCount = 0;
         historySnap.forEach(doc => {
             const d = doc.data();
-            totalCount++;
             [d.kw, d.su].forEach(p => ['m','n','e'].forEach(t => usedAssets.push(p[t].name)));
         });
 
-        // Logic วนกลุ่ม: (จำนวนรายการที่มี % 3) เพื่อเลือกคู่กลุ่ม
-        // รอบ 0: g2, g3 | รอบ 1: g1, g2 | รอบ 2: g1, g3
-        const rotationIdx = totalCount % 3;
+        // ลำดับการสลับ: 0 -> (2,3), 1 -> (1,2), 2 -> (1,3)
+        const rotationIdx = count % 3;
         let selectedGroups = [];
         if (rotationIdx === 0) selectedGroups = [groups.g2, groups.g3];
         else if (rotationIdx === 1) selectedGroups = [groups.g1, groups.g2];
