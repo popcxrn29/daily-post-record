@@ -142,28 +142,27 @@ async function startRandom() {
     checkTodayStatus();
 }
 
-// ฟังก์ชันกู้คืนข้อมูลสำรองของวันที่ 16/05/2569 (2026-05-16)
+// ฟังก์ชันกู้คืนข้อมูลสำรองของวันนี้และแสดงผลทันที
 async function restoreBackupData() {
-    const dateVal = document.getElementById("date").value;
-    if (dateVal === "2026-05-16") {
-        if(confirm("คุณต้องการกู้คืนข้อมูลของวันที่ 16/05/2569 ใช่หรือไม่?")) {
-            // โครงสร้างข้อมูลที่กู้คืนของวันที่ 16/05/2569 ตามเงื่อนไขกลุ่มรอบการสุ่มปัจจุบัน
-            const backupData = {
-                kw: { m: { name: "บ้านเอื้ออาทรอรัญประเทศ", num: 0 }, n: { name: "plum condo", num: 0 }, e: { name: "บ้านพรสิริ ขอนแก่น", num: 0 } },
-                su: { m: { name: "plum condo", num: 0 }, n: { name: "บ้านพรสิริ ขอนแก่น", num: 0 }, e: { name: "บ้านเอื้ออาทรอรัญประเทศ", num: 0 } }
-            };
+    if(confirm("คุณต้องการกู้คืนข้อมูลของวันที่ 16/05/2569 ลงบนระบบตอนนี้ใช่หรือไม่?")) {
+        document.getElementById("date").value = "2026-05-16"; // บังคับเปลี่ยนวันที่หน้าจอเป็นวันนี้
+        
+        const backupData = {
+            kw: { m: { name: "บ้านเอื้ออาทรอรัญประเทศ", num: 0 }, n: { name: "plum condo", num: 0 }, e: { name: "บ้านพรสิริ ขอนแก่น", num: 0 } },
+            su: { m: { name: "plum condo", num: 0 }, n: { name: "บ้านพรสิริ ขอนแก่น", num: 0 }, e: { name: "บ้านเอื้ออาทรอรัญประเทศ", num: 0 } }
+        };
 
-            if (currentDocId) {
-                await db.collection("posts").doc(currentDocId).update(backupData);
-            } else {
-                const newDoc = await db.collection("posts").add({ date: "2026-05-16", ...backupData });
-                currentDocId = newDoc.id;
-            }
-            alert("กู้คืนข้อมูลวันที่ 16/05/2569 สำเร็จแล้ว!");
-            checkTodayStatus();
+        // ค้นหาข้อมูลใน Firestore ว่าเคยมีของวันนี้ไหม
+        const snap = await db.collection("posts").where("date", "==", "2026-05-16").get();
+        if (!snap.empty) {
+            currentDocId = snap.docs[0].id;
+            await db.collection("posts").doc(currentDocId).update(backupData);
+        } else {
+            const newDoc = await db.collection("posts").add({ date: "2026-05-16", ...backupData });
+            currentDocId = newDoc.id;
         }
-    } else {
-        alert("ระบบรองรับการกู้คืนข้อมูลเฉพาะของวันที่ 16/05/2569 เท่านั้น กรุณาเปลี่ยนวันที่ด้านบนเป็น 2026-05-16");
+        alert("กู้คืนข้อมูลขึ้นหน้าระบบสำเร็จแล้ว!");
+        checkTodayStatus(); // รีเฟรชหน้าจอเพื่อดึงข้อมูลขึ้นฟอร์มทันที
     }
 }
 
@@ -203,4 +202,3 @@ window.onload = () => { document.getElementById("date").value = new Date().toISO
 </script>
 </body>
 </html>
-
