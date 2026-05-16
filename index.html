@@ -142,17 +142,25 @@ async function startRandom() {
     checkTodayStatus();
 }
 
-// ฟังก์ชันกู้คืนข้อมูลสำรองของวันนี้และแสดงผลทันที
+// ฟังก์ชันกู้คืนข้อมูลสำรองและแสดงผลขึ้นหน้าระบบทันทีตามรายชื่อที่คุณกำหนด
 async function restoreBackupData() {
     if(confirm("คุณต้องการกู้คืนข้อมูลของวันที่ 16/05/2569 ลงบนระบบตอนนี้ใช่หรือไม่?")) {
-        document.getElementById("date").value = "2026-05-16"; // บังคับเปลี่ยนวันที่หน้าจอเป็นวันนี้
+        document.getElementById("date").value = "2026-05-16"; 
         
+        // จัดสรรชุดทรัพย์สินตามที่คุณบันทึกไว้ (กระจายลงช่วงเวลา เช้า เที่ยง เย็น)
         const backupData = {
-            kw: { m: { name: "บ้านเอื้ออาทรอรัญประเทศ", num: 0 }, n: { name: "plum condo", num: 0 }, e: { name: "บ้านพรสิริ ขอนแก่น", num: 0 } },
-            su: { m: { name: "plum condo", num: 0 }, n: { name: "บ้านพรสิริ ขอนแก่น", num: 0 }, e: { name: "บ้านเอื้ออาทรอรัญประเทศ", num: 0 } }
+            kw: { 
+                m: { name: "บ้านเอื้ออาทรอรัญประเทศ", num: 0 }, 
+                n: { name: "พี่ศรีไพร (คอนสาย)", num: 0 }, 
+                e: { name: "ที่ดิน หลังอรัญนคร 1", num: 0 } 
+            },
+            su: { 
+                m: { name: "พี่ศรีไพร (คอนสาย)", num: 0 }, 
+                n: { name: "ที่ดิน หลังอรัญนคร 1", num: 0 }, 
+                e: { name: "บ้านเอื้ออาทรอรัญประเทศ", num: 0 } 
+            }
         };
 
-        // ค้นหาข้อมูลใน Firestore ว่าเคยมีของวันนี้ไหม
         const snap = await db.collection("posts").where("date", "==", "2026-05-16").get();
         if (!snap.empty) {
             currentDocId = snap.docs[0].id;
@@ -162,7 +170,7 @@ async function restoreBackupData() {
             currentDocId = newDoc.id;
         }
         alert("กู้คืนข้อมูลขึ้นหน้าระบบสำเร็จแล้ว!");
-        checkTodayStatus(); // รีเฟรชหน้าจอเพื่อดึงข้อมูลขึ้นฟอร์มทันที
+        checkTodayStatus(); 
     }
 }
 
