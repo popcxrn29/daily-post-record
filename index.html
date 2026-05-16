@@ -15,6 +15,7 @@
         .row { display: grid; grid-template-columns: 40px 1fr 50px; gap: 8px; margin-bottom: 8px; align-items: center; }
         input[type="number"] { padding: 6px; border: 1px solid #FFE4E9; border-radius: 8px; text-align: center; font-size: 1rem; font-weight: 700; }
         .btn-random, .btn-save { background: #FFFFFF; color: #FF69B4; border: 2px solid #FF69B4; padding: 10px; border-radius: 12px; width: 100%; font-weight: 700; cursor: pointer; }
+        .btn-restore { background: #FFFFFF; color: #0984E3; border: 2px solid #0984E3; padding: 10px; border-radius: 12px; width: 100%; font-weight: 700; cursor: pointer; margin-top: 8px; }
         .btn-action { padding: 4px 8px; font-size: 0.7rem; border-radius: 6px; cursor: pointer; margin-left: 5px; background: #FFFFFF; border: 1px solid #ddd; }
         .btn-delete { border: 1px solid #ff7675; color: #ff7675; }
         .dash-grid { display: grid; grid-template-columns: 1fr auto; gap: 5px; font-size: 0.85rem; margin-top: 10px; }
@@ -46,6 +47,7 @@
         <div class="row"><span>เที่ยง</span><input id="su_n_name" readonly><input id="su_n_num" type="number"></div>
         <div class="row"><span>เย็น</span><input id="su_e_name" readonly><input id="su_e_num" type="number"></div>
         <button class="btn-save" style="margin-top:10px" onclick="saveData()">💾 บันทึกยอดโพสต์</button>
+        <button class="btn-restore" onclick="restoreBackupData()">🔄 กู้คืนข้อมูล</button>
     </div>
 
     <div id="dashBoard" class="card" style="border-top:4px solid var(--fresh-pink); display:none;">
@@ -63,7 +65,7 @@ const firebaseConfig = { apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI", auth
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ฐานข้อมูลกลุ่มทรัพย์สินที่อัปเดตแล้ว
+// ฐานข้อมูลกลุ่มทรัพย์สิน
 const groups = {
     g1: ["แม่ย่าพี่ปลา 11 ไร่", "บ้านพี่แดง อรัญนคร3", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์"],
     g2: ["ศรีวราห์การ์เด้น", "ลุมพินีรามอินทรา", "แฮปปี้คอนโด", "คอนโดชีวาทัย ฮอล์มาร์ค", "คอนโด The Base Park East", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "plum condo", "Lumpini Ville"],
@@ -140,6 +142,31 @@ async function startRandom() {
     checkTodayStatus();
 }
 
+// ฟังก์ชันกู้คืนข้อมูลสำรองของวันที่ 16/05/2569 (2026-05-16)
+async function restoreBackupData() {
+    const dateVal = document.getElementById("date").value;
+    if (dateVal === "2026-05-16") {
+        if(confirm("คุณต้องการกู้คืนข้อมูลของวันที่ 16/05/2569 ใช่หรือไม่?")) {
+            // โครงสร้างข้อมูลที่กู้คืนของวันที่ 16/05/2569 ตามเงื่อนไขกลุ่มรอบการสุ่มปัจจุบัน
+            const backupData = {
+                kw: { m: { name: "บ้านเอื้ออาทรอรัญประเทศ", num: 0 }, n: { name: "plum condo", num: 0 }, e: { name: "บ้านพรสิริ ขอนแก่น", num: 0 } },
+                su: { m: { name: "plum condo", num: 0 }, n: { name: "บ้านพรสิริ ขอนแก่น", num: 0 }, e: { name: "บ้านเอื้ออาทรอรัญประเทศ", num: 0 } }
+            };
+
+            if (currentDocId) {
+                await db.collection("posts").doc(currentDocId).update(backupData);
+            } else {
+                const newDoc = await db.collection("posts").add({ date: "2026-05-16", ...backupData });
+                currentDocId = newDoc.id;
+            }
+            alert("กู้คืนข้อมูลวันที่ 16/05/2569 สำเร็จแล้ว!");
+            checkTodayStatus();
+        }
+    } else {
+        alert("ระบบรองรับการกู้คืนข้อมูลเฉพาะของวันที่ 16/05/2569 เท่านั้น กรุณาเปลี่ยนวันที่ด้านบนเป็น 2026-05-16");
+    }
+}
+
 async function updateDashboard() {
     const month = document.getElementById("date").value.substring(0, 7);
     const snap = await db.collection("posts").get();
@@ -176,3 +203,4 @@ window.onload = () => { document.getElementById("date").value = new Date().toISO
 </script>
 </body>
 </html>
+
