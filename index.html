@@ -65,61 +65,8 @@ const firebaseConfig = { apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI", auth
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ฐานข้อมูลกลุ่มทรัพย์สินที่อัปเดตแล้ว
+// ฐานข้อมูลกลุ่มทรัพย์สินที่อัปเดตล่าสุด
 const groups = {
     g1: ["แม่ย่าพี่ปลา 11 ไร่", "บ้านพี่แดง อรัญนคร3", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์"],
     g2: ["ศรีวราห์การ์เด้น", "ลุมพินีรามอินทรา", "แฮปปี้คอนโด", "คอนโดชีวาทัย ฮอล์มาร์ค", "คอนโด The Base Park East", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "plum condo", "Lumpini Ville", "ลุมพินี วิลล์ รามอินทรา-ลาดปลาเค้า 1", "D condo"],
-    g3: ["พี่ศรีไพร (คอนสาย)", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9"]
-};
-
-const fixedAsset = "บ้านเอื้ออาทรอรัญประเทศ";
-let currentDocId = null;
-
-async function checkTodayStatus() {
-    const dateVal = document.getElementById("date").value;
-    if(!dateVal) return;
-    const snap = await db.collection("posts").where("date", "==", dateVal).get();
-    if (!snap.empty) {
-        currentDocId = snap.docs[0].id;
-        document.getElementById("randomBox").style.display = "none";
-        document.getElementById("inputSection").style.display = "block";
-        const d = snap.docs[0].data();
-        document.getElementById("kw_m_name").value = d.kw.m.name; document.getElementById("kw_m_num").value = d.kw.m.num || 0;
-        document.getElementById("kw_n_name").value = d.kw.n.name; document.getElementById("kw_n_num").value = d.kw.n.num || 0;
-        document.getElementById("kw_e_name").value = d.kw.e.name; document.getElementById("kw_e_num").value = d.kw.e.num || 0;
-        document.getElementById("su_m_name").value = d.su.m.name; document.getElementById("su_m_num").value = d.su.m.num || 0;
-        document.getElementById("su_n_name").value = d.su.n.name; document.getElementById("su_n_num").value = d.su.n.num || 0;
-        document.getElementById("su_e_name").value = d.su.e.name; document.getElementById("su_e_num").value = d.su.e.num || 0;
-    } else {
-        currentDocId = null;
-        document.getElementById("randomBox").style.display = "block";
-        document.getElementById("inputSection").style.display = "none";
-    }
-    updateDashboard(); loadHistory();
-}
-
-async function startRandom() {
-    const dateVal = document.getElementById("date").value;
-    let finalAssets = [];
-    
-    if (dateVal === "2026-04-27") {
-        finalAssets = [fixedAsset, "แม่ย่าพี่ปลา 11 ไร่", "ที่ดิน หลังอรัญนคร 1"];
-    } else {
-        const historyCountSnap = await db.collection("posts").get();
-        const count = historyCountSnap.size;
-
-        const historySnap = await db.collection("posts").orderBy("date", "desc").limit(7).get();
-        let usedAssets = [];
-        historySnap.forEach(doc => {
-            const d = doc.data();
-            [d.kw, d.su].forEach(p => ['m','n','e'].forEach(t => usedAssets.push(p[t].name)));
-        });
-
-        const rotationIdx = count % 3;
-        let selectedGroups = [];
-        if (rotationIdx === 0) selectedGroups = [groups.g2, groups.g3];
-        else if (rotationIdx === 1) selectedGroups = [groups.g1, groups.g2];
-        else selectedGroups = [groups.g1, groups.g3];
-
-        const getSmartRandom = (group) => {
-            let available = group
+    g3: ["พี่ศรีไพร (คอนสาย)", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประ
