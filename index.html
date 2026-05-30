@@ -65,7 +65,6 @@ const firebaseConfig = { apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI", auth
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ฐานข้อมูลกลุ่มทรัพย์สิน (เพิ่มทรัพย์สินใหม่ลงกลุ่ม 2 เรียบร้อย)
 const groups = {
     g1: ["แม่ย่าพี่ปลา 11 ไร่", "บ้านพี่แดง อรัญนคร3", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์"],
     g2: ["ศรีวราห์การ์เด้น", "ลุมพินีรามอินทรา", "แฮปปี้คอนโด", "คอนโดชีวาทัย ฮอล์มาร์ค", "คอนโด The Base Park East", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "plum condo", "Lumpini Ville", "ลุมพินี วิลล์ รามอินทรา-ลาดปลาเค้า 1", "D condo"],
@@ -86,7 +85,6 @@ async function checkTodayStatus() {
             document.getElementById("inputSection").style.display = "block";
             const d = snap.docs[0].data();
             
-            // ป้องกันระบบค้างหากข้อมูลบางฟิลด์หายหรือไม่สมบูรณ์
             document.getElementById("kw_m_name").value = (d.kw && d.kw.m) ? d.kw.m.name : ""; 
             document.getElementById("kw_m_num").value = (d.kw && d.kw.m) ? (d.kw.m.num || 0) : 0;
             document.getElementById("kw_n_name").value = (d.kw && d.kw.n) ? d.kw.n.name : ""; 
@@ -113,10 +111,142 @@ async function checkTodayStatus() {
 
 async function startRandom() {
     const dateVal = document.getElementById("date").value;
+    if(!dateVal) return;
     let finalAssets = [];
     
     if (dateVal === "2026-04-27") {
         finalAssets = [fixedAsset, "แม่ย่าพี่ปลา 11 ไร่", "ที่ดิน หลังอรัญนคร 1"];
     } else {
         const historyCountSnap = await db.collection("posts").get();
-        const count
+        const count = historyCountSnap.size;
+
+        const historySnap = await db.collection("posts").orderBy("date", "desc").limit(7).get();
+        let usedAssets = [];
+        historySnap.forEach(doc => {
+            const d = doc.data();
+            if(d.kw && d.su) {
+                ['m','n','e'].forEach(t => {
+                    if(d.kw[t]) usedAssets.push(d.kw[t].name);
+                    if(d.su[t]) usedAssets.push(d.su[t].name);
+                });
+            }
+        });
+
+        const rotationIdx = count % 3;
+        let selectedGroups = [];
+        if (rotationIdx === 0) selectedGroups = [groups.g2, groups.g3];
+        else if (rotationIdx === 1) selectedGroups = [groups.g1, groups.g2];
+        else selectedGroups = [groups.g1, groups.g3];
+
+        const getSmartRandom = (group) => {
+            let available = group.filter(a => !usedAssets.includes(a));
+            if (available.length === 0) available = group; 
+            return available[Math.floor(Math.random() * available.length)];
+        };
+
+        let res1 = fixedAsset;
+        let res2 = getSmartRandom(selectedGroups[0]);
+        let res3 = getSmartRandom(selectedGroups[1]);
+        
+        finalAssets = [res1, res2, res3].sort(() => 0.5 - Math.random());
+    }
+
+    await db.collection("posts").add({ 
+        date: dateVal, 
+        kw: { m:{name:finalAssets[0], num:0}, n:{name:finalAssets[1], num:0}, e:{name:finalAssets[2], num:0} }, 
+        su: { m:{name:finalAssets[1], num:0}, n:{name:finalAssets[2], num:0}, e:{name:finalAssets[0], num:0} } 
+    });
+    checkTodayStatus();
+}
+
+async function restoreBackupData() {
+    if(confirm("คุณต้องการกู้คืนข้อมูลของวันที่ 16/05/2569 ลงบนระบบตอนนี้ใช่หรือไม่?")) {
+        document.getElementById("date").value = "2026-05-16"; 
+        
+        const backupData = {
+            kw: { 
+                m: { name: "บ้านเอื้ออาทรอรัญประเทศ", num: 0 }, 
+                n: { name: "พี่ศรีไพร (คอนสาย)", num: 0 }, 
+                e: { name: "ที่ดิน หลังอรัญนคร 1", num: 0 } 
+            },
+            su: { 
+                m: { name: "พี่ศรีไพร (คอนสาย)", num: 0 }, 
+                n: { name: "ที่ดิน หลังอรัญนคร 1", num: 0 }, 
+                e: { name: "บ้านเอื้ออาทรอรัญประเทศ", num: 0 } 
+            }
+        };
+
+        const snap = await db.collection("posts").where("date", "==", "2026-05-16").get();
+        if (!snap.empty) {
+            currentDocId = snap.docs[0].id;
+            await db.collection("posts").doc(currentDocId).update(backupData);
+        } else {
+            const newDoc = await db.collection("posts").add({ date: "2026-05-16", ...backupData });
+            currentDocId = newDoc.id;
+        }
+        alert("กู้คืนข้อมูลขึ้นหน้าระบบสำเร็จแล้ว!");
+        checkTodayStatus(); 
+    }
+}
+
+async function updateDashboard() {
+    try {
+        const dateInput = document.getElementById("date").value;
+        if(!dateInput) return;
+        const month = dateInput.substring(0, 7);
+        const snap = await db.collection("posts").get();
+        let stats = {}; 
+        snap.forEach(doc => { 
+            const d = doc.data(); 
+            if(d.date && d.date.startsWith(month) && d.kw && d.su) { 
+                ['m','n','e'].forEach(t => {
+                    if(d.kw[t]) stats[d.kw[t].name] = (stats[d.kw[t].name] || 0) + (Number(d.kw[t].num) || 0);
+                    if(d.su[t]) stats[d.su[t].name] = (stats[d.su[t].name] || 0) + (Number(d.su[t].num) || 0);
+                });
+            }
+        });
+        document.getElementById("dashContent").innerHTML = Object.entries(stats).sort((a,b) => b[1]-a[1]).map(([n, c]) => `<div class="dash-item">${n}</div><div class="dash-item" style="text-align:right"><b>${c}</b></div>`).join('') || "ไม่มีข้อมูล";
+        document.getElementById("dashBoard").style.display = "block";
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+async function loadHistory() {
+    try {
+        const snap = await db.collection("posts").orderBy("date", "desc").get();
+        let html = ""; snap.forEach(doc => { const d = doc.data();
+        if(d.date && d.kw && d.su && d.kw.m && d.kw.n && d.kw.e && d.su.m && d.su.n && d.su.e) {
+            html += `<div class="history-card"><strong>🗓 ${d.date}</strong>
+            <button class="btn-action" onclick="editEntry('${doc.id}')">✏️</button>
+            <button class="btn-action btn-delete" onclick="deleteEntry('${doc.id}')">🗑️</button>
+            <div class="h-row" style="color:var(--kw-color); margin-top:5px"><span>เช้า</span><span>${d.kw.m.name}</span><span>${d.kw.m.num}</span></div>
+            <div class="h-row" style="color:var(--kw-color)"><span>เที่ยง</span><span>${d.kw.n.name}</span><span>${d.kw.n.num}</span></div>
+            <div class="h-row" style="color:var(--kw-color)"><span>เย็น</span><span>${d.kw.e.name}</span><span>${d.kw.e.num}</span></div>
+            <div class="h-row" style="color:var(--su-color); margin-top:5px"><span>เช้า</span><span>${d.su.m.name}</span><span>${d.su.m.num}</span></div>
+            <div class="h-row" style="color:var(--su-color)"><span>เที่ยง</span><span>${d.su.n.name}</span><span>${d.su.n.num}</span></div>
+            <div class="h-row" style="color:var(--su-color)"><span>เย็น</span><span>${d.su.e.name}</span><span>${d.su.e.num}</span></div></div>`; 
+        }
+        });
+        document.getElementById("historyList").innerHTML = html;
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+async function editEntry(id) { const doc = await db.collection("posts").doc(id).get(); document.getElementById("date").value = doc.data().date; checkTodayStatus(); }
+async function deleteEntry(id) { if(confirm("ยืนยันการลบ?")) { await db.collection("posts").doc(id).delete(); checkTodayStatus(); } }
+async function saveData() { await db.collection("posts").doc(currentDocId).update({ "kw.m.num": Number(document.getElementById("kw_m_num").value), "kw.n.num": Number(document.getElementById("kw_n_num").value), "kw.e.num": Number(document.getElementById("kw_e_num").value), "su.m.num": Number(document.getElementById("su_m_num").value), "su.n.num": Number(document.getElementById("su_n_num").value), "su.e.num": Number(document.getElementById("su_e_num").value) }); alert("บันทึกแล้ว!"); checkTodayStatus(); }
+
+// ปรับปรุงการคำนวณและดึงวันที่เริ่มต้นให้รองรับ Safari และทุกบราวเซอร์อย่างเสถียร
+window.onload = () => { 
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    document.getElementById("date").value = `${y}-${m}-${d}`; 
+    checkTodayStatus(); 
+};
+</script>
+</body>
+</html>
