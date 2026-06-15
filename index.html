@@ -65,7 +65,6 @@ const firebaseConfig = { apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI", auth
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ฐานข้อมูลกลุ่มทรัพย์สิน (เพิ่ม Whizdom ในกลุ่ม g2 เรียบร้อยแล้ว)
 const groups = {
     g1: ["แม่ย่าพี่ปลา 11 ไร่", "บ้านพี่แดง อรัญนคร3", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์"],
     g2: ["ศรีวราห์การ์เด้น", "ลุมพินีรามอินทรา", "แฮปปี้คอนโด", "คอนโดชีวาทัย ฮอล์มาร์ค", "คอนโด The Base Park East", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "plum condo", "Lumpini Ville", "ลุมพินี วิลล์ รามอินทรา-ลาดปลาเค้า 1", "D condo", "Whizdom"],
@@ -110,6 +109,7 @@ async function checkTodayStatus() {
     }
 }
 
+// ฟังก์ชันสุ่มแบบปรับปรุงใหม่: ให้บ้านเอื้ออาทรอรัญประเทศสุ่มแบบวันเว้นวัน
 async function startRandom() {
     const dateVal = document.getElementById("date").value;
     if(!dateVal) return;
@@ -145,10 +145,29 @@ async function startRandom() {
             return available[Math.floor(Math.random() * available.length)];
         };
 
-        let res1 = fixedAsset;
+        // ตรวจสอบว่าเป็นวันเว้นวัน (อิงจากตัวเลขวันของวันที่เลือก)
+        const dayNum = parseInt(dateVal.split("-")[2], 10);
+        let res1;
+        
+        if (dayNum % 2 !== 0) {
+            // วันที่เป็นเลขคี่: บังคับให้สุ่มได้บ้านเอื้ออาทรฯ เหมือนเดิม
+            res1 = fixedAsset;
+        } else {
+            // วันที่เป็นเลขคู่: จะเปลี่ยนไปดึงทรัพย์สินจากกลุ่มที่เหลือมาแสดงแทน (บ้านเอื้ออาทรฯ จะไม่มาโผล่วันนี้)
+            // ดึงกลุ่มทั้งหมดมารวมกันยกเว้นกลุ่มที่ถูกเลือกไปเป็น res2 และ res3 แล้ว เพื่อนำมาหาตัวเลือกเสริม
+            let allAvailableAssets = [...groups.g1, ...groups.g2, ...groups.g3].filter(a => a !== fixedAsset);
+            let backupAvailable = allAvailableAssets.filter(a => !usedAssets.includes(a));
+            if (backupAvailable.length === 0) backupAvailable = allAvailableAssets;
+            res1 = backupAvailable[Math.floor(Math.random() * backupAvailable.length)];
+        }
+
         let res2 = getSmartRandom(selectedGroups[0]);
         let res3 = getSmartRandom(selectedGroups[1]);
         
+        // ป้องกันกรณีสุ่มได้ชื่อซ้ำกันในรอบนั้น
+        if (res2 === res1) res2 = getSmartRandom(selectedGroups[0].filter(a => a !== res1));
+        if (res3 === res1 || res3 === res2) res3 = getSmartRandom(selectedGroups[1].filter(a => a !== res1 && a !== res2));
+
         finalAssets = [res1, res2, res3].sort(() => 0.5 - Math.random());
     }
 
