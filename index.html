@@ -61,7 +61,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script>
-// ข้อแนะนำ: หากนำโค้ดนี้ไปเปิดแล้วหน้าเว็บบังคับให้กดสุ่มได้ แต่ข้อมูลไม่บันทึกเข้าฐานข้อมูล ให้ตรวจสอบสิทธิ์การใช้งานหรือคีย์ apiKey ในโปรเจกต์ Firebase ของพี่เพิ่มเติมนะครับ
 const firebaseConfig = { apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI", authDomain: "save-data-92eca.firebaseapp.com", projectId: "save-data-92eca", storageBucket: "save-data-92eca.firebasestorage.app", messagingSenderId: "661096454777", appId: "1:661096454777:web:d8b4297db798e14b76d2a8" };
 
 let db = null;
@@ -69,7 +68,7 @@ try {
     firebase.initializeApp(firebaseConfig);
     db = firebase.firestore();
 } catch (e) {
-    console.error("Firebase initialization failed:", e);
+    console.error("Firebase initial error:", e);
 }
 
 const groups = {
@@ -85,12 +84,11 @@ async function checkTodayStatus() {
     const dateVal = document.getElementById("date").value;
     if(!dateVal) return;
     
-    // ระบบ Safe-Load ป้องกันการค้างจากโครงข่ายหลังบ้านเชื่อมต่อไม่ได้
-    if(!db) {
-        document.getElementById("randomBox").style.display = "block";
-        document.getElementById("inputSection").style.display = "none";
-        return;
-    }
+    // บังคับเปิดโครงสร้างหน้าสุ่มไว้ก่อนเสมอเพื่อป้องกันอาการ "หน้าจอขาว" จาก Network ค้าง
+    document.getElementById("randomBox").style.display = "block";
+    document.getElementById("inputSection").style.display = "none";
+
+    if(!db) return;
 
     try {
         const snap = await db.collection("posts").where("date", "==", dateVal).get();
@@ -113,17 +111,10 @@ async function checkTodayStatus() {
             document.getElementById("su_n_num").value = (d.su && d.su.n) ? (d.su.n.num || 0) : 0;
             document.getElementById("su_e_name").value = (d.su && d.su.e) ? d.su.e.name : ""; 
             document.getElementById("su_e_num").value = (d.su && d.su.e) ? (d.su.e.num || 0) : 0;
-        } else {
-            currentDocId = null;
-            document.getElementById("randomBox").style.display = "block";
-            document.getElementById("inputSection").style.display = "none";
         }
         updateDashboard(); loadHistory();
     } catch (e) {
-        console.error(e);
-        // หาก Database บล็อกการเข้าถึง ให้แสดงผลกล่องปุ่มสุ่มเพื่อให้ระบบยังสามารถกดสุ่มเล่นได้แทนการค้างหน้าเปล่า
-        document.getElementById("randomBox").style.display = "block";
-        document.getElementById("inputSection").style.display = "none";
+        console.error("Fetch status error:", e);
     }
 }
 
@@ -132,46 +123,44 @@ async function startRandom() {
     if(!dateVal) return;
     let finalAssets = [];
     
-    // เงื่อนไขล็อกสุ่มวันที่ 24 มิ.ย. 2569
+    // เงื่อนไขสุ่มพิเศษวันที่ 24 มิ.ย. 2569
     if (dateVal === "2026-06-24") {
         try {
             let usedIn10Days = [];
             let totalPostCounts = {};
             
-            // กำหนดค่าตั้งต้นความถี่สะสมทรัพย์เป็น 0
             [...groups.g1, ...groups.g2, ...groups.g3, fixedAsset].forEach(asset => {
                 totalPostCounts[asset] = 0;
             });
 
             if (db) {
-                // 1. ตรวจสอบเงื่อนไขประวัติย้อนหลัง 10 วันล่าสุดเพื่อทำ Blacklist
-                const history10Snap = await db.collection("posts").orderBy("date", "desc").limit(10).get();
-                history10Snap.forEach(doc => {
-                    const d = doc.data();
-                    if(d.kw && d.su) {
-                        ['m','n','e'].forEach(t => {
-                            if(d.kw[t]) usedIn10Days.push(d.kw[t].name);
-                            if(d.su[t]) usedIn10Days.push(d.su[t].name);
-                        });
-                    }
-                });
+                try {
+                    const history10Snap = await db.collection("posts").orderBy("date", "desc").limit(10).get();
+                    history10Snap.forEach(doc => {
+                        const d = doc.data();
+                        if(d.kw && d.su) {
+                            ['m','n','e'].forEach(t => {
+                                if(d.kw[t]) usedIn10Days.push(d.kw[t].name);
+                                if(d.su[t]) usedIn10Days.push(d.su[t].name);
+                            });
+                        }
+                    });
 
-                // 2. คำนวณหายอดคะแนนสะสม (ยอดโพสต์ทั้งหมดในฐานข้อมูล)
-                const allSnap = await db.collection("posts").get();
-                allSnap.forEach(doc => {
-                    const d = doc.data();
-                    if(d.kw && d.su) {
-                        ['m','n','e'].forEach(t => {
-                            if(d.kw[t] && d.kw[t].name) totalPostCounts[d.kw[t].name] += (Number(d.kw[t].num) || 0);
-                            if(d.su[t] && d.su[t].name) totalPostCounts[d.su[t].name] += (Number(d.su[t].num) || 0);
-                        });
-                    }
-                });
+                    const allSnap = await db.collection("posts").get();
+                    allSnap.forEach(doc => {
+                        const d = doc.data();
+                        if(d.kw && d.su) {
+                            ['m','n','e'].forEach(t => {
+                                if(d.kw[t] && d.kw[t].name) totalPostCounts[d.kw[t].name] += (Number(d.kw[t].num) || 0);
+                                if(d.su[t] && d.su[t].name) totalPostCounts[d.su[t].name] += (Number(d.su[t].num) || 0);
+                            });
+                        }
+                    });
+                } catch(netErr) { console.error(netErr); }
             }
 
             const coreAsset = "ยูดีไลท์3";
             
-            // กรองเอาเฉพาะทรัพย์ที่ไม่ตรงกับ 10 วันก่อนหน้า และเรียงลำดับจากยอดโพสต์น้อยที่สุดขึ้นมาเสมอ
             let pool = [...groups.g1, ...groups.g2, ...groups.g3, fixedAsset]
                 .filter(asset => asset !== coreAsset && !usedIn10Days.includes(asset))
                 .sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
@@ -182,18 +171,15 @@ async function startRandom() {
                     .sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
             }
 
-            // เลือก 2 ทรัพย์ที่สอดคล้องตามเงื่อนไขมากที่สุด
             finalAssets = [coreAsset, pool[0], pool[1]];
             finalAssets.sort(() => 0.5 - Math.random());
 
         } catch (err) {
-            console.error("Error specialized random logic:", err);
             finalAssets = ["ยูดีไลท์3", "บ้านเอื้ออาทรอรัญประเทศ", "ที่ดินบ้านนา นครนายก"];
         }
     } else if (dateVal === "2026-04-27") {
         finalAssets = [fixedAsset, "แม่ย่าพี่ปลา 11 ไร่", "ที่ดิน หลังอรัญนคร 1"];
     } else {
-        // แผนสุ่มระบบปกติ
         let count = 0;
         let usedAssets = [];
         
@@ -254,20 +240,25 @@ async function startRandom() {
                 kw: { m:{name:finalAssets[0], num:0}, n:{name:finalAssets[1], num:0}, e:{name:finalAssets[2], num:0} }, 
                 su: { m:{name:finalAssets[1], num:0}, n:{name:finalAssets[2], num:0}, e:{name:finalAssets[0], num:0} } 
             });
-        } catch(e) { console.error(e); }
+            checkTodayStatus();
+        } catch(e) { 
+            console.error(e);
+            showOfflineForm(finalAssets);
+        }
     } else {
-        // โหมดออฟไลน์จำลองการแสดงผลบนฟอร์ม
-        document.getElementById("randomBox").style.display = "none";
-        document.getElementById("inputSection").style.display = "block";
-        document.getElementById("kw_m_name").value = finalAssets[0];
-        document.getElementById("kw_n_name").value = finalAssets[1];
-        document.getElementById("kw_e_name").value = finalAssets[2];
-        document.getElementById("su_m_name").value = finalAssets[1];
-        document.getElementById("su_n_name").value = finalAssets[2];
-        document.getElementById("su_e_name").value = finalAssets[0];
-        return;
+        showOfflineForm(finalAssets);
     }
-    checkTodayStatus();
+}
+
+function showOfflineForm(assets) {
+    document.getElementById("randomBox").style.display = "none";
+    document.getElementById("inputSection").style.display = "block";
+    document.getElementById("kw_m_name").value = assets[0];
+    document.getElementById("kw_n_name").value = assets[1];
+    document.getElementById("kw_e_name").value = assets[2];
+    document.getElementById("su_m_name").value = assets[1];
+    document.getElementById("su_n_name").value = assets[2];
+    document.getElementById("su_e_name").value = assets[0];
 }
 
 async function restoreBackupData() {
@@ -340,7 +331,7 @@ async function loadHistory() {
 async function editEntry(id) { if(!db)return; const doc = await db.collection("posts").doc(id).get(); document.getElementById("date").value = doc.data().date; checkTodayStatus(); }
 async function deleteEntry(id) { if(!db)return; if(confirm("ยืนยันการลบ?")) { await db.collection("posts").doc(id).delete(); checkTodayStatus(); } }
 async function saveData() { 
-    if(!db) { alert("ระบบออฟไลน์ชั่วคราว ไม่สามารถส่งข้อมูลหาฐานข้อมูลหลักได้"); return; }
+    if(!db) { alert("ระบบไม่สามารถเชื่อมต่อฐานข้อมูลได้ในขณะนี้"); return; }
     await db.collection("posts").doc(currentDocId).update({ "kw.m.num": Number(document.getElementById("kw_m_num").value), "kw.n.num": Number(document.getElementById("kw_n_num").value), "kw.e.num": Number(document.getElementById("kw_e_num").value), "su.m.num": Number(document.getElementById("su_m_num").value), "su.n.num": Number(document.getElementById("su_n_num").value), "su.e.num": Number(document.getElementById("su_e_num").value) }); alert("บันทึกแล้ว!"); checkTodayStatus(); 
 }
 
@@ -351,9 +342,8 @@ window.onload = () => {
     const d = String(now.getDate()).padStart(2, '0');
     document.getElementById("date").value = `${y}-${m}-${d}`; 
     
-    setTimeout(() => {
-        checkTodayStatus();
-    }, 200);
+    // สั่งวาดกล่องโครงสร้างพื้นฐานขึ้นมารอทันทีแบบไม่ต้องรอคิวเครือข่าย Firebase
+    checkTodayStatus();
 };
 </script>
 </body>
