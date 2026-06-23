@@ -62,9 +62,8 @@
 <script src="https://unpkg.com/firebase@10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-// ดักจับ Error ร้ายแรงของระบบหลังบ้านทั้งหมด ไม่ให้ทำหน้าจอค้างหรือขาวเด็ดขาด
 window.onerror = function(message, source, lineno, colno, error) {
-    console.log("ระบบหลังบ้านมีปัญหา แต่หน้าจอจะยังทำงานต่อได้แบบออฟไลน์");
+    console.log("ระบบทำงานต่อแบบเซฟโหมด");
     return true; 
 };
 
@@ -80,9 +79,10 @@ try {
     console.error("Firebase setup error:", e);
 }
 
+// ลบ "ลุมพินีรามอินทรา" ออกจากกลุ่ม g2 เรียบร้อยแล้วครับ
 const groups = {
     g1: ["แม่ย่าพี่ปลา 11 ไร่", "บ้านพี่แดง อรัญนคร3", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์"],
-    g2: ["ศรีวราห์การ์เด้น", "ลุมพินีรามอินทรา", "แฮปปี้คอนโด", "คอนโดชีวาทัย ฮอล์มาร์ค", "คอนโด The Base Park East", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "plum condo", "Lumpini Ville", "ลุมพินี วิลล์ รามอินทรา-ลาดปลาเค้า 1", "D condo", "Whizdom", "ยูดีไลท์3"],
+    g2: ["ศรีวราห์การ์เด้น", "แฮปปี้คอนโด", "คอนโดชีวาทัย ฮอล์มาร์ค", "คอนโด The Base Park East", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "plum condo", "Lumpini Ville", "ลุมพินี วิลล์ รามอินทรา-ลาดปลาเค้า 1", "D condo", "Whizdom", "ยูดีไลท์3"],
     g3: ["พี่ศรีไพร (คอนสาย)", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9"]
 };
 
@@ -93,7 +93,6 @@ async function checkTodayStatus() {
     const dateVal = document.getElementById("date").value;
     if(!dateVal) return;
     
-    // ตั้งค่าหน้าสุ่มให้สว่างวาบขึ้นมาแสดงผลก่อนทันทีเพื่อป้องกันหน้าจอขาว
     document.getElementById("randomBox").style.display = "block";
     document.getElementById("inputSection").style.display = "none";
 
