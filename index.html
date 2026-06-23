@@ -115,11 +115,68 @@ async function startRandom() {
     if(!dateVal) return;
     let finalAssets = [];
     
+    // เงื่อนไขบังคับสำหรับสุ่มวันที่ 24 มิถุนายน 2569
     if (dateVal === "2026-06-24") {
-        finalAssets = ["ยูดีไลท์3", "บ้านเอื้ออาทรอรัญประเทศ", "ที่ดินบ้านนา นครนายก"];
+        try {
+            // 1. ดึงประวัติย้อนหลัง 10 วันล่าสุดเพื่อเอามาทำ Blacklist (ห้ามซ้ำ)
+            const history10Snap = await db.collection("posts").orderBy("date", "desc").limit(10).get();
+            let usedIn10Days = [];
+            history10Snap.forEach(doc => {
+                const d = doc.data();
+                if(d.kw && d.su) {
+                    ['m','n','e'].forEach(t => {
+                        if(d.kw[t]) usedIn10Days.push(d.kw[t].name);
+                        if(d.su[t]) usedIn10Days.push(d.su[t].name);
+                    });
+                }
+            });
+
+            // 2. คำนวณหายอดคะแนนสะสม (ยอดรวมทั้งหมดในระบบ) ของทรัพย์แต่ละตัว เพื่อหาทรัพย์ที่ถูกโพสต์น้อยที่สุด
+            const allSnap = await db.collection("posts").get();
+            let totalPostCounts = {};
+            // ตั้งค่าตั้งต้นให้ทรัพย์ทุกตัวคะแนนเป็น 0
+            [...groups.g1, ...groups.g2, ...groups.g3, fixedAsset].forEach(asset => {
+                totalPostCounts[asset] = 0;
+            });
+            
+            allSnap.forEach(doc => {
+                const d = doc.data();
+                if(d.kw && d.su) {
+                    ['m','n','e'].forEach(t => {
+                        if(d.kw[t] && d.kw[t].name) totalPostCounts[d.kw[t].name] = (totalPostCounts[d.kw[t].name] || 0) + (Number(d.kw[t].num) || 0);
+                        if(d.su[t] && d.su[t].name) totalPostCounts[d.su[t].name] = (totalPostCounts[d.su[t].name] || 0) + (Number(d.su[t].num) || 0);
+                    });
+                }
+            });
+
+            // ทรัพย์หลักคือ ยูดีไลท์3
+            const coreAsset = "ยูดีไลท์3";
+            
+            // นำทรัพย์ทั้งหมด (ยกเว้น ยูดีไลท์3 และทรัพย์ที่สุ่มไปแล้วใน 10 วันก่อนหน้า) มาเรียงจากโพสต์น้อยไปมาก
+            let pool = [...groups.g1, ...groups.g2, ...groups.g3, fixedAsset]
+                .filter(asset => asset !== coreAsset && !usedIn10Days.includes(asset))
+                .sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
+
+            // หากทรัพย์ที่เหลือหลังจากกรอง 10 วันมีไม่พอ ให้ดึงทรัพย์ทั้งหมดที่ไม่ใช่ ยูดีไลท์3 มาแทนเพื่อกันระบบค้าง
+            if (pool.length < 2) {
+                pool = [...groups.g1, ...groups.g2, ...groups.g3, fixedAsset]
+                    .filter(asset => asset !== coreAsset)
+                    .sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
+            }
+
+            // เลือก 2 ทรัพย์ที่ยอดโพสต์น้อยที่สุดมาจับคู่
+            finalAssets = [coreAsset, pool[0], pool[1]];
+            // สลับตำแหน่งการแสดงผล เช้า-เที่ยง-เย็น แบบสุ่มสลับเพื่อความเหมาะสม
+            finalAssets.sort(() => 0.5 - Math.random());
+
+        } catch (err) {
+            console.error("Error filtered random:", err);
+            finalAssets = ["ยูดีไลท์3", "บ้านเอื้ออาทรอรัญประเทศ", "ที่ดินบ้านนา นครนายก"];
+        }
     } else if (dateVal === "2026-04-27") {
         finalAssets = [fixedAsset, "แม่ย่าพี่ปลา 11 ไร่", "ที่ดิน หลังอรัญนคร 1"];
     } else {
+        // เงื่อนไขการสุ่มปกติสำหรับวันอื่นๆ
         const historyCountSnap = await db.collection("posts").get();
         const count = historyCountSnap.size;
 
@@ -223,55 +280,4 @@ async function updateDashboard() {
             const d = doc.data(); 
             if(d.date && d.date.startsWith(month) && d.kw && d.su) { 
                 ['m','n','e'].forEach(t => {
-                    if(d.kw[t]) stats[d.kw[t].name] = (stats[d.kw[t].name] || 0) + (Number(d.kw[t].num) || 0);
-                    if(d.su[t]) stats[d.su[t].name] = (stats[d.su[t].name] || 0) + (Number(d.su[t].num) || 0);
-                });
-            }
-        });
-        document.getElementById("dashContent").innerHTML = Object.entries(stats).sort((a,b) => b[1]-a[1]).map(([n, c]) => `<div class="dash-item">${n}</div><div class="dash-item" style="text-align:right"><b>${c}</b></div>`).join('') || "ไม่มีข้อมูล";
-        document.getElementById("dashBoard").style.display = "block";
-    } catch (e) {
-        console.error(e);
-    }
-}
-
-async function loadHistory() {
-    try {
-        const snap = await db.collection("posts").orderBy("date", "desc").get();
-        let html = ""; snap.forEach(doc => { const d = doc.data();
-        if(d.date && d.kw && d.su && d.kw.m && d.kw.n && d.kw.e && d.su.m && d.su.n && d.su.e) {
-            html += `<div class="history-card"><strong>🗓 ${d.date}</strong>
-            <button class="btn-action" onclick="editEntry('${doc.id}')">✏️</button>
-            <button class="btn-action btn-delete" onclick="deleteEntry('${doc.id}')">🗑️</button>
-            <div class="h-row" style="color:var(--kw-color); margin-top:5px"><span>เช้า</span><span>${d.kw.m.name}</span><span>${d.kw.m.num}</span></div>
-            <div class="h-row" style="color:var(--kw-color)"><span>เที่ยง</span><span>${d.kw.n.name}</span><span>${d.kw.n.num}</span></div>
-            <div class="h-row" style="color:var(--kw-color)"><span>เย็น</span><span>${d.kw.e.name}</span><span>${d.kw.e.num}</span></div>
-            <div class="h-row" style="color:var(--su-color); margin-top:5px"><span>เช้า</span><span>${d.su.m.name}</span><span>${d.su.m.num}</span></div>
-            <div class="h-row" style="color:var(--su-color)"><span>เที่ยง</span><span>${d.su.n.name}</span><span>${d.su.n.num}</span></div>
-            <div class="h-row" style="color:var(--su-color)"><span>เย็น</span><span>${d.su.e.name}</span><span>${d.su.e.num}</span></div></div>`; 
-        }
-        });
-        document.getElementById("historyList").innerHTML = html;
-    } catch (e) {
-        console.error(e);
-    }
-}
-
-async function editEntry(id) { const doc = await db.collection("posts").doc(id).get(); document.getElementById("date").value = doc.data().date; checkTodayStatus(); }
-async function deleteEntry(id) { if(confirm("ยืนยันการลบ?")) { await db.collection("posts").doc(id).delete(); checkTodayStatus(); } }
-async function saveData() { await db.collection("posts").doc(currentDocId).update({ "kw.m.num": Number(document.getElementById("kw_m_num").value), "kw.n.num": Number(document.getElementById("kw_n_num").value), "kw.e.num": Number(document.getElementById("kw_e_num").value), "su.m.num": Number(document.getElementById("su_m_num").value), "su.n.num": Number(document.getElementById("su_n_num").value), "su.e.num": Number(document.getElementById("su_e_num").value) }); alert("บันทึกแล้ว!"); checkTodayStatus(); }
-
-window.onload = () => { 
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, '0');
-    const d = String(now.getDate()).padStart(2, '0');
-    document.getElementById("date").value = `${y}-${m}-${d}`; 
-    
-    setTimeout(() => {
-        checkTodayStatus();
-    }, 200);
-};
-</script>
-</body>
-</html>
+                    if(d.kw[t]) stats[d.kw[t].name] = (stats[d.kw[t].name] || 0) + (Number(
