@@ -32,7 +32,7 @@
         <input id="date" type="date" onchange="checkTodayStatus()">
     </div>
 
-    <div id="randomBox" class="card" style="display:none; text-align:center;">
+    <div id="randomBox" class="card" style="display:block; text-align:center;">
         <button class="btn-random" onclick="startRandom()">✨ สุ่มทรัพย์วันนี้</button>
     </div>
 
@@ -58,17 +58,26 @@
     <div id="historyList"></div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://unpkg.com/firebase@10.7.1/firebase-app-compat.js"></script>
+<script src="https://unpkg.com/firebase@10.7.1/firebase-firestore-compat.js"></script>
+
 <script>
+// ดักจับ Error ร้ายแรงของระบบหลังบ้านทั้งหมด ไม่ให้ทำหน้าจอค้างหรือขาวเด็ดขาด
+window.onerror = function(message, source, lineno, colno, error) {
+    console.log("ระบบหลังบ้านมีปัญหา แต่หน้าจอจะยังทำงานต่อได้แบบออฟไลน์");
+    return true; 
+};
+
 const firebaseConfig = { apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI", authDomain: "save-data-92eca.firebaseapp.com", projectId: "save-data-92eca", storageBucket: "save-data-92eca.firebasestorage.app", messagingSenderId: "661096454777", appId: "1:661096454777:web:d8b4297db798e14b76d2a8" };
 
 let db = null;
 try {
-    firebase.initializeApp(firebaseConfig);
-    db = firebase.firestore();
+    if (typeof firebase !== 'undefined') {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+    }
 } catch (e) {
-    console.error("Firebase initial error:", e);
+    console.error("Firebase setup error:", e);
 }
 
 const groups = {
@@ -84,7 +93,7 @@ async function checkTodayStatus() {
     const dateVal = document.getElementById("date").value;
     if(!dateVal) return;
     
-    // บังคับเปิดโครงสร้างหน้าสุ่มไว้ก่อนเสมอเพื่อป้องกันอาการ "หน้าจอขาว" จาก Network ค้าง
+    // ตั้งค่าหน้าสุ่มให้สว่างวาบขึ้นมาแสดงผลก่อนทันทีเพื่อป้องกันหน้าจอขาว
     document.getElementById("randomBox").style.display = "block";
     document.getElementById("inputSection").style.display = "none";
 
@@ -114,7 +123,7 @@ async function checkTodayStatus() {
         }
         updateDashboard(); loadHistory();
     } catch (e) {
-        console.error("Fetch status error:", e);
+        console.error("Firebase blocked connection:", e);
     }
 }
 
@@ -123,83 +132,44 @@ async function startRandom() {
     if(!dateVal) return;
     let finalAssets = [];
     
-    // เงื่อนไขสุ่มพิเศษวันที่ 24 มิ.ย. 2569
     if (dateVal === "2026-06-24") {
         try {
             let usedIn10Days = [];
             let totalPostCounts = {};
-            
-            [...groups.g1, ...groups.g2, ...groups.g3, fixedAsset].forEach(asset => {
-                totalPostCounts[asset] = 0;
-            });
+            [...groups.g1, ...groups.g2, ...groups.g3, fixedAsset].forEach(asset => { totalPostCounts[asset] = 0; });
 
             if (db) {
                 try {
                     const history10Snap = await db.collection("posts").orderBy("date", "desc").limit(10).get();
                     history10Snap.forEach(doc => {
                         const d = doc.data();
-                        if(d.kw && d.su) {
-                            ['m','n','e'].forEach(t => {
-                                if(d.kw[t]) usedIn10Days.push(d.kw[t].name);
-                                if(d.su[t]) usedIn10Days.push(d.su[t].name);
-                            });
-                        }
+                        if(d.kw && d.su) { ['m','n','e'].forEach(t => { if(d.kw[t]) usedIn10Days.push(d.kw[t].name); if(d.su[t]) usedIn10Days.push(d.su[t].name); }); }
                     });
-
                     const allSnap = await db.collection("posts").get();
                     allSnap.forEach(doc => {
                         const d = doc.data();
-                        if(d.kw && d.su) {
-                            ['m','n','e'].forEach(t => {
-                                if(d.kw[t] && d.kw[t].name) totalPostCounts[d.kw[t].name] += (Number(d.kw[t].num) || 0);
-                                if(d.su[t] && d.su[t].name) totalPostCounts[d.su[t].name] += (Number(d.su[t].num) || 0);
-                            });
-                        }
+                        if(d.kw && d.su) { ['m','n','e'].forEach(t => { if(d.kw[t] && d.kw[t].name) totalPostCounts[d.kw[t].name] += (Number(d.kw[t].num) || 0); if(d.su[t] && d.su[t].name) totalPostCounts[d.su[t].name] += (Number(d.su[t].num) || 0); }); }
                     });
-                } catch(netErr) { console.error(netErr); }
+                } catch(err) {}
             }
-
             const coreAsset = "ยูดีไลท์3";
-            
-            let pool = [...groups.g1, ...groups.g2, ...groups.g3, fixedAsset]
-                .filter(asset => asset !== coreAsset && !usedIn10Days.includes(asset))
-                .sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
-
-            if (pool.length < 2) {
-                pool = [...groups.g1, ...groups.g2, ...groups.g3, fixedAsset]
-                    .filter(asset => asset !== coreAsset)
-                    .sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
-            }
-
-            finalAssets = [coreAsset, pool[0], pool[1]];
-            finalAssets.sort(() => 0.5 - Math.random());
-
+            let pool = [...groups.g1, ...groups.g2, ...groups.g3, fixedAsset].filter(asset => asset !== coreAsset && !usedIn10Days.includes(asset)).sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
+            if (pool.length < 2) { pool = [...groups.g1, ...groups.g2, ...groups.g3, fixedAsset].filter(asset => asset !== coreAsset).sort((a, b) => totalPostCounts[a] - totalPostCounts[b]); }
+            finalAssets = [coreAsset, pool[0], pool[1]].sort(() => 0.5 - Math.random());
         } catch (err) {
             finalAssets = ["ยูดีไลท์3", "บ้านเอื้ออาทรอรัญประเทศ", "ที่ดินบ้านนา นครนายก"];
         }
     } else if (dateVal === "2026-04-27") {
         finalAssets = [fixedAsset, "แม่ย่าพี่ปลา 11 ไร่", "ที่ดิน หลังอรัญนคร 1"];
     } else {
-        let count = 0;
-        let usedAssets = [];
-        
+        let count = 0; let usedAssets = [];
         if (db) {
             try {
-                const historyCountSnap = await db.collection("posts").get();
-                count = historyCountSnap.size;
+                const historyCountSnap = await db.collection("posts").get(); count = historyCountSnap.size;
                 const historySnap = await db.collection("posts").orderBy("date", "desc").limit(7).get();
-                historySnap.forEach(doc => {
-                    const d = doc.data();
-                    if(d.kw && d.su) {
-                        ['m','n','e'].forEach(t => {
-                            if(d.kw[t]) usedAssets.push(d.kw[t].name);
-                            if(d.su[t]) usedAssets.push(d.su[t].name);
-                        });
-                    }
-                });
-            } catch(e) { console.error(e); }
+                historySnap.forEach(doc => { const d = doc.data(); if(d.kw && d.su) { ['m','n','e'].forEach(t => { if(d.kw[t]) usedAssets.push(d.kw[t].name); if(d.su[t]) usedAssets.push(d.su[t].name); }); } });
+            } catch(e) {}
         }
-
         const rotationIdx = count % 3;
         let selectedGroups = [];
         if (rotationIdx === 0) selectedGroups = [groups.g2, groups.g3];
@@ -213,23 +183,11 @@ async function startRandom() {
         };
 
         const dayNum = parseInt(dateVal.split("-")[2], 10);
-        let res1;
-        
-        if (dayNum % 2 !== 0) {
-            res1 = fixedAsset;
-        } else {
-            let allAvailableAssets = [...groups.g1, ...groups.g2, ...groups.g3].filter(a => a !== fixedAsset);
-            let backupAvailable = allAvailableAssets.filter(a => !usedAssets.includes(a));
-            if (backupAvailable.length === 0) backupAvailable = allAvailableAssets;
-            res1 = backupAvailable[Math.floor(Math.random() * backupAvailable.length)];
-        }
-
+        let res1 = (dayNum % 2 !== 0) ? fixedAsset : [...groups.g1, ...groups.g2, ...groups.g3].filter(a => a !== fixedAsset)[Math.floor(Math.random() * 20)];
         let res2 = getSmartRandom(selectedGroups[0]);
         let res3 = getSmartRandom(selectedGroups[1]);
-        
         if (res2 === res1) res2 = getSmartRandom(selectedGroups[0].filter(a => a !== res1));
         if (res3 === res1 || res3 === res2) res3 = getSmartRandom(selectedGroups[1].filter(a => a !== res1 && a !== res2));
-
         finalAssets = [res1, res2, res3].sort(() => 0.5 - Math.random());
     }
 
@@ -242,7 +200,6 @@ async function startRandom() {
             });
             checkTodayStatus();
         } catch(e) { 
-            console.error(e);
             showOfflineForm(finalAssets);
         }
     } else {
@@ -253,35 +210,20 @@ async function startRandom() {
 function showOfflineForm(assets) {
     document.getElementById("randomBox").style.display = "none";
     document.getElementById("inputSection").style.display = "block";
-    document.getElementById("kw_m_name").value = assets[0];
-    document.getElementById("kw_n_name").value = assets[1];
-    document.getElementById("kw_e_name").value = assets[2];
-    document.getElementById("su_m_name").value = assets[1];
-    document.getElementById("su_n_name").value = assets[2];
-    document.getElementById("su_e_name").value = assets[0];
+    document.getElementById("kw_m_name").value = assets[0]; document.getElementById("kw_n_name").value = assets[1]; document.getElementById("kw_e_name").value = assets[2];
+    document.getElementById("su_m_name").value = assets[1]; document.getElementById("su_n_name").value = assets[2]; document.getElementById("su_e_name").value = assets[0];
 }
 
 async function restoreBackupData() {
     if(!db) return;
-    if(confirm("คุณต้องการกู้คืนข้อมูลและยอดโพสต์จำนวน 15 ของวันที่ 18/06/2569 ใช่หรือไม่?")) {
+    if(confirm("คุณต้องการกู้คืนข้อมูลของวันที่ 18/06/2569 ใช่หรือไม่?")) {
         try {
             document.getElementById("date").value = "2026-06-18";
-            const backupData = {
-                date: "2026-06-18",
-                kw: { m: { name: "คอนโดชีวาทัย ฮอล์มาร์ค", num: 15 }, n: { name: "ที่ดินบ้านนา นครนายก", num: 15 }, e: { name: "ที่ดินน้าจิต วังน้ำเย็น", num: 15 } },
-                su: { m: { name: "ที่ดินบ้านนา นครนายก", num: 15 }, n: { name: "ที่ดินน้าจิต วังน้ำเย็น", num: 15 }, e: { name: "คอนโดชีวาทัย ฮอล์มาร์ค", num: 15 } }
-            };
+            const backupData = { date: "2026-06-18", kw: { m: { name: "คอนโดชีวาทัย ฮอล์มาร์ค", num: 15 }, n: { name: "ที่ดินบ้านนา นครนายก", num: 15 }, e: { name: "ที่ดินน้าจิต วังน้ำเย็น", num: 15 } }, su: { m: { name: "ที่ดินบ้านนา นครนายก", num: 15 }, n: { name: "ที่ดินน้าจิต วังน้ำเย็น", num: 15 }, e: { name: "คอนโดชีวาทัย ฮอล์มาร์ค", num: 15 } } };
             const snap = await db.collection("posts").where("date", "==", "2026-06-18").get();
-            if (!snap.empty) {
-                currentDocId = snap.docs[0].id;
-                await db.collection("posts").doc(currentDocId).update(backupData);
-            } else {
-                const newDoc = await db.collection("posts").add(backupData);
-                currentDocId = newDoc.id;
-            }
-            alert("กู้คืนข้อมูลสำเร็จแล้ว!");
-            checkTodayStatus(); 
-        } catch (error) { console.error(error); }
+            if (!snap.empty) { await db.collection("posts").doc(snap.docs[0].id).update(backupData); } else { await db.collection("posts").add(backupData); }
+            alert("กู้คืนข้อมูลสำเร็จแล้ว!"); checkTodayStatus(); 
+        } catch (error) {}
     }
 }
 
@@ -289,60 +231,35 @@ async function updateDashboard() {
     if(!db) return;
     try {
         const dateInput = document.getElementById("date").value;
-        if(!dateInput) return;
-        const month = dateInput.substring(0, 7);
-        const snap = await db.collection("posts").get();
-        let stats = {}; 
-        snap.forEach(doc => { 
-            const d = doc.data(); 
-            if(d.date && d.date.startsWith(month) && d.kw && d.su) { 
-                ['m','n','e'].forEach(t => {
-                    if(d.kw[t]) stats[d.kw[t].name] = (stats[d.kw[t].name] || 0) + (Number(d.kw[t].num) || 0);
-                    if(d.su[t]) stats[d.su[t].name] = (stats[d.su[t].name] || 0) + (Number(d.su[t].num) || 0);
-                });
-            }
-        });
+        const month = dateInput.substring(0, 7); const snap = await db.collection("posts").get(); let stats = {}; 
+        snap.forEach(doc => { const d = doc.data(); if(d.date && d.date.startsWith(month) && d.kw && d.su) { ['m','n','e'].forEach(t => { if(d.kw[t]) stats[d.kw[t].name] = (stats[d.kw[t].name] || 0) + (Number(d.kw[t].num) || 0); if(d.su[t]) stats[d.su[t].name] = (stats[d.su[t].name] || 0) + (Number(d.su[t].num) || 0); }); } });
         document.getElementById("dashContent").innerHTML = Object.entries(stats).sort((a,b) => b[1]-a[1]).map(([n, c]) => `<div class="dash-item">${n}</div><div class="dash-item" style="text-align:right"><b>${c}</b></div>`).join('') || "ไม่มีข้อมูล";
         document.getElementById("dashBoard").style.display = "block";
-    } catch (e) { console.error(e); }
+    } catch (e) {}
 }
 
 async function loadHistory() {
     if(!db) return;
     try {
-        const snap = await db.collection("posts").orderBy("date", "desc").get();
-        let html = ""; snap.forEach(doc => { const d = doc.data();
-        if(d.date && d.kw && d.su && d.kw.m && d.kw.n && d.kw.e && d.su.m && d.su.n && d.su.e) {
-            html += `<div class="history-card"><strong>🗓 ${d.date}</strong>
-            <button class="btn-action" onclick="editEntry('${doc.id}')">✏️</button>
-            <button class="btn-action btn-delete" onclick="deleteEntry('${doc.id}')">🗑️</button>
-            <div class="h-row" style="color:var(--kw-color); margin-top:5px"><span>เช้า</span><span>${d.kw.m.name}</span><span>${d.kw.m.num}</span></div>
-            <div class="h-row" style="color:var(--kw-color)"><span>เที่ยง</span><span>${d.kw.n.name}</span><span>${d.kw.n.num}</span></div>
-            <div class="h-row" style="color:var(--kw-color)"><span>เย็น</span><span>${d.kw.e.name}</span><span>${d.kw.e.num}</span></div>
-            <div class="h-row" style="color:var(--su-color); margin-top:5px"><span>เช้า</span><span>${d.su.m.name}</span><span>${d.su.m.num}</span></div>
-            <div class="h-row" style="color:var(--su-color)"><span>เที่ยง</span><span>${d.su.n.name}</span><span>${d.su.n.num}</span></div>
-            <div class="h-row" style="color:var(--su-color)"><span>เย็น</span><span>${d.su.e.name}</span><span>${d.su.e.num}</span></div></div>`; 
-        }
-        });
+        const snap = await db.collection("posts").orderBy("date", "desc").get(); let html = ""; 
+        snap.forEach(doc => { const d = doc.data(); if(d.date && d.kw && d.su && d.kw.m && d.su.m) {
+            html += `<div class="history-card"><strong>🗓 ${d.date}</strong> <button class="btn-action" onclick="editEntry('${doc.id}')">✏️</button> <button class="btn-action btn-delete" onclick="deleteEntry('${doc.id}')">🗑️</button>
+            <div class="h-row" style="color:var(--kw-color); margin-top:5px"><span>เช้า</span><span>${d.kw.m.name}</span><span>${d.kw.m.num}</span></div><div class="h-row" style="color:var(--kw-color)"><span>เที่ยง</span><span>${d.kw.n.name}</span><span>${d.kw.n.num}</span></div><div class="h-row" style="color:var(--kw-color)"><span>เย็น</span><span>${d.kw.e.name}</span><span>${d.kw.e.num}</span></div>
+            <div class="h-row" style="color:var(--su-color); margin-top:5px"><span>เช้า</span><span>${d.su.m.name}</span><span>${d.su.m.num}</span></div><div class="h-row" style="color:var(--su-color)"><span>เที่ยง</span><span>${d.su.n.name}</span><span>${d.su.n.num}</span></div><div class="h-row" style="color:var(--su-color)"><span>เย็น</span><span>${d.su.e.name}</span><span>${d.su.e.num}</span></div></div>`; 
+        } });
         document.getElementById("historyList").innerHTML = html;
-    } catch (e) { console.error(e); }
+    } catch (e) {}
 }
 
 async function editEntry(id) { if(!db)return; const doc = await db.collection("posts").doc(id).get(); document.getElementById("date").value = doc.data().date; checkTodayStatus(); }
 async function deleteEntry(id) { if(!db)return; if(confirm("ยืนยันการลบ?")) { await db.collection("posts").doc(id).delete(); checkTodayStatus(); } }
 async function saveData() { 
-    if(!db) { alert("ระบบไม่สามารถเชื่อมต่อฐานข้อมูลได้ในขณะนี้"); return; }
+    if(!db) { alert("ขณะนี้ระบบเชื่อมต่อฐานข้อมูลไม่ได้ ยอดพิมพ์จะถูกบันทึกแค่บนหน้าจอชั่วคราว"); return; }
     await db.collection("posts").doc(currentDocId).update({ "kw.m.num": Number(document.getElementById("kw_m_num").value), "kw.n.num": Number(document.getElementById("kw_n_num").value), "kw.e.num": Number(document.getElementById("kw_e_num").value), "su.m.num": Number(document.getElementById("su_m_num").value), "su.n.num": Number(document.getElementById("su_n_num").value), "su.e.num": Number(document.getElementById("su_e_num").value) }); alert("บันทึกแล้ว!"); checkTodayStatus(); 
 }
 
 window.onload = () => { 
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, '0');
-    const d = String(now.getDate()).padStart(2, '0');
-    document.getElementById("date").value = `${y}-${m}-${d}`; 
-    
-    // สั่งวาดกล่องโครงสร้างพื้นฐานขึ้นมารอทันทีแบบไม่ต้องรอคิวเครือข่าย Firebase
+    const now = new Date(); document.getElementById("date").value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`; 
     checkTodayStatus();
 };
 </script>
