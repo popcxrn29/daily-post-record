@@ -81,7 +81,7 @@ try {
 
 const groups = {
     g1: ["แม่ย่าพี่ปลา 11 ไร่", "บ้านพี่แดง อรัญนคร3", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์"],
-    g2: ["ศรีวราห์การ์เเดน", "แฮปปี้คอนโด", "คอนโดชีวาทัย ฮอล์มาร์ค", "คอนโด The Base Park East", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "plum condo", "Lumpini Ville", "ลุมพินี วิลล์ รามอินทรา-ลาดปลาเค้า 1", "D condo", "Whizdom", "ยูดีไลท์3"],
+    g2: ["ศรีวราห์การเเดน", "แฮปปี้คอนโด", "คอนโดชีวาทัย ฮอล์มาร์ค", "คอนโด The Base Park East", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "plum condo", "Lumpini Ville", "ลุมพินี วิลล์ รามอินทรา-ลาดปลาเค้า 1", "D condo", "Whizdom", "ยูดีไลท์3"],
     g3: ["พี่ศรีไพร (คอนสาย)", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "บ้านmilindaคุณมีน"]
 };
 
@@ -186,6 +186,35 @@ async function startRandom() {
             finalAssets = [coreAsset, pool[0], pool[1]].sort(() => 0.5 - Math.random());
         } catch (err) {
             finalAssets = ["บ้านmilindaคุณมีน", "บ้านเอื้ออาทรอรัญประเทศ", "ที่ดินบ้านนา นครนายก"];
+        }
+    }
+    // ล็อกสุ่มวันที่ 27 มิถุนายน 2569 เป็น รีช พหลโยธิน 52 แกนหลัก ตามเงื่อนไขใหม่ค่ะ
+    else if (dateVal === "2026-06-27") {
+        try {
+            let usedIn10Days = [];
+            let totalPostCounts = {};
+            [...groups.g1, ...groups.g2, ...groups.g3, fixedAsset].forEach(asset => { totalPostCounts[asset] = 0; });
+
+            if (db) {
+                try {
+                    const history10Snap = await db.collection("posts").orderBy("date", "desc").limit(10).get();
+                    history10Snap.forEach(doc => {
+                        const d = doc.data();
+                        if(d.kw && d.su) { ['m','n','e'].forEach(t => { if(d.kw[t]) usedIn10Days.push(d.kw[t].name); if(d.su[t]) usedIn10Days.push(d.su[t].name); }); }
+                    });
+                    const allSnap = await db.collection("posts").get();
+                    allSnap.forEach(doc => {
+                        const d = doc.data();
+                        if(d.kw && d.su) { ['m','n','e'].forEach(t => { if(d.kw[t] && d.kw[t].name) totalPostCounts[d.kw[t].name] += (Number(d.kw[t].num) || 0); if(d.su[t] && d.su[t].name) totalPostCounts[d.su[t].name] += (Number(d.su[t].num) || 0); }); }
+                    });
+                } catch(err) {}
+            }
+            const coreAsset = "รีช พหลโยธิน 52 ";
+            let pool = [...groups.g1, ...groups.g2, ...groups.g3, fixedAsset].filter(asset => asset !== coreAsset && !usedIn10Days.includes(asset)).sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
+            if (pool.length < 2) { pool = [...groups.g1, ...groups.g2, ...groups.g3, fixedAsset].filter(asset => asset !== coreAsset).sort((a, b) => totalPostCounts[a] - totalPostCounts[b]); }
+            finalAssets = [coreAsset, pool[0], pool[1]].sort(() => 0.5 - Math.random());
+        } catch (err) {
+            finalAssets = ["รีช พหลโยธิน 52 ", "บ้านเอื้ออาทรอรัญประเทศ", "ที่ดินบ้านนา นครนายก"];
         }
     } else if (dateVal === "2026-04-27") {
         finalAssets = [fixedAsset, "แม่ย่าพี่ปลา 11 ไร่", "ที่ดิน หลังอรัญนคร 1"];
