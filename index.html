@@ -159,8 +159,8 @@ async function startRandom() {
             finalAssets = ["ยูดีไลท์3", "บ้านเอื้ออาทรอรัญประเทศ", "ที่ดินบ้านนา นครนายก"];
         }
     } 
-    // ล็อกสุ่มวันที่ 26 และ 29 มิถุนายน 2569 เป็นบ้านmilindaคุณมีน แกนหลัก
-    else if (dateVal === "2026-06-26" || dateVal === "2026-06-29") {
+    // ล็อกสุ่มวันที่ 26 มิถุนายน 2569 เป็นบ้านmilindaคุณมีน แกนหลัก
+    else if (dateVal === "2026-06-26") {
         try {
             let usedIn10Days = [];
             let totalPostCounts = {};
@@ -216,15 +216,40 @@ async function startRandom() {
         } catch (err) {
             finalAssets = ["รีช พหลโยธิน 52 ", "บ้านเอื้ออาทรอรัญประเทศ", "ที่ดินบ้านนา นครนายก"];
         }
+    }
+    // ล็อกสุ่มวันที่ 29 มิถุนายน 2569: บังคับเลือกบ้านเอื้ออาทรอรัญประเทศ + อีก 2 ทรัพย์ที่ไม่ซ้ำ 7 วันก่อนหน้า
+    else if (dateVal === "2026-06-29") {
+        try {
+            let usedIn7Days = [];
+            if (db) {
+                try {
+                    const history7Snap = await db.collection("posts").orderBy("date", "desc").limit(7).get();
+                    history7Snap.forEach(doc => {
+                        const d = doc.data();
+                        if(d.kw && d.su) { ['m','n','e'].forEach(t => { if(d.kw[t]) usedIn7Days.push(d.kw[t].name); if(d.su[t]) usedIn7Days.push(d.su[t].name); }); }
+                    });
+                } catch(err) {}
+            }
+            const coreAsset = fixedAsset; // บ้านเอื้ออาทรอรัญประเทศ
+            // คัดทรัพย์ในกลุ่มทั้งหมดที่ยังไม่ได้สุ่มโดนในรอบ 7 วันก่อนหน้า
+            let pool = [...groups.g1, ...groups.g2, ...groups.g3].filter(asset => asset !== coreAsset && !usedIn7Days.includes(asset));
+            // กรณีถ้าประวัติซ้ำหมดจนคัดได้ไม่ครบ 2 ทรัพย์ ให้ดึงตัวอื่นมารองรับเพื่อไม่ให้ระบบค้าง
+            if (pool.length < 2) { pool = [...groups.g1, ...groups.g2, ...groups.g3].filter(asset => asset !== coreAsset); }
+            
+            // สุ่มเลือกมา 2 ทรัพย์จาก Pool ที่ผ่านเงื่อนไข
+            pool = pool.sort(() => 0.5 - Math.random());
+            finalAssets = [coreAsset, pool[0], pool[1]].sort(() => 0.5 - Math.random());
+        } catch (err) {
+            finalAssets = ["บ้านเอื้ออาทรอรัญประเทศ", "แม่ย่าพี่ปลา 11 ไร่", "แฮปปี้คอนโด"];
+        }
     } else if (dateVal === "2026-04-27") {
         finalAssets = [fixedAsset, "แม่ย่าพี่ปลา 11 ไร่", "ที่ดิน หลังอรัญนคร 1"];
     } else {
-        // เคสวันทำงานปกติทั่วไป ปรับปรุงระบบสุ่ม "บ้านเอื้ออาทรอรัญประเทศ" ให้เป็น "วันเว้นวัน" โดยอิงจากประวัติการสุ่มล่าสุด
+        // เคสวันทำงานปกติทั่วไป ระบบสุ่ม "บ้านเอื้ออาทรอรัญประเทศ" แบบ "วันเว้นวัน"
         let count = 0; let usedAssets = []; let wasFixedAssetUsedYesterday = false;
         if (db) {
             try {
                 const historyCountSnap = await db.collection("posts").get(); count = historyCountSnap.size;
-                // ดึงประวัติย้อนหลังมา 7 วัน เพื่อใช้ในระบบหลบเลี่ยงไม่ให้ซ้ำถี่เกินไป
                 const historySnap = await db.collection("posts").orderBy("date", "desc").limit(7).get();
                 let idx = 0;
                 historySnap.forEach(doc => { 
@@ -233,7 +258,6 @@ async function startRandom() {
                         ['m','n','e'].forEach(t => { 
                             if(d.kw[t]) {
                                 usedAssets.push(d.kw[t].name);
-                                // ตรวจสอบว่า "บ้านเอื้ออาทรอรัญประเทศ" ถูกสุ่มใช้ไปในวันล่าสุด (ย้อนหลัง 1 รายการแรก) หรือไม่
                                 if(idx === 0 && d.kw[t].name === fixedAsset) wasFixedAssetUsedYesterday = true;
                             } 
                             if(d.su[t]) {
@@ -258,7 +282,7 @@ async function startRandom() {
             return available[Math.floor(Math.random() * available.length)];
         };
 
-        // ตรวจสอบเงื่อนไขวันเว้นวัน: ถ้าเมื่อวาน (รายการล่าสุด) ไม่ได้ใช้บ้านเอื้อฯ วันนี้จะมีสิทธิ์สุ่มได้ 50% แต่ถ้าเมื่อวานใช้ไปแล้ว วันนี้จะถูกข้ามทันที
+        // เงื่อนไขวันเว้นวัน: ถ้าเมื่อวานใช้ไปแล้ว วันนี้ข้ามทันที
         let res1;
         if (!wasFixedAssetUsedYesterday && Math.random() < 0.5) {
             res1 = fixedAsset;
@@ -336,7 +360,7 @@ async function loadHistory() {
 async function editEntry(id) { if(!db)return; const doc = await db.collection("posts").doc(id).get(); document.getElementById("date").value = doc.data().date; checkTodayStatus(); }
 async function deleteEntry(id) { if(!db)return; if(confirm("ยืนยันการลบ?")) { await db.collection("posts").doc(id).delete(); checkTodayStatus(); } }
 async function saveData() { 
-    if(!db) { alert("ขณะนี้ระบบเชื่อมต่อฐานข้อมูลไม่ได้ ยอดพิมพ์จะถูกบันทึกแค่บนหน้าจอชราว"); return; }
+    if(!db) { alert("ขณะนี้ระบบเชื่อมต่อฐานข้อมูลไม่ได้ ยอดพิมพ์จะถูกบันทึกแค่บนหน้าจอชั่วคราว"); return; }
     await db.collection("posts").doc(currentDocId).update({ "kw.m.num": Number(document.getElementById("kw_m_num").value), "kw.n.num": Number(document.getElementById("kw_n_num").value), "kw.e.num": Number(document.getElementById("kw_e_num").value), "su.m.num": Number(document.getElementById("su_m_num").value), "su.n.num": Number(document.getElementById("su_n_num").value), "su.e.num": Number(document.getElementById("su_e_num").value) }); alert("บันทึกแล้ว!"); checkTodayStatus(); 
 }
 
