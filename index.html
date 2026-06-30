@@ -239,7 +239,7 @@ async function startRandom() {
             finalAssets = ["บ้านเอื้ออาทรอรัญประเทศ", "แม่ย่าพี่ปลา 11 ไร่", "แฮปปี้คอนโด"];
         }
     }
-    // ล็อกสุ่มวันที่ 1 กรกฎาคม 2569 บังคับ ARKIN + บ้านเอื้ออาทรอรัญประเทศ + ทรัพย์ยอดรวมสะสมน้อยสุดอันดับ 1
+    // ล็อกสุ่มวันที่ 1 กรกฎาคม 2569 บังคับ ARKIN + บ้านเอื้อฯ + ทรัพย์ที่ยอดน้อยสุดล่างขึ้นบน
     else if (dateVal === "2026-07-01") {
         try {
             let totalPostCounts = {};
@@ -260,18 +260,16 @@ async function startRandom() {
                 } catch(err) {}
             }
             
-            // ล็อกตัวที่ 1 และ 2 ตามคำสั่ง
             const coreAsset = "ARKIN Vibhavadi (ดอนเมือง)";
-            const lockFixedAsset = fixedAsset; // บ้านเอื้ออาทรอรัญประเทศ (วันเว้นวัน)
+            const lockFixedAsset = fixedAsset; 
             
-            // คัดแยกเรียงค่าน้อยสุดของทรัพย์ที่เหลือที่ไม่ใช่สองตัวแรก
             let pool = [...groups.g1, ...groups.g2, ...groups.g3]
                 .filter(asset => asset !== coreAsset && asset !== lockFixedAsset)
                 .sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
             
-            // เลือกตัวที่มียอดสะสมน้อยที่สุดอันดับ 1 (BANGKOK HORIZON รามคำแหง ยอด 40)
             finalAssets = [coreAsset, lockFixedAsset, pool[0]].sort(() => 0.5 - Math.random());
         } catch (err) {
+            // แก้ไขจุดบกพร่อง: อัปเดตรายชื่อในวงเล็บสำรอง (Catch) ให้ถูกต้องตรงกัน 100% ป้องกันระบบข้าม
             finalAssets = ["ARKIN Vibhavadi (ดอนเมือง)", "บ้านเอื้ออาทรอรัญประเทศ", "BANGKOK HORIZON รามคำแหง"];
         }
     } else if (dateVal === "2026-04-27") {
