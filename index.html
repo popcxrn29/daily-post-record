@@ -79,7 +79,6 @@ try {
     console.error("Firebase setup error:", e);
 }
 
-// เพิ่ม ARKIN Vibhavadi (ดอนเมือง) ลงในกลุ่มสุ่มที่ 2 เรียบร้อยค่ะ
 const groups = {
     g1: ["แม่ย่าพี่ปลา 11 ไร่", "บ้านพี่แดง อรัญนคร3", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์"],
     g2: ["ศรีวราห์การเเดน", "แฮปปี้คอนโด", "คอนโดชีวาทัย ฮอล์มาร์ค", "คอนโด The Base Park East", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "plum condo", "Lumpini Ville", "ลุมพินี วิลล์ รามอินทรา-ลาดปลาเค้า 1", "D condo", "Whizdom", "ยูดีไลท์3", "ARKIN Vibhavadi (ดอนเมือง)"],
@@ -160,7 +159,7 @@ async function startRandom() {
             finalAssets = ["ยูดีไลท์3", "บ้านเอื้ออาทรอรัญประเทศ", "ที่ดินบ้านนา นครนายก"];
         }
     } 
-    // ล็อกสุ่มวันที่ 26 มิถุนายน 2569 เป็นบ้านmilindaคุณมีน แกนหลัก
+    // ล็อกสุ่มวันที่ 26 มิถุนายน 2569
     else if (dateVal === "2026-06-26") {
         try {
             let usedIn10Days = [];
@@ -189,7 +188,7 @@ async function startRandom() {
             finalAssets = ["บ้านmilindaคุณมีน", "บ้านเอื้ออาทรอรัญประเทศ", "ที่ดินบ้านนา นครนายก"];
         }
     }
-    // ล็อกสุ่มวันที่ 27 มิถุนายน 2569 เป็น รีช พหลโยธิน 52 แกนหลัก
+    // ล็อกสุ่มวันที่ 27 มิถุนายน 2569
     else if (dateVal === "2026-06-27") {
         try {
             let usedIn10Days = [];
@@ -218,7 +217,7 @@ async function startRandom() {
             finalAssets = ["รีช พหลโยธิน 52 ", "บ้านเอื้ออาทรอรัญประเทศ", "ที่ดินบ้านนา นครนายก"];
         }
     }
-    // ล็อกสุ่มวันที่ 29 มิถุนายน 2569 บังคับบ้านเอื้อฯ + อีก 2 ทรัพย์ที่ไม่ซ้ำ 7 วันก่อนหน้า
+    // ล็อกสุ่มวันที่ 29 มิถุนายน 2569
     else if (dateVal === "2026-06-29") {
         try {
             let usedIn7Days = [];
@@ -240,11 +239,10 @@ async function startRandom() {
             finalAssets = ["บ้านเอื้ออาทรอรัญประเทศ", "แม่ย่าพี่ปลา 11 ไร่", "แฮปปี้คอนโด"];
         }
     }
-    // ล็อกสุ่มวันที่ 1 กรกฎาคม 2569 บังคับ ARKIN Vibhavadi (ดอนเมือง) + อีก 2 ทรัพย์ที่ยอดโพสต์สะสมน้อยที่สุดตลอด
+    // ล็อกสุ่มวันที่ 1 กรกฎาคม 2569 บังคับ ARKIN + บ้านเอื้ออาทรอรัญประเทศ + ทรัพย์ยอดรวมสะสมน้อยสุดอันดับ 1
     else if (dateVal === "2026-07-01") {
         try {
             let totalPostCounts = {};
-            // ตั้งค่าเริ่มต้นยอดรวมของทุกทรัพย์ให้เป็น 0
             [...groups.g1, ...groups.g2, ...groups.g3, fixedAsset].forEach(asset => { totalPostCounts[asset] = 0; });
 
             if (db) {
@@ -261,19 +259,25 @@ async function startRandom() {
                     });
                 } catch(err) {}
             }
-            const coreAsset = "ARKIN Vibhavadi (ดอนเมือง)";
-            // คัดแยกเรียงลำดับทรัพย์ที่ยอดโพสต์รวมสะสมน้อยที่สุดจากน้อยไปมากตลอด
-            let pool = [...groups.g1, ...groups.g2, ...groups.g3, fixedAsset].filter(asset => asset !== coreAsset).sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
             
-            // เลือกตัวที่น้อยสุดอันดับ 1 และอันดับ 2 ขึ้นมาทำงานร่วมกับแกนหลัก
-            finalAssets = [coreAsset, pool[0], pool[1]].sort(() => 0.5 - Math.random());
+            // ล็อกตัวที่ 1 และ 2 ตามคำสั่ง
+            const coreAsset = "ARKIN Vibhavadi (ดอนเมือง)";
+            const lockFixedAsset = fixedAsset; // บ้านเอื้ออาทรอรัญประเทศ (วันเว้นวัน)
+            
+            // คัดแยกเรียงค่าน้อยสุดของทรัพย์ที่เหลือที่ไม่ใช่สองตัวแรก
+            let pool = [...groups.g1, ...groups.g2, ...groups.g3]
+                .filter(asset => asset !== coreAsset && asset !== lockFixedAsset)
+                .sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
+            
+            // เลือกตัวที่มียอดสะสมน้อยที่สุดอันดับ 1 (BANGKOK HORIZON รามคำแหง ยอด 40)
+            finalAssets = [coreAsset, lockFixedAsset, pool[0]].sort(() => 0.5 - Math.random());
         } catch (err) {
-            finalAssets = ["ARKIN Vibhavadi (ดอนเมือง)", "บ้านเอื้ออาทรอรัญประเทศ", "ที่ดินบ้านนา นครนายก"];
+            finalAssets = ["ARKIN Vibhavadi (ดอนเมือง)", "บ้านเอื้ออาทรอรัญประเทศ", "BANGKOK HORIZON รามคำแหง"];
         }
     } else if (dateVal === "2026-04-27") {
         finalAssets = [fixedAsset, "แม่ย่าพี่ปลา 11 ไร่", "ที่ดิน หลังอรัญนคร 1"];
     } else {
-        // เคสวันทำงานปกติทั่วไป ระบบสุ่ม "บ้านเอื้ออาทรอรัญประเทศ" แบบ "วันเว้นวัน"
+        // เคสวันทำงานปกติทั่วไป ระบบสุ่ม "บ้านเอื้ออาทรอรัญประเทศ" แบบ "วันเว้นวัน" ตลอดไป
         let count = 0; let usedAssets = []; let wasFixedAssetUsedYesterday = false;
         if (db) {
             try {
