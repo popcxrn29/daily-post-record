@@ -79,9 +79,10 @@ try {
     console.error("Firebase setup error:", e);
 }
 
+// เพิ่ม ARKIN Vibhavadi (ดอนเมือง) ลงในกลุ่มสุ่มที่ 2 เรียบร้อยค่ะ
 const groups = {
     g1: ["แม่ย่าพี่ปลา 11 ไร่", "บ้านพี่แดง อรัญนคร3", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์"],
-    g2: ["ศรีวราห์การเเดน", "แฮปปี้คอนโด", "คอนโดชีวาทัย ฮอล์มาร์ค", "คอนโด The Base Park East", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "plum condo", "Lumpini Ville", "ลุมพินี วิลล์ รามอินทรา-ลาดปลาเค้า 1", "D condo", "Whizdom", "ยูดีไลท์3"],
+    g2: ["ศรีวราห์การเเดน", "แฮปปี้คอนโด", "คอนโดชีวาทัย ฮอล์มาร์ค", "คอนโด The Base Park East", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "plum condo", "Lumpini Ville", "ลุมพินี วิลล์ รามอินทรา-ลาดปลาเค้า 1", "D condo", "Whizdom", "ยูดีไลท์3", "ARKIN Vibhavadi (ดอนเมือง)"],
     g3: ["พี่ศรีไพร (คอนสาย)", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "บ้านmilindaคุณมีน"]
 };
 
@@ -217,7 +218,7 @@ async function startRandom() {
             finalAssets = ["รีช พหลโยธิน 52 ", "บ้านเอื้ออาทรอรัญประเทศ", "ที่ดินบ้านนา นครนายก"];
         }
     }
-    // ล็อกสุ่มวันที่ 29 มิถุนายน 2569: บังคับเลือกบ้านเอื้ออาทรอรัญประเทศ + อีก 2 ทรัพย์ที่ไม่ซ้ำ 7 วันก่อนหน้า
+    // ล็อกสุ่มวันที่ 29 มิถุนายน 2569 บังคับบ้านเอื้อฯ + อีก 2 ทรัพย์ที่ไม่ซ้ำ 7 วันก่อนหน้า
     else if (dateVal === "2026-06-29") {
         try {
             let usedIn7Days = [];
@@ -230,17 +231,44 @@ async function startRandom() {
                     });
                 } catch(err) {}
             }
-            const coreAsset = fixedAsset; // บ้านเอื้ออาทรอรัญประเทศ
-            // คัดทรัพย์ในกลุ่มทั้งหมดที่ยังไม่ได้สุ่มโดนในรอบ 7 วันก่อนหน้า
+            const coreAsset = fixedAsset;
             let pool = [...groups.g1, ...groups.g2, ...groups.g3].filter(asset => asset !== coreAsset && !usedIn7Days.includes(asset));
-            // กรณีถ้าประวัติซ้ำหมดจนคัดได้ไม่ครบ 2 ทรัพย์ ให้ดึงตัวอื่นมารองรับเพื่อไม่ให้ระบบค้าง
             if (pool.length < 2) { pool = [...groups.g1, ...groups.g2, ...groups.g3].filter(asset => asset !== coreAsset); }
-            
-            // สุ่มเลือกมา 2 ทรัพย์จาก Pool ที่ผ่านเงื่อนไข
             pool = pool.sort(() => 0.5 - Math.random());
             finalAssets = [coreAsset, pool[0], pool[1]].sort(() => 0.5 - Math.random());
         } catch (err) {
             finalAssets = ["บ้านเอื้ออาทรอรัญประเทศ", "แม่ย่าพี่ปลา 11 ไร่", "แฮปปี้คอนโด"];
+        }
+    }
+    // ล็อกสุ่มวันที่ 1 กรกฎาคม 2569 บังคับ ARKIN Vibhavadi (ดอนเมือง) + อีก 2 ทรัพย์ที่ยอดโพสต์สะสมน้อยที่สุดตลอด
+    else if (dateVal === "2026-07-01") {
+        try {
+            let totalPostCounts = {};
+            // ตั้งค่าเริ่มต้นยอดรวมของทุกทรัพย์ให้เป็น 0
+            [...groups.g1, ...groups.g2, ...groups.g3, fixedAsset].forEach(asset => { totalPostCounts[asset] = 0; });
+
+            if (db) {
+                try {
+                    const allSnap = await db.collection("posts").get();
+                    allSnap.forEach(doc => {
+                        const d = doc.data();
+                        if(d.kw && d.su) { 
+                            ['m','n','e'].forEach(t => { 
+                                if(d.kw[t] && d.kw[t].name) totalPostCounts[d.kw[t].name] = (totalPostCounts[d.kw[t].name] || 0) + (Number(d.kw[t].num) || 0); 
+                                if(d.su[t] && d.su[t].name) totalPostCounts[d.su[t].name] = (totalPostCounts[d.su[t].name] || 0) + (Number(d.su[t].num) || 0); 
+                            }); 
+                        }
+                    });
+                } catch(err) {}
+            }
+            const coreAsset = "ARKIN Vibhavadi (ดอนเมือง)";
+            // คัดแยกเรียงลำดับทรัพย์ที่ยอดโพสต์รวมสะสมน้อยที่สุดจากน้อยไปมากตลอด
+            let pool = [...groups.g1, ...groups.g2, ...groups.g3, fixedAsset].filter(asset => asset !== coreAsset).sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
+            
+            // เลือกตัวที่น้อยสุดอันดับ 1 และอันดับ 2 ขึ้นมาทำงานร่วมกับแกนหลัก
+            finalAssets = [coreAsset, pool[0], pool[1]].sort(() => 0.5 - Math.random());
+        } catch (err) {
+            finalAssets = ["ARKIN Vibhavadi (ดอนเมือง)", "บ้านเอื้ออาทรอรัญประเทศ", "ที่ดินบ้านนา นครนายก"];
         }
     } else if (dateVal === "2026-04-27") {
         finalAssets = [fixedAsset, "แม่ย่าพี่ปลา 11 ไร่", "ที่ดิน หลังอรัญนคร 1"];
@@ -282,7 +310,6 @@ async function startRandom() {
             return available[Math.floor(Math.random() * available.length)];
         };
 
-        // เงื่อนไขวันเว้นวัน: ถ้าเมื่อวานใช้ไปแล้ว วันนี้ข้ามทันที
         let res1;
         if (!wasFixedAssetUsedYesterday && Math.random() < 0.5) {
             res1 = fixedAsset;
