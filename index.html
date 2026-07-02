@@ -202,39 +202,38 @@ const groups = {
 
 const fixedAsset = "บ้านเอื้ออาทรอรัญประเทศ";
 let currentDocId = null;
-let isCurrentDocOldFormat = false;
 
 function generateInputRows(user, data) {
     const container = document.getElementById(`${user}_rows`);
     container.innerHTML = "";
     
-    if (data && data[user] && data[user].m) {
-        isCurrentDocOldFormat = true;
-        const slots = [{k:'m', n:'เช้า'}, {k:'n', n:'เที่ยง'}, {k:'e', n:'เย็น'}];
-        slots.forEach((slot, idx) => {
-            const rowData = data[user][slot.k] || { name: "", num: 0 };
-            container.innerHTML += `
-                <div class="row">
-                    <input type="text" class="input-time" id="${user}_t${idx+1}" value="${slot.n}" readonly style="background:#ECEFF1; border:none; color:var(--royal-navy); font-weight:700;">
-                    <input id="${user}_n${idx+1}" value="${rowData.name || ''}" readonly>
-                    <button class="btn-action" onclick="editAssetName('${user}_n${idx+1}')">✏️</button>
-                    <input id="${user}_num${idx+1}" type="number" value="${rowData.num || 0}">
-                </div>
-            `;
-        });
-    } else {
-        isCurrentDocOldFormat = false;
-        for (let i = 1; i <= 6; i++) {
-            const rowData = (data && data[user] && data[user][`p${i}`]) ? data[user][`p${i}`] : { time: "", name: "", num: 0 };
-            container.innerHTML += `
-                <div class="row">
-                    <input type="text" class="input-time" id="${user}_t${i}" placeholder="เวลา" value="${rowData.time || ''}">
-                    <input id="${user}_n${i}" value="${rowData.name || ''}" readonly>
-                    <button class="btn-action" onclick="editAssetName('${user}_n${i}')">✏️</button>
-                    <input id="${user}_num${i}" type="number" value="${rowData.num || 0}">
-                </div>
-            `;
+    // บังคับแสดงผลเป็นระบบ 6 ช่องในหน้าจอแก้ไขปัจจุบันทั้งหมด
+    for (let i = 1; i <= 6; i++) {
+        let rowData = { time: "", name: "", num: 0 };
+        
+        if (data && data[user]) {
+            if (data[user][`p${i}`]) {
+                rowData = data[user][`p${i}`];
+            } else if (i <= 3) {
+                // รองรับข้อมูลแบบเก่าเช้าเที่ยงเย็นให้แสดงผลใน 3 ช่องแรกไปก่อน
+                const oldSlots = ['m', 'n', 'e'];
+                const oldTimes = ['เช้า', 'เที่ยง', 'เย็น'];
+                if (data[user][oldSlots[i-1]]) {
+                    rowData.name = data[user][oldSlots[i-1]].name || "";
+                    rowData.num = data[user][oldSlots[i-1]].num || 0;
+                    rowData.time = oldTimes[i-1];
+                }
+            }
         }
+        
+        container.innerHTML += `
+            <div class="row">
+                <input type="text" class="input-time" id="${user}_t${i}" placeholder="เวลา" value="${rowData.time || ''}">
+                <input id="${user}_n${i}" value="${rowData.name || ''}" readonly>
+                <button class="btn-action" onclick="editAssetName('${user}_n${i}')">✏️</button>
+                <input id="${user}_num${i}" type="number" value="${rowData.num || 0}">
+            </div>
+        `;
     }
 }
 
@@ -359,24 +358,15 @@ async function saveData() {
     if(!db) return;
     let updateData = {};
     
-    if (isCurrentDocOldFormat) {
-        const slots = ['m', 'n', 'e'];
-        for(let i=1; i<=3; i++) {
-            updateData[`kw.${slots[i-1]}.name`] = document.getElementById(`kw_n${i}`).value;
-            updateData[`kw.${slots[i-1]}.num`] = Number(document.getElementById(`kw_num${i}`).value);
-            updateData[`su.${slots[i-1]}.name`] = document.getElementById(`su_n${i}`).value;
-            updateData[`su.${slots[i-1]}.num`] = Number(document.getElementById(`su_num${i}`).value);
-        }
-    } else {
-        for(let i=1; i<=6; i++) {
-            updateData[`kw.p${i}.time`] = document.getElementById(`kw_t${i}`).value;
-            updateData[`kw.p${i}.name`] = document.getElementById(`kw_n${i}`).value;
-            updateData[`kw.p${i}.num`] = Number(document.getElementById(`kw_num${i}`).value);
-            updateData[`su.p${i}.time`] = document.getElementById(`su_t${i}`).value;
-            updateData[`su.p${i}.name`] = document.getElementById(`su_n${i}`).value;
-            updateData[`su.p${i}.num`] = Number(document.getElementById(`su_num${i}`).value);
-        }
+    for(let i=1; i<=6; i++) {
+        updateData[`kw.p${i}.time`] = document.getElementById(`kw_t${i}`).value;
+        updateData[`kw.p${i}.name`] = document.getElementById(`kw_n${i}`).value;
+        updateData[`kw.p${i}.num`] = Number(document.getElementById(`kw_num${i}`).value);
+        updateData[`su.p${i}.time`] = document.getElementById(`su_t${i}`).value;
+        updateData[`su.p${i}.name`] = document.getElementById(`su_n${i}`).value;
+        updateData[`su.p${i}.num`] = Number(document.getElementById(`su_num${i}`).value);
     }
+
     try {
         await db.collection("posts").doc(currentDocId).update(updateData); 
         alert("✨ บันทึกข้อมูลประจำวันเรียบร้อยแล้วค่ะ!"); 
