@@ -156,7 +156,7 @@
     </div>
 
     <div id="inputSection" class="card" style="display: none;">
-        <div class="user-title">👤 แंधनงานประจำวัน: พี่ขวัญ</div>
+        <div class="user-title">👤 แผนงานประจำวัน: พี่ขวัญ</div>
         <div id="kw_rows"></div>
         
         <hr style="border:0; border-top:1px solid var(--border-luxury); margin:22px 0;">
@@ -203,7 +203,7 @@ const groups = {
 const fixedAsset = "บ้านเอื้ออาทรอรัญประเทศ";
 let currentDocId = null;
 
-// [แก้ไขแก้ขาดตัวที่ 1] บังคับล้างหน้าตา 3 ช่องเก่าทิ้งร้อยเปอร์เซ็นต์ ให้วาด 6 แถวป้อนเวลาอิสระถาวรทุกรันหน้าจอ
+// บังคับเปลี่ยนสถาปัตยกรรมแถวแสดงผลให้เป็น 6 แถวพิมพ์เวลาอิสระถาวร ไม่ดึงข้อมูล 3 ช่องเดิมมาบดบังดีไซน์ใหม่
 function generateInputRows(user, data) {
     const container = document.getElementById(`${user}_rows`);
     container.innerHTML = "";
@@ -211,19 +211,8 @@ function generateInputRows(user, data) {
     for (let i = 1; i <= 6; i++) {
         let rowData = { time: "", name: "", num: 0 };
         
-        if (data && data[user]) {
-            if (data[user][`p${i}`]) {
-                rowData = data[user][`p${i}`];
-            } else if (i <= 3) {
-                // หากดึงเจอวันเก่าที่เป็นฟอร์แมต เช้า/เที่ยง/เย็น ระบบจะเอาข้อมูลมาจัดใส่ 3 แถวแรกให้ทันทีโดยไม่พังโครงสร้าง 6 ช่อง
-                const oldSlots = ['m', 'n', 'e'];
-                const oldTimes = ['เช้า', 'เที่ยง', 'เย็น'];
-                if (data[user][oldSlots[i-1]]) {
-                    rowData.name = data[user][oldSlots[i-1]].name || "";
-                    rowData.num = data[user][oldSlots[i-1]].num || 0;
-                    rowData.time = oldTimes[i-1];
-                }
-            }
+        if (data && data[user] && data[user][`p${i}`]) {
+            rowData = data[user][`p${i}`];
         }
         
         container.innerHTML += `
@@ -267,7 +256,6 @@ async function checkTodayStatus() {
     } catch (e) { console.error(e); }
 }
 
-// [แก้ไขแก้ขาดตัวที่ 2] ปลดล็อกตรรกะสุ่มหลังบ้านให้คำนวณจากคลังข้อมูล Firebase ทั้งหมดและกระจาย 6 ทรัพย์สินอัตโนมัติ
 async function startRandom() {
     const dateVal = document.getElementById("date").value;
     if(!dateVal) return;
@@ -283,10 +271,6 @@ async function startRandom() {
             allSnap.forEach(doc => {
                 const d = doc.data();
                 if(d.kw && d.su) { 
-                    ['m','n','e'].forEach(slot => {
-                        if(d.kw[slot] && d.kw[slot].name) totalPostCounts[d.kw[slot].name] = (totalPostCounts[d.kw[slot].name] || 0) + (Number(d.kw[slot].num) || 0);
-                        if(d.su[slot] && d.su[slot].name) totalPostCounts[d.su[slot].name] = (totalPostCounts[d.su[slot].name] || 0) + (Number(d.su[slot].num) || 0);
-                    });
                     for(let i=1; i<=6; i++) {
                         if(d.kw[`p${i}`] && d.kw[`p${i}`].name) totalPostCounts[d.kw[`p${i}`].name] = (totalPostCounts[d.kw[`p${i}`].name] || 0) + (Number(d.kw[`p${i}`].num) || 0); 
                         if(d.su[`p${i}`] && d.su[`p${i}`].name) totalPostCounts[d.su[`p${i}`].name] = (totalPostCounts[d.su[`p${i}`].name] || 0) + (Number(d.su[`p${i}`].num) || 0); 
@@ -328,9 +312,6 @@ async function searchAssetDays() {
             const d = doc.data();
             let found = false;
             if(d.kw && d.su) {
-                ['m','n','e'].forEach(slot => {
-                    if((d.kw[slot] && d.kw[slot].name.includes(key)) || (d.su[slot] && d.su[slot].name.includes(key))) found = true;
-                });
                 for(let i=1; i<=6; i++) {
                     if((d.kw[`p${i}`] && d.kw[`p${i}`].name.includes(key)) || (d.su[`p${i}`] && d.su[`p${i}`].name.includes(key))) found = true;
                 }
@@ -348,7 +329,6 @@ async function searchAssetDays() {
     } catch(e) { console.error(e); }
 }
 
-// [แก้ไขแก้ขาดตัวที่ 3] เซฟค่าลง Firebase เป็นพิกัดฟอร์แมต p1-p6 สากลใหม่ทั้งหมด
 async function saveData() { 
     if(!db) return;
     let updateData = {};
@@ -383,10 +363,6 @@ async function updateDashboard() {
         snap.forEach(doc => { 
             const d = doc.data(); 
             if(d.date && d.date.startsWith(month) && d.kw && d.su) { 
-                ['m','n','e'].forEach(slot => {
-                    if(d.kw[slot]) stats[d.kw[slot].name] = (stats[d.kw[slot].name] || 0) + (Number(d.kw[slot].num) || 0);
-                    if(d.su[slot]) stats[d.su[slot].name] = (stats[d.su[slot].name] || 0) + (Number(d.su[slot].num) || 0);
-                });
                 for(let i=1; i<=6; i++) {
                     if(d.kw[`p${i}`]) stats[d.kw[`p${i}`].name] = (stats[d.kw[`p${i}`].name] || 0) + (Number(d.kw[`p${i}`].num) || 0); 
                     if(d.su[`p${i}`]) stats[d.su[`p${i}`].name] = (stats[d.su[`p${i}`].name] || 0) + (Number(d.su[`p${i}`].num) || 0); 
@@ -409,25 +385,13 @@ async function loadHistory() {
                 html += `<div class="history-card"><strong style="color:var(--text-dark); font-size:0.95rem;">🗓 วันที่ ${d.date}</strong> <button class="btn-action" style="display:inline-block; margin-left:10px;" onclick="editEntry('${doc.id}')">✏️</button> <button class="btn-action btn-delete" style="display:inline-block;" onclick="deleteEntry('${doc.id}')">🗑️</button>`;
                 
                 html += `<div style="color:var(--royal-navy); margin-top:12px; font-weight:bold; font-size:0.95rem;">👤 พี่ขวัญ</div>`;
-                if(d.kw.m) {
-                    if(d.kw.m) html += `<div class="h-row" style="color:var(--text-dark)"><span>เช้า</span><span>${d.kw.m.name}</span><span><b>${d.kw.m.num || 0}</b></span></div>`;
-                    if(d.kw.n) html += `<div class="h-row" style="color:var(--text-dark)"><span>เที่ยง</span><span>${d.kw.n.name}</span><span><b>${d.kw.n.num || 0}</b></span></div>`;
-                    if(d.kw.e) html += `<div class="h-row" style="color:var(--text-dark)"><span>เย็น</span><span>${d.kw.e.name}</span><span><b>${d.kw.e.num || 0}</b></span></div>`;
-                } else {
-                    for(let i=1; i<=6; i++) {
-                        if(d.kw[`p${i}`]) html += `<div class="h-row" style="color:var(--text-dark)"><span>${d.kw[`p${i}`].time || '--:--'}</span><span>${d.kw[`p${i}`].name}</span><span><b>${d.kw[`p${i}`].num}</b></span></div>`;
-                    }
+                for(let i=1; i<=6; i++) {
+                    if(d.kw[`p${i}`]) html += `<div class="h-row" style="color:var(--text-dark)"><span>${d.kw[`p${i}`].time || '--:--'}</span><span>${d.kw[`p${i}`].name}</span><span><b>${d.kw[`p${i}`].num}</b></span></div>`;
                 }
                 
                 html += `<div style="color:var(--royal-navy); margin-top:12px; font-weight:bold; font-size:0.95rem;">👤 พี่สุ</div>`;
-                if(d.su.m) {
-                    if(d.su.m) html += `<div class="h-row" style="color:var(--text-dark)"><span>เช้า</span><span>${d.su.m.name}</span><span><b>${d.su.m.num || 0}</b></span></div>`;
-                    if(d.su.n) html += `<div class="h-row" style="color:var(--text-dark)"><span>เที่ยง</span><span>${d.su.n.name}</span><span><b>${d.su.n.num || 0}</b></span></div>`;
-                    if(d.su.e) html += `<div class="h-row" style="color:var(--text-dark)"><span>เย็น</span><span>${d.su.e.name}</span><span><b>${d.su.e.num || 0}</b></span></div>`;
-                } else {
-                    for(let i=1; i<=6; i++) {
-                        if(d.su[`p${i}`]) html += `<div class="h-row" style="color:var(--text-dark)"><span>${d.su[`p${i}`].time || '--:--'}</span><span>${d.su[`p${i}`].name}</span><span><b>${d.su[`p${i}`].num}</b></span></div>`;
-                    }
+                for(let i=1; i<=6; i++) {
+                    if(d.su[`p${i}`]) html += `<div class="h-row" style="color:var(--text-dark)"><span>${d.su[`p${i}`].time || '--:--'}</span><span>${d.su[`p${i}`].name}</span><span><b>${d.su[`p${i}`].num}</b></span></div>`;
                 }
                 html += `</div>`;
             } 
