@@ -7,11 +7,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --bg-color: #F8F9FA; /* พื้นหลังสีงาช้างนุ่มนวล สบายตา */
+            --bg-color: #F8F9FA; 
             --card-bg: #FFFFFF;
-            --text-dark: #1C2833; /* ฟอนต์น้ำเงินเข้มเกือบดำ ตัดฉับ อ่านง่ายมาก */
-            --royal-navy: #1B4F72; /* น้ำเงินหรู Royal Navy */
-            --rose-gold: #B47B84; /* ทองชมพูพรีเมียม Deep Rose Gold */
+            --text-dark: #1C2833; 
+            --royal-navy: #1B4F72; 
+            --rose-gold: #B47B84; 
             --rose-gold-light: #F9EBEA;
             --border-luxury: #E5E8E8;
             --shadow-luxury: 0 10px 30px rgba(27, 79, 114, 0.05);
@@ -40,7 +40,7 @@
         }
         
         .header-box { text-align: center; padding: 20px; border-bottom: 3px solid var(--rose-gold); }
-        .header-title { color: var(--royal-navy); font-size: 1.25rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.5px; }
+        .header-title { color: var(--royal-navy); font-size: 1.25rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; }
         
         #date { 
             width: 60%; 
@@ -53,12 +53,10 @@
             color: var(--royal-navy);
             text-align: center;
             outline: none;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
         }
         
         .user-title { font-size: 1.1rem; font-weight: 700; color: var(--royal-navy); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; border-left: 4px solid var(--rose-gold); padding-left: 10px; }
         
-        /* แถวข้อมูลระบุเวลาอิสระ 6 ช่อง */
         .row { 
             display: grid; 
             grid-template-columns: 65px 1fr 34px 55px; 
@@ -90,7 +88,6 @@
             background: #FAFAFA;
             font-weight: 600;
         }
-        .input-time::placeholder { color: #BDC3C7; }
         
         input[type="number"] { 
             padding: 8px 4px; 
@@ -105,13 +102,11 @@
             background: #FAFAFA;
         }
         
-        /* ปุ่มกดดีไซน์ Modern Luxury หรูหราสะดุดตา */
         .btn-random {
             background: linear-gradient(135deg, var(--royal-navy), #2C3E50); color: #FFFFFF; border: none; 
             padding: 14px; border-radius: 16px; width: 100%; font-weight: 700; font-size: 1rem; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(27, 79, 114, 0.2); transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(27, 79, 114, 0.2);
         }
-        .btn-random:active { transform: scale(0.99); }
         
         .btn-save { 
             background: linear-gradient(135deg, var(--royal-navy), #2471A3); color: #FFFFFF; border: none; 
@@ -123,7 +118,7 @@
             padding: 12px; border-radius: 16px; width: 100%; font-weight: 700; font-size: 0.95rem; cursor: pointer;
         }
         
-        .btn-action { border: none; background: #F2F4F4; color: var(--royal-navy); padding: 7px; font-size: 0.85rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+        .btn-action { border: none; background: #F2F4F4; color: var(--royal-navy); padding: 7px; font-size: 0.85rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-action:hover { background: var(--rose-gold-light); color: var(--rose-gold); }
         .btn-delete { background: #FADBD8; color: #CB4335; }
         
@@ -187,10 +182,7 @@
 <script src="https://unpkg.com/firebase@10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-window.onerror = function(message, source, lineno, colno, error) {
-    console.log("ระบบเซฟโหมดเปิดทำงานปกติ");
-    return true; 
-};
+window.onerror = function(message, source, lineno, colno, error) { return true; };
 
 const firebaseConfig = { apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI", authDomain: "save-data-92eca.firebaseapp.com", projectId: "save-data-92eca", storageBucket: "save-data-92eca.firebasestorage.app", messagingSenderId: "661096454777", appId: "1:661096454777:web:d8b4297db798e14b76d2a8" };
 
