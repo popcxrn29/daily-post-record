@@ -3,234 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Post Diary - Modern Luxury Hybrid</title>
+    <title>Post Diary - Modern Luxury</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --bg-gradient: linear-gradient(135deg, #FDFBFB 0%, #EBEDEE 100%);
+            --bg-color: #F8F9FA; /* พื้นหลังสีงาช้างนุ่มนวล สบายตา */
             --card-bg: #FFFFFF;
-            --text-dark: #2C3E50;
-            --text-muted: #7F8C8D;
-            --kw-primary: #1B4F72; 
-            --su-primary: #78281F; 
-            --accent-gold: #D4AC0D; 
-            --luxury-pink: #FADBD8;
-            --border-color: #E5E7E9;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            --text-dark: #1C2833; /* ฟอนต์น้ำเงินเข้มเกือบดำ ตัดฉับ อ่านง่ายมาก */
+            --royal-navy: #1B4F72; /* น้ำเงินหรู Royal Navy */
+            --rose-gold: #B47B84; /* ทองชมพูพรีเมียม Deep Rose Gold */
+            --rose-gold-light: #F9EBEA;
+            --border-luxury: #E5E8E8;
+            --shadow-luxury: 0 10px 30px rgba(27, 79, 114, 0.05);
         }
         
         body { 
             font-family: 'Sarabun', sans-serif; 
-            background: var(--bg-gradient); 
+            background-color: var(--bg-color); 
             margin: 0; 
-            padding: 15px; 
+            padding: 16px; 
             color: var(--text-dark); 
             display: flex; 
             flex-direction: column; 
             align-items: center;
-            min-height: 100vh;
         }
         
-        .main-container { width: 100%; max-width: 430px; }
+        .main-container { width: 100%; max-width: 420px; }
         
         .card { 
             background: var(--card-bg); 
             border-radius: 24px; 
-            padding: 20px; 
-            box-shadow: var(--shadow); 
+            padding: 22px; 
+            box-shadow: var(--shadow-luxury); 
             margin-bottom: 16px; 
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
+            border: 1px solid rgba(180, 123, 132, 0.1);
         }
         
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .header-box { text-align: center; padding: 20px; border-bottom: 3px solid var(--rose-gold); }
+        .header-title { color: var(--royal-navy); font-size: 1.25rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.5px; }
         
         #date { 
             width: 60%; 
             padding: 10px; 
             border-radius: 14px; 
-            border: 1px solid var(--border-color); 
-            background: #F9EBEA; 
-            font-size: 1rem; 
-            font-weight: bold;
-            color: var(--su-primary);
+            border: 1px solid var(--border-luxury); 
+            background: #FAFAFA; 
+            font-size: 1.05rem; 
+            font-weight: 700;
+            color: var(--royal-navy);
             text-align: center;
             outline: none;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+        
+        .user-title { font-size: 1.1rem; font-weight: 700; color: var(--royal-navy); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; border-left: 4px solid var(--rose-gold); padding-left: 10px; }
+        
+        /* แถวข้อมูลระบุเวลาอิสระ 6 ช่อง */
+        .row { 
+            display: grid; 
+            grid-template-columns: 65px 1fr 34px 55px; 
+            gap: 8px; 
+            margin-bottom: 12px; 
+            align-items: center; 
         }
         
         input[readonly] { 
             font-size: 0.95rem; 
-            font-weight: 600; 
+            font-weight: 700; 
             color: var(--text-dark); 
             background: transparent; 
             border: none; 
             width: 100%;
             text-overflow: ellipsis;
-        }
-        
-        .row { 
-            display: grid; 
-            grid-template-columns: 75px 1fr 35px 55px; 
-            gap: 8px; 
-            margin-bottom: 10px; 
-            align-items: center; 
-            background: #F8F9F9;
-            padding: 6px 10px;
-            border-radius: 14px;
-            border: 1px solid #F2F4F4;
-        }
-        
-        input[type="number"], .input-time { 
-            padding: 8px; 
-            border: 1px solid var(--border-color); 
-            border-radius: 10px; 
-            text-align: center; 
-            font-size: 0.9rem; 
-            font-weight: 700; 
-            width: 100%; 
-            box-sizing: border-box;
-            background: #FFFFFF;
-            color: var(--text-dark);
+            padding-left: 4px;
         }
         
         .input-time { 
+            padding: 8px 4px; 
+            border: 1px solid var(--border-luxury); 
+            border-radius: 12px; 
             text-align: center; 
-            font-weight: 500; 
-            color: #1A5276;
-            border: 1px dashed #A9CCE3;
-        }
-        
-        .btn-random, .btn-save { 
-            background: linear-gradient(135deg, #641E16 0%, #78281F 100%); 
-            color: #FFFFFF; 
-            border: none; 
-            padding: 14px; 
-            border-radius: 16px; 
-            width: 100%; 
-            font-weight: 700; 
-            font-size: 1rem;
-            cursor: pointer; 
-            box-shadow: 0 4px 15px rgba(120, 40, 31, 0.2);
-        }
-        
-        .btn-restore { 
-            background: #FFFFFF; 
-            color: var(--text-muted); 
-            border: 1px solid var(--border-color); 
-            padding: 10px; 
-            border-radius: 14px; 
-            width: 100%; 
-            font-weight: 500; 
-            font-size: 0.85rem;
-            cursor: pointer; 
-            margin-top: 10px; 
-        }
-        
-        .btn-action { 
-            border: none;
-            background: #EAECEE;
-            color: var(--text-dark);
-            padding: 6px; 
-            font-size: 0.8rem; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .btn-action:hover { background: var(--luxury-pink); }
-        .btn-delete { background: #FADBD8; color: #CD6155; }
-        
-        .dash-grid { display: grid; grid-template-columns: 1fr auto; gap: 8px; font-size: 0.9rem; margin-top: 12px; }
-        .dash-item { border-bottom: 1px solid #FBEEE6; padding: 6px 0; font-weight: 500; }
-        
-        .history-card { 
-            background: #FFFFFF; 
-            border-radius: 20px; 
-            padding: 16px; 
-            margin-bottom: 12px; 
-            border-left: 6px solid var(--su-primary); 
             font-size: 0.85rem; 
-            box-shadow: var(--shadow);
+            width: 100%; 
+            box-sizing: border-box;
+            color: var(--royal-navy);
+            background: #FAFAFA;
+            font-weight: 600;
         }
-        .h-row { display: grid; grid-template-columns: 65px 1fr 45px; padding: 4px 0; border-bottom: 1px dashed #F2F4F4; }
+        .input-time::placeholder { color: #BDC3C7; }
         
-        .search-box { display: flex; gap: 8px; margin-bottom: 0px; }
-        .search-input { 
-            flex: 1; 
-            padding: 12px 16px; 
-            border: 1px solid var(--border-color); 
-            border-radius: 16px; 
-            font-size: 0.9rem; 
-            outline: none;
-            background: #F8F9F9;
-            color: var(--text-dark);
-        }
-        .btn-search { 
-            background: var(--kw-primary); 
-            color: white; 
-            border: none; 
-            padding: 0 20px; 
-            border-radius: 16px; 
+        input[type="number"] { 
+            padding: 8px 4px; 
+            border: 1px solid var(--border-luxury); 
+            border-radius: 12px; 
+            text-align: center; 
+            font-size: 1rem; 
             font-weight: 700; 
-            cursor: pointer; 
-            box-shadow: 0 4px 10px rgba(27, 79, 114, 0.2);
+            width: 100%; 
+            box-sizing: border-box;
+            color: var(--royal-navy);
+            background: #FAFAFA;
         }
-        .search-result { 
-            background: #EAFAF1; 
-            padding: 14px; 
-            border-radius: 16px; 
-            margin-top: 12px; 
-            font-size: 0.9rem; 
-            display: none; 
-            border: 1px solid #ABEBC6; 
-            color: #196F3D;
+        
+        /* ปุ่มกดดีไซน์ Modern Luxury หรูหราสะดุดตา */
+        .btn-random {
+            background: linear-gradient(135deg, var(--royal-navy), #2C3E50); color: #FFFFFF; border: none; 
+            padding: 14px; border-radius: 16px; width: 100%; font-weight: 700; font-size: 1rem; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(27, 79, 114, 0.2); transition: all 0.2s;
         }
+        .btn-random:active { transform: scale(0.99); }
+        
+        .btn-save { 
+            background: linear-gradient(135deg, var(--royal-navy), #2471A3); color: #FFFFFF; border: none; 
+            padding: 14px; border-radius: 16px; width: 100%; font-weight: 700; font-size: 1rem; cursor: pointer; margin-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(27, 79, 114, 0.2);
+        }
+        .btn-restore { 
+            background: #FFFFFF; color: var(--rose-gold); border: 1px solid var(--rose-gold); 
+            padding: 12px; border-radius: 16px; width: 100%; font-weight: 700; font-size: 0.95rem; cursor: pointer;
+        }
+        
+        .btn-action { border: none; background: #F2F4F4; color: var(--royal-navy); padding: 7px; font-size: 0.85rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+        .btn-action:hover { background: var(--rose-gold-light); color: var(--rose-gold); }
+        .btn-delete { background: #FADBD8; color: #CB4335; }
+        
+        .dash-title { color: var(--royal-navy); font-weight: 700; font-size: 1.1rem; margin-bottom: 14px; border-left: 4px solid var(--rose-gold); padding-left: 10px; }
+        .dash-grid { display: grid; grid-template-columns: 1fr auto; gap: 8px; font-size: 0.95rem; }
+        .dash-item { border-bottom: 1px solid #F2F4F4; padding: 10px 0; font-weight: 600; color: var(--text-dark); }
+        
+        .history-card { background: #FFFFFF; border-radius: 20px; padding: 18px; margin-bottom: 14px; border-top: 4px solid var(--rose-gold); font-size: 0.85rem; box-shadow: var(--shadow-luxury); }
+        .h-row { display: grid; grid-template-columns: 65px 1fr 50px; padding: 8px 0; border-bottom: 1px dashed var(--border-luxury); align-items: center; }
+        
+        .search-box { display: flex; gap: 8px; }
+        .search-input { flex: 1; padding: 12px 16px; border: 1px solid var(--border-luxury); border-radius: 14px; font-size: 0.9rem; outline: none; background: #FAFAFA; color: var(--text-dark); }
+        .btn-search { background: var(--royal-navy); color: white; border: none; padding: 0 20px; border-radius: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 10px rgba(27, 79, 114, 0.15); }
+        .search-result { background: #EBF5FB; padding: 14px; border-radius: 16px; margin-top: 12px; font-size: 0.9rem; display: none; border: 1px solid #AED6F1; color: var(--royal-navy); }
     </style>
 </head>
 <body>
 
 <div class="main-container">
-    <div class="card">
+    <div class="card" style="padding: 14px;">
         <div class="search-box">
-            <input type="text" id="searchKey" class="search-input" placeholder="🔍 พิมพ์ชื่อทรัพย์เพื่อค้นหาวันลง...">
+            <input type="text" id="searchKey" class="search-input" placeholder="🔍 ค้นหาประวัติวันลงโพสต์ของทรัพย์...">
             <button class="btn-search" onclick="searchAssetDays()">ค้นหา</button>
         </div>
         <div id="searchResult" class="search-result"></div>
     </div>
 
-    <div class="card" style="text-align:center;">
-        <h2 style="font-size:1.2rem; color:var(--su-primary); margin: 0 0 12px 0; font-weight:700;">📂 Post Diary Studio</h2>
+    <div class="card header-box">
+        <div class="header-title">⚜️ Post Diary Premium</div>
         <input id="date" type="date" onchange="checkTodayStatus()">
     </div>
 
     <div id="randomBox" class="card" style="display:block; text-align:center;">
-        <button class="btn-random" onclick="startRandom()">✨ สุ่มจัดการแผนงาน (6 ทรัพย์สิน)</button>
+        <button class="btn-random" onclick="startRandom()">✨ สุ่มแผนงานวันนี้ (6 ทรัพย์สิน)</button>
     </div>
 
     <div id="inputSection" class="card" style="display: none;">
-        <div class="section-title" style="color:var(--kw-primary);">🔹 แผนงานโพสต์: พี่ขวัญ</div>
+        <div class="user-title">👤 แผนงานประจำวัน: พี่ขวัญ</div>
         <div id="kw_rows"></div>
         
-        <hr style="border:0; border-top:1px solid var(--border-color); margin:20px 0;">
+        <hr style="border:0; border-top:1px solid var(--border-luxury); margin:22px 0;">
         
-        <div class="section-title" style="color:var(--su-primary);">🔸 แผนงานโพสต์: พี่สุ</div>
+        <div class="user-title">👤 แผนงานประจำวัน: พี่สุ</div>
         <div id="su_rows"></div>
         
-        <button class="btn-save" style="margin-top:20px" onclick="saveData()">💾 บันทึกยอดโพสต์เข้าระบบ</button>
-        <button class="btn-restore" onclick="restoreBackupData()">🔄 ดึงข้อมูลสำรอง</button>
+        <div style="margin-top: 26px;">
+            <button class="btn-save" onclick="saveData()">💾 บันทึกยอดโพสต์เข้าระบบคู่ขนาน</button>
+            <button class="btn-restore" onclick="restoreBackupData()">🔄 ดึงข้อมูลสำรองล่าสุด</button>
+        </div>
     </div>
 
-    <div id="dashBoard" class="card" style="border-top:4px solid var(--su-primary); display:none;">
-        <div style="color:var(--su-primary); font-weight:700; font-size:1rem;">📊 สรุปสถิติยอดรวมเดือนนี้</div>
+    <div id="dashBoard" class="card" style="display:none;">
+        <div class="dash-title">📊 สรุปยอดรวมเดือนนี้</div>
         <div id="dashContent" class="dash-grid"></div>
     </div>
 
@@ -242,7 +188,7 @@
 
 <script>
 window.onerror = function(message, source, lineno, colno, error) {
-    console.log("ระบบทำงานต่อแบบเซฟโหมด");
+    console.log("ระบบเซฟโหมดเปิดทำงานปกติ");
     return true; 
 };
 
@@ -254,25 +200,22 @@ try {
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
     }
-} catch (e) {
-    console.error("Firebase setup error:", e);
-}
+} catch (e) { console.error(e); }
 
 const groups = {
     g1: ["แม่ย่าพี่ปลา 11 ไร่", "บ้านพี่แดง อรัญนคร3", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์"],
-    g2: ["ศรีวราห์การเเดน", "แฮปปี้คอนโด", "คอนโดชีวาทัย ฮอล์มาร์ค", "คอนโด The Base Park East", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "plum condo", "Lumpini Ville", "ลุมพินี วิลล์ รามอินทรา-ลาดปลาเค้า 1", "D condo", "Whizdom", "ยูดีไลท์3", "ARKIN Vibhavadi (ดอนเมือง)"],
+    g2: ["ศรีวราห์การเเดน", "แฮปปี้คอนโด", "คอนโดชีวาทัย ฮอลล์มาร์ค", "คอนโด The Base Park East", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "plum condo", "Lumpini Ville", "ลุมพินี วิลล์ รามอินทรา-ลาดปลาเค้า 1", "D condo", "Whizdom", "ยูดีไลท์3", "ARKIN Vibhavadi (ดอนเมือง)"],
     g3: ["พี่ศรีไพร (คอนสาย)", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "บ้านmilindaคุณมีน"]
 };
 
 const fixedAsset = "บ้านเอื้ออาทรอรัญประเทศ";
 let currentDocId = null;
-let isCurrentDocOldFormat = false; // ตัวแปรเช็กว่าเอกสารนี้เป็นแบบเก่า 3 ทรัพย์หรือไม่
+let isCurrentDocOldFormat = false;
 
 function generateInputRows(user, data) {
     const container = document.getElementById(`${user}_rows`);
     container.innerHTML = "";
     
-    // ระบบไฮบริด: เช็กข้อมูลว่าถ้าเป็นโครงสร้างเก่า (มีฟิลด์ m) ให้ดึงค่าเก่ามาแสดงผลแบบ 3 แถว
     if (data && data[user] && data[user].m) {
         isCurrentDocOldFormat = true;
         const slots = [{k:'m', n:'เช้า'}, {k:'n', n:'เที่ยง'}, {k:'e', n:'เย็น'}];
@@ -280,7 +223,7 @@ function generateInputRows(user, data) {
             const rowData = data[user][slot.k] || { name: "", num: 0 };
             container.innerHTML += `
                 <div class="row">
-                    <input type="text" class="input-time" id="${user}_t${idx+1}" placeholder="เวลา" value="${slot.n}" readonly style="background:#EAECEE; color:#7F8C8D; border:none;">
+                    <input type="text" class="input-time" id="${user}_t${idx+1}" value="${slot.n}" readonly style="background:#ECEFF1; border:none; color:var(--royal-navy); font-weight:700;">
                     <input id="${user}_n${idx+1}" value="${rowData.name || ''}" readonly>
                     <button class="btn-action" onclick="editAssetName('${user}_n${idx+1}')">✏️</button>
                     <input id="${user}_num${idx+1}" type="number" value="${rowData.num || 0}">
@@ -288,13 +231,12 @@ function generateInputRows(user, data) {
             `;
         });
     } else {
-        // ถ้าเป็นโครงสร้างแบบใหม่ (6 ทรัพย์) แตกฟอร์ม 6 ช่องสมบูรณ์แบบ
         isCurrentDocOldFormat = false;
         for (let i = 1; i <= 6; i++) {
             const rowData = (data && data[user] && data[user][`p${i}`]) ? data[user][`p${i}`] : { time: "", name: "", num: 0 };
             container.innerHTML += `
                 <div class="row">
-                    <input type="text" class="input-time" id="${user}_t${i}" placeholder="00:00" value="${rowData.time || ''}">
+                    <input type="text" class="input-time" id="${user}_t${i}" placeholder="เวลา" value="${rowData.time || ''}">
                     <input id="${user}_n${i}" value="${rowData.name || ''}" readonly>
                     <button class="btn-action" onclick="editAssetName('${user}_n${i}')">✏️</button>
                     <input id="${user}_num${i}" type="number" value="${rowData.num || 0}">
@@ -306,7 +248,7 @@ function generateInputRows(user, data) {
 
 function editAssetName(id) {
     const input = document.getElementById(id);
-    const newName = prompt("📝 แก้ไขปรับเปลี่ยนชื่อทรัพย์สิน:", input.value);
+    const newName = prompt("✏️ แก้ไขชื่อทรัพย์สินชั่วคราวประจำวันนี้:", input.value);
     if (newName !== null && newName.trim() !== "") {
         input.value = newName.trim();
     }
@@ -318,7 +260,6 @@ async function checkTodayStatus() {
     
     document.getElementById("randomBox").style.display = "block";
     document.getElementById("inputSection").style.display = "none";
-
     if(!db) return;
 
     try {
@@ -328,14 +269,11 @@ async function checkTodayStatus() {
             document.getElementById("randomBox").style.display = "none";
             document.getElementById("inputSection").style.display = "block";
             const d = snap.docs[0].data();
-            
             generateInputRows("kw", d);
             generateInputRows("su", d);
         }
         updateDashboard(); loadHistory();
-    } catch (e) {
-        console.error(e);
-    }
+    } catch (e) { console.error(e); }
 }
 
 async function startRandom() {
@@ -353,7 +291,6 @@ async function startRandom() {
             allSnap.forEach(doc => {
                 const d = doc.data();
                 if(d.kw && d.su) { 
-                    // ไฮบริดดึงยอดรวม: นับทั้งแบบ m,n,e และ p1-p6
                     ['m','n','e'].forEach(slot => {
                         if(d.kw[slot] && d.kw[slot].name) totalPostCounts[d.kw[slot].name] = (totalPostCounts[d.kw[slot].name] || 0) + (Number(d.kw[slot].num) || 0);
                         if(d.su[slot] && d.su[slot].name) totalPostCounts[d.su[slot].name] = (totalPostCounts[d.su[slot].name] || 0) + (Number(d.su[slot].num) || 0);
@@ -390,9 +327,7 @@ async function startRandom() {
             }
             await db.collection("posts").add(uploadData);
             checkTodayStatus();
-        } catch(e) { 
-            alert("บันทึกฐานข้อมูลขัดข้อง");
-        }
+        } catch(e) { alert("เกิดข้อผิดพลาดในการบันทึก"); }
     }
 }
 
@@ -423,7 +358,7 @@ async function searchAssetDays() {
         if(matchDates.length > 0) {
             resBox.innerHTML = `<strong>📌 วันที่เคยลงโพสต์ของ "${key}":</strong><br>` + matchDates.map(d => `• ${d}`).join('<br>');
         } else {
-            resBox.innerHTML = `❌ ไม่พบประวัติการลงโพสต์ของทรัพย์ชื่อ "${key}"`;
+            resBox.innerHTML = `❌ ไม่พบประวัติการบันทึกของทรัพย์สินชื่อ "${key}"`;
         }
     } catch(e) { console.error(e); }
 }
@@ -432,7 +367,6 @@ async function saveData() {
     if(!db) return;
     let updateData = {};
     
-    // เซฟแบบไฮบริด: ถ้ารายการปัจจุบันเป็นของเก่า ให้เซฟกลับเป็นฟอร์มเก่า m,n,e
     if (isCurrentDocOldFormat) {
         const slots = ['m', 'n', 'e'];
         for(let i=1; i<=3; i++) {
@@ -442,7 +376,6 @@ async function saveData() {
             updateData[`su.${slots[i-1]}.num`] = Number(document.getElementById(`su_num${i}`).value);
         }
     } else {
-        // เซฟตามโครงสร้างระบบใหม่แบบ 6 ทรัพย์สิน
         for(let i=1; i<=6; i++) {
             updateData[`kw.p${i}.time`] = document.getElementById(`kw_t${i}`).value;
             updateData[`kw.p${i}.name`] = document.getElementById(`kw_n${i}`).value;
@@ -452,9 +385,13 @@ async function saveData() {
             updateData[`su.p${i}.num`] = Number(document.getElementById(`su_num${i}`).value);
         }
     }
-    await db.collection("posts").doc(currentDocId).update(updateData); 
-    alert("✨ บันทึกข้อมูลเรียบร้อยแล้วค่ะ!"); 
-    checkTodayStatus(); 
+    try {
+        await db.collection("posts").doc(currentDocId).update(updateData); 
+        alert("✨ บันทึกข้อมูลประจำวันเรียบร้อยแล้วค่ะ!"); 
+        checkTodayStatus(); 
+    } catch(err) {
+        alert("เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้งค่ะ");
+    }
 }
 
 async function restoreBackupData() { if(!db) return; checkTodayStatus(); }
@@ -492,29 +429,27 @@ async function loadHistory() {
         snap.forEach(doc => { 
             const d = doc.data(); 
             if(d.date && d.kw && d.su) {
-                html += `<div class="history-card"><strong>🗓 วันที่ ${d.date}</strong> <button class="btn-action" style="display:inline-block; margin-left:10px;" onclick="editEntry('${doc.id}')">✏️</button> <button class="btn-action btn-delete" style="display:inline-block;" onclick="deleteEntry('${doc.id}')">🗑️</button>`;
+                html += `<div class="history-card"><strong style="color:var(--text-dark); font-size:0.95rem;">🗓 วันที่ ${d.date}</strong> <button class="btn-action" style="display:inline-block; margin-left:10px;" onclick="editEntry('${doc.id}')">✏️</button> <button class="btn-action btn-delete" style="display:inline-block;" onclick="deleteEntry('${doc.id}')">🗑️</button>`;
                 
-                // ประวัติของพี่ขวัญ
-                html += `<div style="color:var(--kw-primary); margin-top:8px; font-weight:bold;">👤 พี่ขวัญ</div>`;
-                if(d.kw.m) { // แสดงข้อมูลเก่า 3 ทรัพย์
-                    if(d.kw.m) html += `<div class="h-row" style="color:var(--kw-primary)"><span>⏰ เช้า</span><span>${d.kw.m.name}</span><span>${d.kw.m.num || 0} โพสต์</span></div>`;
-                    if(d.kw.n) html += `<div class="h-row" style="color:var(--kw-primary)"><span>⏰ เที่ยง</span><span>${d.kw.n.name}</span><span>${d.kw.n.num || 0} โพสต์</span></div>`;
-                    if(d.kw.e) html += `<div class="h-row" style="color:var(--kw-primary)"><span>⏰ เย็น</span><span>${d.kw.e.name}</span><span>${d.kw.e.num || 0} โพสต์</span></div>`;
-                } else { // แสดงข้อมูลใหม่ 6 ทรัพย์
+                html += `<div style="color:var(--royal-navy); margin-top:12px; font-weight:bold; font-size:0.95rem;">👤 พี่ขวัญ</div>`;
+                if(d.kw.m) {
+                    if(d.kw.m) html += `<div class="h-row" style="color:var(--text-dark)"><span>เช้า</span><span>${d.kw.m.name}</span><span><b>${d.kw.m.num || 0}</b></span></div>`;
+                    if(d.kw.n) html += `<div class="h-row" style="color:var(--text-dark)"><span>เที่ยง</span><span>${d.kw.n.name}</span><span><b>${d.kw.n.num || 0}</b></span></div>`;
+                    if(d.kw.e) html += `<div class="h-row" style="color:var(--text-dark)"><span>เย็น</span><span>${d.kw.e.name}</span><span><b>${d.kw.e.num || 0}</b></span></div>`;
+                } else {
                     for(let i=1; i<=6; i++) {
-                        if(d.kw[`p${i}`]) html += `<div class="h-row" style="color:var(--kw-primary)"><span>⏰ ${d.kw[`p${i}`].time || '--:--'}</span><span>${d.kw[`p${i}`].name}</span><span>${d.kw[`p${i}`].num} โพสต์</span></div>`;
+                        if(d.kw[`p${i}`]) html += `<div class="h-row" style="color:var(--text-dark)"><span>${d.kw[`p${i}`].time || '--:--'}</span><span>${d.kw[`p${i}`].name}</span><span><b>${d.kw[`p${i}`].num}</b></span></div>`;
                     }
                 }
                 
-                // ประวัติของพี่สุ
-                html += `<div style="color:var(--su-primary); margin-top:8px; font-weight:bold;">👤 พี่สุ</div>`;
-                if(d.su.m) { // แสดงข้อมูลเก่า 3 ทรัพย์
-                    if(d.su.m) html += `<div class="h-row" style="color:var(--su-primary)"><span>⏰ เช้า</span><span>${d.su.m.name}</span><span>${d.su.m.num || 0} โพสต์</span></div>`;
-                    if(d.su.n) html += `<div class="h-row" style="color:var(--su-primary)"><span>⏰ เที่ยง</span><span>${d.su.n.name}</span><span>${d.su.n.num || 0} โพสต์</span></div>`;
-                    if(d.su.e) html += `<div class="h-row" style="color:var(--su-primary)"><span>⏰ เย็น</span><span>${d.su.e.name}</span><span>${d.su.e.num || 0} โพสต์</span></div>`;
-                } else { // แสดงข้อมูลใหม่ 6 ทรัพย์
+                html += `<div style="color:var(--royal-navy); margin-top:12px; font-weight:bold; font-size:0.95rem;">👤 พี่สุ</div>`;
+                if(d.su.m) {
+                    if(d.su.m) html += `<div class="h-row" style="color:var(--text-dark)"><span>เช้า</span><span>${d.su.m.name}</span><span><b>${d.su.m.num || 0}</b></span></div>`;
+                    if(d.su.n) html += `<div class="h-row" style="color:var(--text-dark)"><span>เที่ยง</span><span>${d.su.n.name}</span><span><b>${d.su.n.num || 0}</b></span></div>`;
+                    if(d.su.e) html += `<div class="h-row" style="color:var(--text-dark)"><span>เย็น</span><span>${d.su.e.name}</span><span><b>${d.su.e.num || 0}</b></span></div>`;
+                } else {
                     for(let i=1; i<=6; i++) {
-                        if(d.su[`p${i}`]) html += `<div class="h-row" style="color:var(--su-primary)"><span>⏰ ${d.su[`p${i}`].time || '--:--'}</span><span>${d.su[`p${i}`].name}</span><span>${d.su[`p${i}`].num} โพสต์</span></div>`;
+                        if(d.su[`p${i}`]) html += `<div class="h-row" style="color:var(--text-dark)"><span>${d.su[`p${i}`].time || '--:--'}</span><span>${d.su[`p${i}`].name}</span><span><b>${d.su[`p${i}`].num}</b></span></div>`;
                     }
                 }
                 html += `</div>`;
@@ -525,7 +460,7 @@ async function loadHistory() {
 }
 
 async function editEntry(id) { if(!db)return; const doc = await db.collection("posts").doc(id).get(); document.getElementById("date").value = doc.data().date; checkTodayStatus(); }
-async function deleteEntry(id) { if(!db)return; if(confirm("ยืนยันการลบประวัติรายการนี้?")) { await db.collection("posts").doc(id).delete(); checkTodayStatus(); } }
+async function deleteEntry(id) { if(!db)return; if(confirm("ต้องการลบประวัติรายการนี้ใช่ไหม?")) { await db.collection("posts").doc(id).delete(); checkTodayStatus(); } }
 
 window.onload = () => { 
     const now = new Date(); document.getElementById("date").value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`; 
