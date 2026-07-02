@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Post Diary - Modern Luxury</title>
+    <title>Post Diary - Modern Luxury Hybrid</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -11,8 +11,8 @@
             --card-bg: #FFFFFF;
             --text-dark: #2C3E50;
             --text-muted: #7F8C8D;
-            --kw-primary: #1B4F72; /* Royal Navy เข้มตัดชัด */
-            --su-primary: #78281F; /* Deep Rose/Burgundy หรูหรา */
+            --kw-primary: #1B4F72; 
+            --su-primary: #78281F; 
             --accent-gold: #D4AC0D; 
             --luxury-pink: #FADBD8;
             --border-color: #E5E7E9;
@@ -64,7 +64,6 @@
             color: var(--su-primary);
             text-align: center;
             outline: none;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
         }
         
         input[readonly] { 
@@ -120,9 +119,7 @@
             font-size: 1rem;
             cursor: pointer; 
             box-shadow: 0 4px 15px rgba(120, 40, 31, 0.2);
-            transition: all 0.2s;
         }
-        .btn-random:active, .btn-save:active { transform: scale(0.98); }
         
         .btn-restore { 
             background: #FFFFFF; 
@@ -148,7 +145,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s;
         }
         .btn-action:hover { background: var(--luxury-pink); }
         .btn-delete { background: #FADBD8; color: #CD6155; }
@@ -167,7 +163,6 @@
         }
         .h-row { display: grid; grid-template-columns: 65px 1fr 45px; padding: 4px 0; border-bottom: 1px dashed #F2F4F4; }
         
-        /* ดีไซน์ช่องค้นหาแนวโมเดิร์นหรู */
         .search-box { display: flex; gap: 8px; margin-bottom: 0px; }
         .search-input { 
             flex: 1; 
@@ -271,20 +266,41 @@ const groups = {
 
 const fixedAsset = "บ้านเอื้ออาทรอรัญประเทศ";
 let currentDocId = null;
+let isCurrentDocOldFormat = false; // ตัวแปรเช็กว่าเอกสารนี้เป็นแบบเก่า 3 ทรัพย์หรือไม่
 
 function generateInputRows(user, data) {
     const container = document.getElementById(`${user}_rows`);
     container.innerHTML = "";
-    for (let i = 1; i <= 6; i++) {
-        const rowData = (data && data[user] && data[user][`p${i}`]) ? data[user][`p${i}`] : { time: "", name: "", num: 0 };
-        container.innerHTML += `
-            <div class="row">
-                <input type="text" class="input-time" id="${user}_t${i}" placeholder="00:00" value="${rowData.time || ''}">
-                <input id="${user}_n${i}" value="${rowData.name || ''}" readonly>
-                <button class="btn-action" onclick="editAssetName('${user}_n${i}')">✏️</button>
-                <input id="${user}_num${i}" type="number" value="${rowData.num || 0}">
-            </div>
-        `;
+    
+    // ระบบไฮบริด: เช็กข้อมูลว่าถ้าเป็นโครงสร้างเก่า (มีฟิลด์ m) ให้ดึงค่าเก่ามาแสดงผลแบบ 3 แถว
+    if (data && data[user] && data[user].m) {
+        isCurrentDocOldFormat = true;
+        const slots = [{k:'m', n:'เช้า'}, {k:'n', n:'เที่ยง'}, {k:'e', n:'เย็น'}];
+        slots.forEach((slot, idx) => {
+            const rowData = data[user][slot.k] || { name: "", num: 0 };
+            container.innerHTML += `
+                <div class="row">
+                    <input type="text" class="input-time" id="${user}_t${idx+1}" placeholder="เวลา" value="${slot.n}" readonly style="background:#EAECEE; color:#7F8C8D; border:none;">
+                    <input id="${user}_n${idx+1}" value="${rowData.name || ''}" readonly>
+                    <button class="btn-action" onclick="editAssetName('${user}_n${idx+1}')">✏️</button>
+                    <input id="${user}_num${idx+1}" type="number" value="${rowData.num || 0}">
+                </div>
+            `;
+        });
+    } else {
+        // ถ้าเป็นโครงสร้างแบบใหม่ (6 ทรัพย์) แตกฟอร์ม 6 ช่องสมบูรณ์แบบ
+        isCurrentDocOldFormat = false;
+        for (let i = 1; i <= 6; i++) {
+            const rowData = (data && data[user] && data[user][`p${i}`]) ? data[user][`p${i}`] : { time: "", name: "", num: 0 };
+            container.innerHTML += `
+                <div class="row">
+                    <input type="text" class="input-time" id="${user}_t${i}" placeholder="00:00" value="${rowData.time || ''}">
+                    <input id="${user}_n${i}" value="${rowData.name || ''}" readonly>
+                    <button class="btn-action" onclick="editAssetName('${user}_n${i}')">✏️</button>
+                    <input id="${user}_num${i}" type="number" value="${rowData.num || 0}">
+                </div>
+            `;
+        }
     }
 }
 
@@ -337,6 +353,11 @@ async function startRandom() {
             allSnap.forEach(doc => {
                 const d = doc.data();
                 if(d.kw && d.su) { 
+                    // ไฮบริดดึงยอดรวม: นับทั้งแบบ m,n,e และ p1-p6
+                    ['m','n','e'].forEach(slot => {
+                        if(d.kw[slot] && d.kw[slot].name) totalPostCounts[d.kw[slot].name] = (totalPostCounts[d.kw[slot].name] || 0) + (Number(d.kw[slot].num) || 0);
+                        if(d.su[slot] && d.su[slot].name) totalPostCounts[d.su[slot].name] = (totalPostCounts[d.su[slot].name] || 0) + (Number(d.su[slot].num) || 0);
+                    });
                     for(let i=1; i<=6; i++) {
                         if(d.kw[`p${i}`] && d.kw[`p${i}`].name) totalPostCounts[d.kw[`p${i}`].name] = (totalPostCounts[d.kw[`p${i}`].name] || 0) + (Number(d.kw[`p${i}`].num) || 0); 
                         if(d.su[`p${i}`] && d.su[`p${i}`].name) totalPostCounts[d.su[`p${i}`].name] = (totalPostCounts[d.su[`p${i}`].name] || 0) + (Number(d.su[`p${i}`].num) || 0); 
@@ -349,11 +370,7 @@ async function startRandom() {
     if (dateVal === "2026-07-01") {
         const coreAsset = "ARKIN Vibhavadi (ดอนเมือง)";
         const lockFixedAsset = fixedAsset;
-        
-        let pool = allAssetsList
-            .filter(asset => asset !== coreAsset && asset !== lockFixedAsset)
-            .sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
-        
+        let pool = allAssetsList.filter(asset => asset !== coreAsset && asset !== lockFixedAsset).sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
         finalAssets = [coreAsset, lockFixedAsset, pool[0], pool[1], pool[2], pool[3]];
     } else {
         let pool = allAssetsList.sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
@@ -391,10 +408,11 @@ async function searchAssetDays() {
             const d = doc.data();
             let found = false;
             if(d.kw && d.su) {
+                ['m','n','e'].forEach(slot => {
+                    if((d.kw[slot] && d.kw[slot].name.includes(key)) || (d.su[slot] && d.su[slot].name.includes(key))) found = true;
+                });
                 for(let i=1; i<=6; i++) {
-                    if((d.kw[`p${i}`] && d.kw[`p${i}`].name.includes(key)) || (d.su[`p${i}`] && d.su[`p${i}`].name.includes(key))) {
-                        found = true;
-                    }
+                    if((d.kw[`p${i}`] && d.kw[`p${i}`].name.includes(key)) || (d.su[`p${i}`] && d.su[`p${i}`].name.includes(key))) found = true;
                 }
             }
             if(found) matchDates.push(d.date);
@@ -413,18 +431,29 @@ async function searchAssetDays() {
 async function saveData() { 
     if(!db) return;
     let updateData = {};
-    for(let i=1; i<=6; i++) {
-        updateData[`kw.p${i}.time`] = document.getElementById(`kw_t${i}`).value;
-        updateData[`kw.p${i}.name`] = document.getElementById(`kw_n${i}`).value;
-        updateData[`kw.pTemplate.num`] = Number(document.getElementById(`kw_num${i}`).value);
-        updateData[`kw.p${i}.num`] = Number(document.getElementById(`kw_num${i}`).value);
-        
-        updateData[`su.p${i}.time`] = document.getElementById(`su_t${i}`).value;
-        updateData[`su.p${i}.name`] = document.getElementById(`su_n${i}`).value;
-        updateData[`su.p${i}.num`] = Number(document.getElementById(`su_num${i}`).value);
+    
+    // เซฟแบบไฮบริด: ถ้ารายการปัจจุบันเป็นของเก่า ให้เซฟกลับเป็นฟอร์มเก่า m,n,e
+    if (isCurrentDocOldFormat) {
+        const slots = ['m', 'n', 'e'];
+        for(let i=1; i<=3; i++) {
+            updateData[`kw.${slots[i-1]}.name`] = document.getElementById(`kw_n${i}`).value;
+            updateData[`kw.${slots[i-1]}.num`] = Number(document.getElementById(`kw_num${i}`).value);
+            updateData[`su.${slots[i-1]}.name`] = document.getElementById(`su_n${i}`).value;
+            updateData[`su.${slots[i-1]}.num`] = Number(document.getElementById(`su_num${i}`).value);
+        }
+    } else {
+        // เซฟตามโครงสร้างระบบใหม่แบบ 6 ทรัพย์สิน
+        for(let i=1; i<=6; i++) {
+            updateData[`kw.p${i}.time`] = document.getElementById(`kw_t${i}`).value;
+            updateData[`kw.p${i}.name`] = document.getElementById(`kw_n${i}`).value;
+            updateData[`kw.p${i}.num`] = Number(document.getElementById(`kw_num${i}`).value);
+            updateData[`su.p${i}.time`] = document.getElementById(`su_t${i}`).value;
+            updateData[`su.p${i}.name`] = document.getElementById(`su_n${i}`).value;
+            updateData[`su.p${i}.num`] = Number(document.getElementById(`su_num${i}`).value);
+        }
     }
     await db.collection("posts").doc(currentDocId).update(updateData); 
-    alert("✨ บันทึกข้อมูลแผนงาน 6 ทรัพย์เรียบร้อยแล้วค่ะ!"); 
+    alert("✨ บันทึกข้อมูลเรียบร้อยแล้วค่ะ!"); 
     checkTodayStatus(); 
 }
 
@@ -440,6 +469,10 @@ async function updateDashboard() {
         snap.forEach(doc => { 
             const d = doc.data(); 
             if(d.date && d.date.startsWith(month) && d.kw && d.su) { 
+                ['m','n','e'].forEach(slot => {
+                    if(d.kw[slot]) stats[d.kw[slot].name] = (stats[d.kw[slot].name] || 0) + (Number(d.kw[slot].num) || 0);
+                    if(d.su[slot]) stats[d.su[slot].name] = (stats[d.su[slot].name] || 0) + (Number(d.su[slot].num) || 0);
+                });
                 for(let i=1; i<=6; i++) {
                     if(d.kw[`p${i}`]) stats[d.kw[`p${i}`].name] = (stats[d.kw[`p${i}`].name] || 0) + (Number(d.kw[`p${i}`].num) || 0); 
                     if(d.su[`p${i}`]) stats[d.su[`p${i}`].name] = (stats[d.su[`p${i}`].name] || 0) + (Number(d.su[`p${i}`].num) || 0); 
@@ -458,17 +491,31 @@ async function loadHistory() {
         let html = ""; 
         snap.forEach(doc => { 
             const d = doc.data(); 
-            if(d.date && d.kw && d.su && d.kw.p1) {
+            if(d.date && d.kw && d.su) {
                 html += `<div class="history-card"><strong>🗓 วันที่ ${d.date}</strong> <button class="btn-action" style="display:inline-block; margin-left:10px;" onclick="editEntry('${doc.id}')">✏️</button> <button class="btn-action btn-delete" style="display:inline-block;" onclick="deleteEntry('${doc.id}')">🗑️</button>`;
                 
+                // ประวัติของพี่ขวัญ
                 html += `<div style="color:var(--kw-primary); margin-top:8px; font-weight:bold;">👤 พี่ขวัญ</div>`;
-                for(let i=1; i<=6; i++) {
-                    if(d.kw[`p${i}`]) html += `<div class="h-row" style="color:var(--kw-primary)"><span>⏰ ${d.kw[`p${i}`].time || '--:--'}</span><span>${d.kw[`p${i}`].name}</span><span>${d.kw[`p${i}`].num} โพสต์</span></div>`;
+                if(d.kw.m) { // แสดงข้อมูลเก่า 3 ทรัพย์
+                    if(d.kw.m) html += `<div class="h-row" style="color:var(--kw-primary)"><span>⏰ เช้า</span><span>${d.kw.m.name}</span><span>${d.kw.m.num || 0} โพสต์</span></div>`;
+                    if(d.kw.n) html += `<div class="h-row" style="color:var(--kw-primary)"><span>⏰ เที่ยง</span><span>${d.kw.n.name}</span><span>${d.kw.n.num || 0} โพสต์</span></div>`;
+                    if(d.kw.e) html += `<div class="h-row" style="color:var(--kw-primary)"><span>⏰ เย็น</span><span>${d.kw.e.name}</span><span>${d.kw.e.num || 0} โพสต์</span></div>`;
+                } else { // แสดงข้อมูลใหม่ 6 ทรัพย์
+                    for(let i=1; i<=6; i++) {
+                        if(d.kw[`p${i}`]) html += `<div class="h-row" style="color:var(--kw-primary)"><span>⏰ ${d.kw[`p${i}`].time || '--:--'}</span><span>${d.kw[`p${i}`].name}</span><span>${d.kw[`p${i}`].num} โพสต์</span></div>`;
+                    }
                 }
                 
+                // ประวัติของพี่สุ
                 html += `<div style="color:var(--su-primary); margin-top:8px; font-weight:bold;">👤 พี่สุ</div>`;
-                for(let i=1; i<=6; i++) {
-                    if(d.su[`p${i}`]) html += `<div class="h-row" style="color:var(--su-primary)"><span>⏰ ${d.su[`p${i}`].time || '--:--'}</span><span>${d.su[`p${i}`].name}</span><span>${d.su[`p${i}`].num} โพสต์</span></div>`;
+                if(d.su.m) { // แสดงข้อมูลเก่า 3 ทรัพย์
+                    if(d.su.m) html += `<div class="h-row" style="color:var(--su-primary)"><span>⏰ เช้า</span><span>${d.su.m.name}</span><span>${d.su.m.num || 0} โพสต์</span></div>`;
+                    if(d.su.n) html += `<div class="h-row" style="color:var(--su-primary)"><span>⏰ เที่ยง</span><span>${d.su.n.name}</span><span>${d.su.n.num || 0} โพสต์</span></div>`;
+                    if(d.su.e) html += `<div class="h-row" style="color:var(--su-primary)"><span>⏰ เย็น</span><span>${d.su.e.name}</span><span>${d.su.e.num || 0} โพสต์</span></div>`;
+                } else { // แสดงข้อมูลใหม่ 6 ทรัพย์
+                    for(let i=1; i<=6; i++) {
+                        if(d.su[`p${i}`]) html += `<div class="h-row" style="color:var(--su-primary)"><span>⏰ ${d.su[`p${i}`].time || '--:--'}</span><span>${d.su[`p${i}`].name}</span><span>${d.su[`p${i}`].num} โพสต์</span></div>`;
+                    }
                 }
                 html += `</div>`;
             } 
