@@ -3,32 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Post Diary</title>
+    <title>Post Diary - Modern Luxury</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #FFFFFF; --card: #FFFFFF; --text-main: #2D3436; --kw-color: #0984E3; --su-color: #74B9FF; --fresh-pink: #FFC0CB; }
-        body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); margin: 0; padding: 10px; color: var(--text-main); display: flex; flex-direction: column; align-items: center; }
-        .main-container { width: 100%; max-width: 420px; }
-        .card { background: var(--card); border-radius: 20px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 12px; border: 1px solid #FDF0F3; }
-        #date { width: 50%; padding: 6px; border-radius: 8px; border: 1px solid #FFE4E9; background: #FFF9FA; font-size: 0.9rem; text-align: center; }
-        input[readonly] { font-size: 1rem; font-weight: 700; color: #333; background: transparent; border: none; width: 100%; }
-        .row { display: grid; grid-template-columns: 70px 1fr 30px 50px; gap: 5px; margin-bottom: 8px; align-items: center; }
-        input[type="number"], .input-time { padding: 6px; border: 1px solid #FFE4E9; border-radius: 8px; text-align: center; font-size: 0.9rem; font-weight: 700; width: 100%; box-sizing: border-box; }
-        .input-time { text-align: left; font-weight: normal; }
-        .btn-random, .btn-save { background: #FFFFFF; color: #FF69B4; border: 2px solid #FF69B4; padding: 10px; border-radius: 12px; width: 100%; font-weight: 700; cursor: pointer; }
-        .btn-restore { background: #FFFFFF; color: #0984E3; border: 2px solid #0984E3; padding: 10px; border-radius: 12px; width: 100%; font-weight: 700; cursor: pointer; margin-top: 8px; }
-        .btn-action { padding: 4px 6px; font-size: 0.7rem; border-radius: 6px; cursor: pointer; background: #FFFFFF; border: 1px solid #ddd; }
-        .btn-delete { border: 1px solid #ff7675; color: #ff7675; }
-        .dash-grid { display: grid; grid-template-columns: 1fr auto; gap: 5px; font-size: 0.85rem; margin-top: 10px; }
-        .dash-item { border-bottom: 1px solid #FFF5F7; padding: 4px 0; }
-        .history-card { background: #FFF9FA; border-radius: 15px; padding: 12px; margin-bottom: 10px; border-left: 5px solid var(--fresh-pink); font-size: 0.85rem; position: relative; }
-        .h-row { display: grid; grid-template-columns: 60px 1fr 40px; padding: 3px 0; }
+        :root { 
+            --bg-gradient: linear-gradient(135deg, #FDFBFB 0%, #EBEDEE 100%);
+            --card-bg: #FFFFFF;
+            --text-dark: #2C3E50;
+            --text-muted: #7F8C8D;
+            --kw-primary: #1B4F72; /* Royal Navy เข้มตัดชัด */
+            --su-primary: #78281F; /* Deep Rose/Burgundy หรูหรา */
+            --accent-gold: #D4AC0D; 
+            --luxury-pink: #FADBD8;
+            --border-color: #E5E7E9;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
         
-        /* สไตล์ส่วนค้นหาที่เพิ่มมาใหม่ */
-        .search-box { display: flex; gap: 5px; margin-bottom: 10px; }
-        .search-input { flex: 1; padding: 8px; border: 1px solid #FFE4E9; border-radius: 10px; font-size: 0.9rem; }
-        .btn-search { background: #FF69B4; color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .search-result { background: #FFF0F5; padding: 10px; border-radius: 10px; margin-bottom: 12px; font-size: 0.85rem; display: none; border: 1px dashed #FF69B4; }
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            background: var(--bg-gradient); 
+            margin: 0; 
+            padding: 15px; 
+            color: var(--text-dark); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .main-container { width: 100%; max-width: 430px; }
+        
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 24px; 
+            padding: 20px; 
+            box-shadow: var(--shadow); 
+            margin-bottom: 16px; 
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        #date { 
+            width: 60%; 
+            padding: 10px; 
+            border-radius: 14px; 
+            border: 1px solid var(--border-color); 
+            background: #F9EBEA; 
+            font-size: 1rem; 
+            font-weight: bold;
+            color: var(--su-primary);
+            text-align: center;
+            outline: none;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+        
+        input[readonly] { 
+            font-size: 0.95rem; 
+            font-weight: 600; 
+            color: var(--text-dark); 
+            background: transparent; 
+            border: none; 
+            width: 100%;
+            text-overflow: ellipsis;
+        }
+        
+        .row { 
+            display: grid; 
+            grid-template-columns: 75px 1fr 35px 55px; 
+            gap: 8px; 
+            margin-bottom: 10px; 
+            align-items: center; 
+            background: #F8F9F9;
+            padding: 6px 10px;
+            border-radius: 14px;
+            border: 1px solid #F2F4F4;
+        }
+        
+        input[type="number"], .input-time { 
+            padding: 8px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 10px; 
+            text-align: center; 
+            font-size: 0.9rem; 
+            font-weight: 700; 
+            width: 100%; 
+            box-sizing: border-box;
+            background: #FFFFFF;
+            color: var(--text-dark);
+        }
+        
+        .input-time { 
+            text-align: center; 
+            font-weight: 500; 
+            color: #1A5276;
+            border: 1px dashed #A9CCE3;
+        }
+        
+        .btn-random, .btn-save { 
+            background: linear-gradient(135deg, #641E16 0%, #78281F 100%); 
+            color: #FFFFFF; 
+            border: none; 
+            padding: 14px; 
+            border-radius: 16px; 
+            width: 100%; 
+            font-weight: 700; 
+            font-size: 1rem;
+            cursor: pointer; 
+            box-shadow: 0 4px 15px rgba(120, 40, 31, 0.2);
+            transition: all 0.2s;
+        }
+        .btn-random:active, .btn-save:active { transform: scale(0.98); }
+        
+        .btn-restore { 
+            background: #FFFFFF; 
+            color: var(--text-muted); 
+            border: 1px solid var(--border-color); 
+            padding: 10px; 
+            border-radius: 14px; 
+            width: 100%; 
+            font-weight: 500; 
+            font-size: 0.85rem;
+            cursor: pointer; 
+            margin-top: 10px; 
+        }
+        
+        .btn-action { 
+            border: none;
+            background: #EAECEE;
+            color: var(--text-dark);
+            padding: 6px; 
+            font-size: 0.8rem; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .btn-action:hover { background: var(--luxury-pink); }
+        .btn-delete { background: #FADBD8; color: #CD6155; }
+        
+        .dash-grid { display: grid; grid-template-columns: 1fr auto; gap: 8px; font-size: 0.9rem; margin-top: 12px; }
+        .dash-item { border-bottom: 1px solid #FBEEE6; padding: 6px 0; font-weight: 500; }
+        
+        .history-card { 
+            background: #FFFFFF; 
+            border-radius: 20px; 
+            padding: 16px; 
+            margin-bottom: 12px; 
+            border-left: 6px solid var(--su-primary); 
+            font-size: 0.85rem; 
+            box-shadow: var(--shadow);
+        }
+        .h-row { display: grid; grid-template-columns: 65px 1fr 45px; padding: 4px 0; border-bottom: 1px dashed #F2F4F4; }
+        
+        /* ดีไซน์ช่องค้นหาแนวโมเดิร์นหรู */
+        .search-box { display: flex; gap: 8px; margin-bottom: 0px; }
+        .search-input { 
+            flex: 1; 
+            padding: 12px 16px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 16px; 
+            font-size: 0.9rem; 
+            outline: none;
+            background: #F8F9F9;
+            color: var(--text-dark);
+        }
+        .btn-search { 
+            background: var(--kw-primary); 
+            color: white; 
+            border: none; 
+            padding: 0 20px; 
+            border-radius: 16px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            box-shadow: 0 4px 10px rgba(27, 79, 114, 0.2);
+        }
+        .search-result { 
+            background: #EAFAF1; 
+            padding: 14px; 
+            border-radius: 16px; 
+            margin-top: 12px; 
+            font-size: 0.9rem; 
+            display: none; 
+            border: 1px solid #ABEBC6; 
+            color: #196F3D;
+        }
     </style>
 </head>
 <body>
@@ -36,36 +206,36 @@
 <div class="main-container">
     <div class="card">
         <div class="search-box">
-            <input type="text" id="searchKey" class="search-input" placeholder="🔍 พิมพ์ชื่อทรัพย์เพื่อค้นหาวันที่ลง...">
+            <input type="text" id="searchKey" class="search-input" placeholder="🔍 พิมพ์ชื่อทรัพย์เพื่อค้นหาวันลง...">
             <button class="btn-search" onclick="searchAssetDays()">ค้นหา</button>
         </div>
         <div id="searchResult" class="search-result"></div>
     </div>
 
     <div class="card" style="text-align:center;">
-        <h2 style="font-size:1.1rem; color:#FF69B4; margin-bottom:10px;">📂 Post Diary (6 ทรัพย์)</h2>
+        <h2 style="font-size:1.2rem; color:var(--su-primary); margin: 0 0 12px 0; font-weight:700;">📂 Post Diary Studio</h2>
         <input id="date" type="date" onchange="checkTodayStatus()">
     </div>
 
     <div id="randomBox" class="card" style="display:block; text-align:center;">
-        <button class="btn-random" onclick="startRandom()">✨ สุ่มทรัพย์วันนี้ (6 ทรัพย์)</button>
+        <button class="btn-random" onclick="startRandom()">✨ สุ่มจัดการแผนงาน (6 ทรัพย์สิน)</button>
     </div>
 
     <div id="inputSection" class="card" style="display: none;">
-        <div style="color:var(--kw-color); font-weight:700; margin-bottom:5px;">👤 พี่ขวัญ</div>
+        <div class="section-title" style="color:var(--kw-primary);">🔹 แผนงานโพสต์: พี่ขวัญ</div>
         <div id="kw_rows"></div>
         
-        <hr style="border:0; border-top:1px solid #FFE4E9; margin:15px 0;">
+        <hr style="border:0; border-top:1px solid var(--border-color); margin:20px 0;">
         
-        <div style="color:var(--su-color); font-weight:700; margin-bottom:5px;">👤 พี่สุ</div>
+        <div class="section-title" style="color:var(--su-primary);">🔸 แผนงานโพสต์: พี่สุ</div>
         <div id="su_rows"></div>
         
-        <button class="btn-save" style="margin-top:15px" onclick="saveData()">💾 บันทึกยอดโพสต์</button>
-        <button class="btn-restore" onclick="restoreBackupData()">🔄 กู้คืนข้อมูล</button>
+        <button class="btn-save" style="margin-top:20px" onclick="saveData()">💾 บันทึกยอดโพสต์เข้าระบบ</button>
+        <button class="btn-restore" onclick="restoreBackupData()">🔄 ดึงข้อมูลสำรอง</button>
     </div>
 
-    <div id="dashBoard" class="card" style="border-top:4px solid var(--fresh-pink); display:none;">
-        <div style="color:#FF69B4; font-weight:700;">📊 สรุปยอดรวมเดือนนี้</div>
+    <div id="dashBoard" class="card" style="border-top:4px solid var(--su-primary); display:none;">
+        <div style="color:var(--su-primary); font-weight:700; font-size:1rem;">📊 สรุปสถิติยอดรวมเดือนนี้</div>
         <div id="dashContent" class="dash-grid"></div>
     </div>
 
@@ -102,7 +272,6 @@ const groups = {
 const fixedAsset = "บ้านเอื้ออาทรอรัญประเทศ";
 let currentDocId = null;
 
-// สร้างฟอร์มกรอกข้อมูล 6 แถวแบบไดนามิก
 function generateInputRows(user, data) {
     const container = document.getElementById(`${user}_rows`);
     container.innerHTML = "";
@@ -110,7 +279,7 @@ function generateInputRows(user, data) {
         const rowData = (data && data[user] && data[user][`p${i}`]) ? data[user][`p${i}`] : { time: "", name: "", num: 0 };
         container.innerHTML += `
             <div class="row">
-                <input type="text" class="input-time" id="${user}_t${i}" placeholder="เวลา" value="${rowData.time || ''}">
+                <input type="text" class="input-time" id="${user}_t${i}" placeholder="00:00" value="${rowData.time || ''}">
                 <input id="${user}_n${i}" value="${rowData.name || ''}" readonly>
                 <button class="btn-action" onclick="editAssetName('${user}_n${i}')">✏️</button>
                 <input id="${user}_num${i}" type="number" value="${rowData.num || 0}">
@@ -119,10 +288,9 @@ function generateInputRows(user, data) {
     }
 }
 
-// ฟังก์ชันที่ 1: ช่วยให้กดปรับเปลี่ยนชื่อทรัพย์แมนนวลได้เลย
 function editAssetName(id) {
     const input = document.getElementById(id);
-    const newName = prompt("แก้ไขชื่อทรัพย์สิน:", input.value);
+    const newName = prompt("📝 แก้ไขปรับเปลี่ยนชื่อทรัพย์สิน:", input.value);
     if (newName !== null && newName.trim() !== "") {
         input.value = newName.trim();
     }
@@ -150,18 +318,16 @@ async function checkTodayStatus() {
         }
         updateDashboard(); loadHistory();
     } catch (e) {
-        console.error("Firebase connection error:", e);
+        console.error(e);
     }
 }
 
-// ฟังก์ชันที่ 3: ปรับการสุ่มให้กระจายออกเป็น 6 ทรัพย์สินไม่ซ้ำกัน
 async function startRandom() {
     const dateVal = document.getElementById("date").value;
     if(!dateVal) return;
     let finalAssets = [];
     
     const allAssetsList = [...groups.g1, ...groups.g2, ...groups.g3, fixedAsset];
-
     let totalPostCounts = {};
     allAssetsList.forEach(asset => { totalPostCounts[asset] = 0; });
 
@@ -180,7 +346,6 @@ async function startRandom() {
         } catch(err) {}
     }
 
-    // ล็อกสุ่มพิเศษวันที่ 1 กรกฎาคม 2569 บังคับ 6 ตัวเรียงลำดับจากน้อยไปมาก
     if (dateVal === "2026-07-01") {
         const coreAsset = "ARKIN Vibhavadi (ดอนเมือง)";
         const lockFixedAsset = fixedAsset;
@@ -189,18 +354,15 @@ async function startRandom() {
             .filter(asset => asset !== coreAsset && asset !== lockFixedAsset)
             .sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
         
-        // ดึง 4 ตัวที่ยอดน้อยที่สุดต่อมาประกบให้ครบ 6 ตัวพอดี
         finalAssets = [coreAsset, lockFixedAsset, pool[0], pool[1], pool[2], pool[3]];
     } else {
-        // วันปกติ ทรัพย์หลักสลับวันเว้นวัน + สุ่มตัวที่เหลือจนครบ 6 ตัวไม่ซ้ำกัน
         let pool = allAssetsList.sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
         finalAssets = pool.slice(0, 6);
     }
 
-    // จัดตารางให้พี่ขวัญและพี่สุสลับไทม์ไลน์กันตามเดิม
     let kw_assets = [...finalAssets].sort(() => 0.5 - Math.random());
     let su_assets = [...kw_assets];
-    su_assets.push(su_assets.shift()); // เลื่อนสลับคู่เวลาไม่ให้ตรงกัน
+    su_assets.push(su_assets.shift()); 
 
     if (db) {
         try {
@@ -212,16 +374,15 @@ async function startRandom() {
             await db.collection("posts").add(uploadData);
             checkTodayStatus();
         } catch(e) { 
-            alert("บันทึกลงฐานข้อมูลขัดข้อง");
+            alert("บันทึกฐานข้อมูลขัดข้อง");
         }
     }
 }
 
-// ฟังก์ชันที่ 4: ค้นหาว่าทรัพย์นี้ลงวันไหนบ้าง
 async function searchAssetDays() {
     const key = document.getElementById("searchKey").value.trim();
     if(!key) return;
-    if(!db) { alert("เชื่อมต่อฐานข้อมูลไม่ได้"); return; }
+    if(!db) return;
     
     try {
         const snap = await db.collection("posts").orderBy("date", "desc").get();
@@ -242,7 +403,7 @@ async function searchAssetDays() {
         const resBox = document.getElementById("searchResult");
         resBox.style.display = "block";
         if(matchDates.length > 0) {
-            resBox.innerHTML = `<strong>📌 ประวัติการลงโพสต์ของ "${key}":</strong><br>` + matchDates.map(d => `• ${d}`).join('<br>');
+            resBox.innerHTML = `<strong>📌 วันที่เคยลงโพสต์ของ "${key}":</strong><br>` + matchDates.map(d => `• ${d}`).join('<br>');
         } else {
             resBox.innerHTML = `❌ ไม่พบประวัติการลงโพสต์ของทรัพย์ชื่อ "${key}"`;
         }
@@ -255,6 +416,7 @@ async function saveData() {
     for(let i=1; i<=6; i++) {
         updateData[`kw.p${i}.time`] = document.getElementById(`kw_t${i}`).value;
         updateData[`kw.p${i}.name`] = document.getElementById(`kw_n${i}`).value;
+        updateData[`kw.pTemplate.num`] = Number(document.getElementById(`kw_num${i}`).value);
         updateData[`kw.p${i}.num`] = Number(document.getElementById(`kw_num${i}`).value);
         
         updateData[`su.p${i}.time`] = document.getElementById(`su_t${i}`).value;
@@ -262,17 +424,11 @@ async function saveData() {
         updateData[`su.p${i}.num`] = Number(document.getElementById(`su_num${i}`).value);
     }
     await db.collection("posts").doc(currentDocId).update(updateData); 
-    alert("บันทึกข้อมูล 6 ทรัพย์เรียบร้อยแล้ว!"); 
+    alert("✨ บันทึกข้อมูลแผนงาน 6 ทรัพย์เรียบร้อยแล้วค่ะ!"); 
     checkTodayStatus(); 
 }
 
-async function restoreBackupData() {
-    if(!db) return;
-    if(confirm("ต้องการกู้คืนข้อมูลสำรองระบบหรือไม่?")) {
-        // คงสคริปต์กู้คืนแบบดั้งเดิมของระบบ
-        checkTodayStatus();
-    }
-}
+async function restoreBackupData() { if(!db) return; checkTodayStatus(); }
 
 async function updateDashboard() {
     if(!db) return;
@@ -302,17 +458,17 @@ async function loadHistory() {
         let html = ""; 
         snap.forEach(doc => { 
             const d = doc.data(); 
-            if(d.date && d.kw && d.su && d.kw.p1 && d.su.p1) {
-                html += `<div class="history-card"><strong>🗓 ${d.date}</strong> <button class="btn-action" onclick="editEntry('${doc.id}')">✏️</button> <button class="btn-action btn-delete" onclick="deleteEntry('${doc.id}')">🗑️</button>`;
+            if(d.date && d.kw && d.su && d.kw.p1) {
+                html += `<div class="history-card"><strong>🗓 วันที่ ${d.date}</strong> <button class="btn-action" style="display:inline-block; margin-left:10px;" onclick="editEntry('${doc.id}')">✏️</button> <button class="btn-action btn-delete" style="display:inline-block;" onclick="deleteEntry('${doc.id}')">🗑️</button>`;
                 
-                html += `<div style="color:var(--kw-color); margin-top:5px; font-weight:bold;">👤 พี่ขวัญ</div>`;
+                html += `<div style="color:var(--kw-primary); margin-top:8px; font-weight:bold;">👤 พี่ขวัญ</div>`;
                 for(let i=1; i<=6; i++) {
-                    if(d.kw[`p${i}`]) html += `<div class="h-row" style="color:var(--kw-color)"><span>${d.kw[`p${i}`].time || 'รอระบุ'}</span><span>${d.kw[`p${i}`].name}</span><span>${d.kw[`p${i}`].num}</span></div>`;
+                    if(d.kw[`p${i}`]) html += `<div class="h-row" style="color:var(--kw-primary)"><span>⏰ ${d.kw[`p${i}`].time || '--:--'}</span><span>${d.kw[`p${i}`].name}</span><span>${d.kw[`p${i}`].num} โพสต์</span></div>`;
                 }
                 
-                html += `<div style="color:var(--su-color); margin-top:5px; font-weight:bold;">👤 พี่สุ</div>`;
+                html += `<div style="color:var(--su-primary); margin-top:8px; font-weight:bold;">👤 พี่สุ</div>`;
                 for(let i=1; i<=6; i++) {
-                    if(d.su[`p${i}`]) html += `<div class="h-row" style="color:var(--su-color)"><span>${d.su[`p${i}`].time || 'รอระบุ'}</span><span>${d.su[`p${i}`].name}</span><span>${d.su[`p${i}`].num}</span></div>`;
+                    if(d.su[`p${i}`]) html += `<div class="h-row" style="color:var(--su-primary)"><span>⏰ ${d.su[`p${i}`].time || '--:--'}</span><span>${d.su[`p${i}`].name}</span><span>${d.su[`p${i}`].num} โพสต์</span></div>`;
                 }
                 html += `</div>`;
             } 
@@ -322,7 +478,7 @@ async function loadHistory() {
 }
 
 async function editEntry(id) { if(!db)return; const doc = await db.collection("posts").doc(id).get(); document.getElementById("date").value = doc.data().date; checkTodayStatus(); }
-async function deleteEntry(id) { if(!db)return; if(confirm("ยืนยันการลบ?")) { await db.collection("posts").doc(id).delete(); checkTodayStatus(); } }
+async function deleteEntry(id) { if(!db)return; if(confirm("ยืนยันการลบประวัติรายการนี้?")) { await db.collection("posts").doc(id).delete(); checkTodayStatus(); } }
 
 window.onload = () => { 
     const now = new Date(); document.getElementById("date").value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`; 
