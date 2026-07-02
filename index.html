@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Post Diary - Modern Luxury</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght=400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root { 
             --bg-color: #F8F9FA; 
@@ -207,7 +207,7 @@ function generateInputRows(user, data) {
     const container = document.getElementById(`${user}_rows`);
     container.innerHTML = "";
     
-    // บังคับแสดงผลเป็นระบบ 6 ช่องในหน้าจอแก้ไขปัจจุบันทั้งหมด
+    // บังคับเปลี่ยนสถาปัตยกรรมแถวแสดงผลให้เป็น 6 แถวพิมพ์เวลาอิสระถาวรทุกวัน
     for (let i = 1; i <= 6; i++) {
         let rowData = { time: "", name: "", num: 0 };
         
@@ -215,7 +215,6 @@ function generateInputRows(user, data) {
             if (data[user][`p${i}`]) {
                 rowData = data[user][`p${i}`];
             } else if (i <= 3) {
-                // รองรับข้อมูลแบบเก่าเช้าเที่ยงเย็นให้แสดงผลใน 3 ช่องแรกไปก่อน
                 const oldSlots = ['m', 'n', 'e'];
                 const oldTimes = ['เช้า', 'เที่ยง', 'เย็น'];
                 if (data[user][oldSlots[i-1]]) {
@@ -295,15 +294,9 @@ async function startRandom() {
         } catch(err) {}
     }
 
-    if (dateVal === "2026-07-01") {
-        const coreAsset = "ARKIN Vibhavadi (ดอนเมือง)";
-        const lockFixedAsset = fixedAsset;
-        let pool = allAssetsList.filter(asset => asset !== coreAsset && asset !== lockFixedAsset).sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
-        finalAssets = [coreAsset, lockFixedAsset, pool[0], pool[1], pool[2], pool[3]];
-    } else {
-        let pool = allAssetsList.sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
-        finalAssets = pool.slice(0, 6);
-    }
+    // [แก้ไขหลังบ้านสำร็จ]: ลบเงื่อนไขล็อกวันที่ 1 ออก เพื่อให้ทุก ๆ วันต่อจากนี้รันระบบ 6 ทรัพย์สินยอดน้อยที่สุดอัตโนมัติ
+    let pool = allAssetsList.sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
+    finalAssets = pool.slice(0, 6);
 
     let kw_assets = [...finalAssets].sort(() => 0.5 - Math.random());
     let su_assets = [...kw_assets];
