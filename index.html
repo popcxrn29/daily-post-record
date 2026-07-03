@@ -59,7 +59,7 @@
         
         .row { 
             display: grid; 
-            grid-template-columns: 65px 1fr 34px 55px; 
+            grid-template-columns: 75px 1fr 34px 55px; 
             gap: 8px; 
             margin-bottom: 12px; 
             align-items: center; 
@@ -196,14 +196,13 @@ try {
 
 const groups = {
     g1: ["แม่ย่าพี่ปลา 11 ไร่", "บ้านพี่แดง อรัญนคร3", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์"],
-    g2: ["ศรีวราห์การเเดน", "แฮปปี้คอนโด", "คอนโดชีวาทัย ฮอลล์มาร์ค", "คอนโด The Base Park East", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "plum condo", "Lumpini Ville", "ลุมพินี วิลล์ รามอินทรา-ลาดปลาเค้า 1", "D condo", "Whizdom", "ยูดีไลท์3", "ARKIN Vibhavadi (ดอนเมือง)"],
+    g2: ["ศรีวราห์การเเดน", "แฮปปี้คอนโด", "คอนโดชีวาทัย ฮอลล์มาร์ค", "คอนโด The Base Park East", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "plum condo", "Lumpini Ville", "ลุมพินี วิลล์ รามอินทรา-ลาดปลาเค้า 1", "D condo", "Whizdom", "ยูดีไลท์3", "ARKIN Vibhavadi (ดอนเมือง)", "รีช พหลโยธิน 52", "ลุมพินีรามอินทรา"],
     g3: ["พี่ศรีไพร (คอนสาย)", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "บ้านmilindaคุณมีน"]
 };
 
 const fixedAsset = "บ้านเอื้ออาทรอรัญประเทศ";
 let currentDocId = null;
 
-// บังคับเปลี่ยนสถาปัตยกรรมแถวแสดงผลให้เป็น 6 แถวพิมพ์เวลาอิสระถาวร ไม่ดึงข้อมูล 3 ช่องเดิมมาบดบังดีไซน์ใหม่
 function generateInputRows(user, data) {
     const container = document.getElementById(`${user}_rows`);
     container.innerHTML = "";
@@ -217,7 +216,7 @@ function generateInputRows(user, data) {
         
         container.innerHTML += `
             <div class="row">
-                <input type="text" class="input-time" id="${user}_t${i}" placeholder="เวลา" value="${rowData.time || ''}">
+                <input type="text" class="input-time" id="${user}_t${i}" placeholder="พิมพ์เวลา" value="${rowData.time || ''}">
                 <input id="${user}_n${i}" value="${rowData.name || ''}" readonly>
                 <button class="btn-action" onclick="editAssetName('${user}_n${i}')">✏️</button>
                 <input id="${user}_num${i}" type="number" value="${rowData.num || 0}">
