@@ -152,7 +152,7 @@
     </div>
 
     <div id="randomBox" class="card" style="display:block; text-align:center;">
-        <button class="btn-random" onclick="startRandom()">✨ สุ่มแผนงานวันนี้ (6 ทรัพย์สิน)</button>
+        <button class="btn-random" onclick="startRandom()">✨ สุ่มแผนงานวันนี้ (คนละ 3 ทรัพย์สิน)</button>
     </div>
 
     <div id="inputSection" class="card" style="display: none;">
@@ -194,23 +194,31 @@ try {
     }
 } catch (e) { console.error(e); }
 
-const groups = {
-    g1: ["แม่ย่าพี่ปลา 11 ไร่", "บ้านพี่แดง อรัญนคร3", "ที่ดินน้าจิต วังน้ำเย็น", "บ้านอรัญนคร 1", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์"],
-    g2: ["ศรีวราห์การเเดน", "แฮปปี้คอนโด", "คอนโดชีวาทัย ฮอลล์มาร์ค", "คอนโด The Base Park East", "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", "plum condo", "Lumpini Ville", "ลุมพินี วิลล์ รามอินทรา-ลาดปลาเค้า 1", "D condo", "Whizdom", "ยูดีไลท์3", "ARKIN Vibhavadi (ดอนเมือง)", "รีช พหลโยธิน 52", "ลุมพินีรามอินทรา"],
-    g3: ["พี่ศรีไพร (คอนสาย)", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "บ้านmilindaคุณมีน"]
-};
+// รายการทรัพย์สินทั้งหมดที่มี
+const allAssetsList = [
+    "แฮปปี้คอนโด", "ยูดีไลท์3", "บ้านเอื้ออาทรอรัญประเทศ", 
+    "แม่ย่าพี่ปลา 11 ไร่", "บ้านพี่แดง อรัญนคร3", "ที่ดินน้าจิต วังน้ำเย็น", 
+    "บ้านอรัญนคร 1", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์",
+    "ศรีวราห์การเเดน", "คอนโดชีวาทัย ฮอลล์มาร์ค", "คอนโด The Base Park East", 
+    "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", 
+    "plum condo", "Lumpini Ville", "ลุมพินี วิลล์ รามอินทรา-ลาดปลาเค้า 1", 
+    "D condo", "Whizdom", "ARKIN Vibhavadi (ดอนเมือง)", "รีช พหลโยธิน 52", "ลุมพินีรามอินทรา",
+    "พี่ศรีไพร (คอนสาย)", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", 
+    "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "บ้านmilindaคุณมีน"
+];
 
-const fixedAsset = "บ้านเอื้ออาทรอรัญประเทศ";
+// ทรัพย์สินเร่งด่วนที่ต้องสุ่มบ่อยแบบวันเว้นวัน
+const urgentAssets = ["แฮปปี้คอนโด", "ยูดีไลท์3", "บ้านเอื้ออาทรอรัญประเทศ"];
+
 let currentDocId = null;
 
 function generateInputRows(user, data) {
     const container = document.getElementById(`${user}_rows`);
     container.innerHTML = "";
     
-    for (let i = 1; i <= 6; i++) {
+    // หน้าจอล็อกแสดงผล 3 ช่องสุ่มต่อคน (รวมเป็น 6 ช่องตามดีไซน์เดิม)
+    for (let i = 1; i <= 3; i++) {
         let rowData = { time: "", name: "", num: 0 };
-        
-        // แก้ไขจุดบกพร่อง: บังคับให้อ่านค่าจากโครงสร้าง p1-p6 เท่านั้น ถ้าไม่มีให้ปล่อยว่าง ไม่ดึงข้อมูลเก่ามาพังระบบ
         if (data && data[user] && data[user][`p${i}`]) {
             rowData = data[user][`p${i}`];
         }
@@ -248,15 +256,6 @@ async function checkTodayStatus() {
             currentDocId = snap.docs[0].id;
             const d = snap.docs[0].data();
             
-            // เช็กว่าเอกสารนี้เป็นแบบ 6 ช่องหรือยัง ถ้ายังเป็นแบบเก่า (มีเช้า/เที่ยง) ให้ลบทิ้งสร้างใหม่ป้องกันการเอ๋อ
-            if (d.kw && (d.kw.m || d.kw.n || d.kw.e)) {
-                if(confirm("พบข้อมูลเก่าที่โครงสร้างไม่รองรับระบบใหม่ ต้องการรีเซ็ตเพื่อเริ่มใช้งานแบบ 6 ช่องไหมคะ?")) {
-                    await db.collection("posts").doc(currentDocId).delete();
-                    checkTodayStatus();
-                    return;
-                }
-            }
-
             document.getElementById("randomBox").style.display = "none";
             document.getElementById("inputSection").style.display = "block";
             generateInputRows("kw", d);
@@ -269,44 +268,81 @@ async function checkTodayStatus() {
 async function startRandom() {
     const dateVal = document.getElementById("date").value;
     if(!dateVal) return;
-    let finalAssets = [];
-    
-    const allAssetsList = [...groups.g1, ...groups.g2, ...groups.g3, fixedAsset];
-    let totalPostCounts = {};
-    allAssetsList.forEach(asset => { totalPostCounts[asset] = 0; });
+    if(!db) return;
 
-    if (db) {
-        try {
-            const allSnap = await db.collection("posts").get();
-            allSnap.forEach(doc => {
-                const d = doc.data();
-                if(d.kw && d.su) { 
+    try {
+        // 1. ดึงข้อมูลย้อนหลัง 7 วันเพื่อหาตัวที่ห้ามซ้ำ
+        let bannedAssets = new Set();
+        const targetDate = new Date(dateVal);
+        const sevenDaysAgo = new Date(targetDate);
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        
+        const yyyymmdd_7 = sevenDaysAgo.toISOString().split('T')[0];
+        
+        const pastSnap = await db.collection("posts")
+            .where("date", ">=", yyyymmdd_7)
+            .where("date", "<", dateVal)
+            .get();
+            
+        pastSnap.forEach(doc => {
+            const d = doc.data();
+            for(let user of ['kw', 'su']) {
+                if(d[user]) {
                     for(let i=1; i<=6; i++) {
-                        if(d.kw[`p${i}`] && d.kw[`p${i}`].name) totalPostCounts[d.kw[`p${i}`].name] = (totalPostCounts[d.kw[`p${i}`].name] || 0) + (Number(d.kw[`p${i}`].num) || 0); 
-                        if(d.su[`p${i}`] && d.su[`p${i}`].name) totalPostCounts[d.su[`p${i}`].name] = (totalPostCounts[d.su[`p${i}`].name] || 0) + (Number(d.su[`p${i}`].num) || 0); 
+                        if(d[user][`p${i}`] && d[user][`p${i}`].name) {
+                            bannedAssets.add(d[user][`p${i}`].name);
+                        }
                     }
                 }
-            });
-        } catch(err) {}
-    }
-
-    let pool = allAssetsList.sort((a, b) => totalPostCounts[a] - totalPostCounts[b]);
-    finalAssets = pool.slice(0, 6);
-
-    let kw_assets = [...finalAssets].sort(() => 0.5 - Math.random());
-    let su_assets = [...kw_assets];
-    su_assets.push(su_assets.shift()); 
-
-    if (db) {
-        try {
-            let uploadData = { date: dateVal, kw: {}, su: {} };
-            for(let i=1; i<=6; i++) {
-                uploadData.kw[`p${i}`] = { name: kw_assets[i-1], time: "", num: 0 };
-                uploadData.su[`p${i}`] = { name: su_assets[i-1], time: "", num: 0 };
             }
-            await db.collection("posts").add(uploadData);
-            checkTodayStatus();
-        } catch(e) { alert("เกิดข้อผิดพลาดในการบันทึก"); }
+        });
+
+        // 2. แยกกลุ่มทรัพย์สินที่พร้อมใช้งาน (ไม่ติดแบน 7 วัน)
+        let availableUrgent = urgentAssets.filter(x => !bannedAssets.has(x));
+        let availableNormal = allAssetsList.filter(x => !urgentAssets.includes(x) && !bannedAssets.has(x));
+
+        // ถ้ารายการไม่พอ ให้ผ่อนปรนเพื่อป้องกันระบบค้าง
+        if (availableNormal.length < 6) {
+            availableNormal = allAssetsList.filter(x => !urgentAssets.includes(x));
+        }
+
+        // คละอาเรย์
+        availableUrgent.sort(() => 0.5 - Math.random());
+        availableNormal.sort(() => 0.5 - Math.random());
+
+        // เลือกทรัพย์สินรวม 6 ชิ้นที่ไม่ซ้ำกันเด็ดขาดในวันนี้
+        let chosen = [];
+        // ใส่ตัวเร่งด่วนเข้าเซ็ตหลักก่อน
+        chosen.push(...availableUrgent);
+        // เติมตัวธรรมดาให้ครบ 6 ชิ้น
+        while(chosen.length < 6 && availableNormal.length > 0) {
+            let item = availableNormal.shift();
+            if(!chosen.includes(item)) chosen.push(item);
+        }
+        // ถ้ายังไม่ครบจริงๆ ดึงจากลิสต์ทั้งหมด
+        if(chosen.length < 6) {
+            let backup = [...allAssetsList].sort(() => 0.5 - Math.random());
+            for(let b of backup) {
+                if(!chosen.includes(b) && chosen.length < 6) chosen.push(b);
+            }
+        }
+
+        // 3. แบ่งให้พี่ขวัญ 3 ทรัพย์ พี่สุ 3 ทรัพย์ (คละกันอย่างอิสระและไม่ซ้ำกัน)
+        chosen.sort(() => 0.5 - Math.random());
+        let kw_picks = [chosen[0], chosen[1], chosen[2]];
+        let su_picks = [chosen[3], chosen[4], chosen[5]];
+
+        // 4. บันทึกลงฐานข้อมูลโครงสร้างเสถียร
+        let uploadData = { date: dateVal, kw: {}, su: {} };
+        for(let i=1; i<=3; i++) {
+            uploadData.kw[`p${i}`] = { name: kw_picks[i-1], time: "", num: 0 };
+            uploadData.su[`p${i}`] = { name: su_picks[i-1], time: "", num: 0 };
+        }
+        
+        await db.collection("posts").add(uploadData);
+        checkTodayStatus();
+    } catch(e) { 
+        alert("เกิดข้อผิดพลาดในระบบสุ่ม กรุณาลองใหม่อีกครั้งค่ะ"); 
     }
 }
 
@@ -321,9 +357,11 @@ async function searchAssetDays() {
         snap.forEach(doc => {
             const d = doc.data();
             let found = false;
-            if(d.kw && d.su) {
-                for(let i=1; i<=6; i++) {
-                    if((d.kw[`p${i}`] && d.kw[`p${i}`].name.includes(key)) || (d.su[`p${i}`] && d.su[`p${i}`].name.includes(key))) found = true;
+            for(let user of ['kw', 'su']) {
+                if(d[user]) {
+                    for(let i=1; i<=3; i++) {
+                        if(d[user][`p${i}`] && d[user][`p${i}`].name.includes(key)) found = true;
+                    }
                 }
             }
             if(found) matchDates.push(d.date);
@@ -343,7 +381,7 @@ async function saveData() {
     if(!db) return;
     let updateData = {};
     
-    for(let i=1; i<=6; i++) {
+    for(let i=1; i<=3; i++) {
         updateData[`kw.p${i}.time`] = document.getElementById(`kw_t${i}`).value;
         updateData[`kw.p${i}.name`] = document.getElementById(`kw_n${i}`).value;
         updateData[`kw.p${i}.num`] = Number(document.getElementById(`kw_num${i}`).value);
@@ -372,10 +410,15 @@ async function updateDashboard() {
         let stats = {}; 
         snap.forEach(doc => { 
             const d = doc.data(); 
-            if(d.date && d.date.startsWith(month) && d.kw && d.su) { 
-                for(let i=1; i<=6; i++) {
-                    if(d.kw[`p${i}`] && d.kw[`p${i}`].name) stats[d.kw[`p${i}`].name] = (stats[d.kw[`p${i}`].name] || 0) + (Number(d.kw[`p${i}`].num) || 0); 
-                    if(d.su[`p${i}`] && d.su[`p${i}`].name) stats[d.su[`p${i}`].name] = (stats[d.su[`p${i}`].name] || 0) + (Number(d.su[`p${i}`].num) || 0); 
+            if(d.date && d.date.startsWith(month)) { 
+                for(let user of ['kw', 'su']) {
+                    if(d[user]) {
+                        for(let i=1; i<=3; i++) {
+                            if(d[user][`p${i}`] && d[user][`p${i}`].name) {
+                                stats[d[user][`p${i}`].name] = (stats[d.kw[`p${i}`].name] || 0) + (Number(d[user][`p${i}`].num) || 0);
+                            }
+                        }
+                    }
                 }
             } 
         });
@@ -391,16 +434,16 @@ async function loadHistory() {
         let html = ""; 
         snap.forEach(doc => { 
             const d = doc.data(); 
-            if(d.date && d.kw && d.su && d.kw.p1) {
+            if(d.date && d.kw && d.su) {
                 html += `<div class="history-card"><strong style="color:var(--text-dark); font-size:0.95rem;">🗓 วันที่ ${d.date}</strong> <button class="btn-action" style="display:inline-block; margin-left:10px;" onclick="editEntry('${doc.id}')">✏️</button> <button class="btn-action btn-delete" style="display:inline-block;" onclick="deleteEntry('${doc.id}')">🗑️</button>`;
                 
                 html += `<div style="color:var(--royal-navy); margin-top:12px; font-weight:bold; font-size:0.95rem;">👤 พี่ขวัญ</div>`;
-                for(let i=1; i<=6; i++) {
+                for(let i=1; i<=3; i++) {
                     if(d.kw[`p${i}`]) html += `<div class="h-row" style="color:var(--text-dark)"><span>${d.kw[`p${i}`].time || '--:--'}</span><span>${d.kw[`p${i}`].name}</span><span><b>${d.kw[`p${i}`].num}</b></span></div>`;
                 }
                 
                 html += `<div style="color:var(--royal-navy); margin-top:12px; font-weight:bold; font-size:0.95rem;">👤 พี่สุ</div>`;
-                for(let i=1; i<=6; i++) {
+                for(let i=1; i<=3; i++) {
                     if(d.su[`p${i}`]) html += `<div class="h-row" style="color:var(--text-dark)"><span>${d.su[`p${i}`].time || '--:--'}</span><span>${d.su[`p${i}`].name}</span><span><b>${d.su[`p${i}`].num}</b></span></div>`;
                 }
                 html += `</div>`;
