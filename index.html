@@ -210,6 +210,7 @@ function generateInputRows(user, data) {
     for (let i = 1; i <= 6; i++) {
         let rowData = { time: "", name: "", num: 0 };
         
+        // แก้ไขจุดบกพร่อง: บังคับให้อ่านค่าจากโครงสร้าง p1-p6 เท่านั้น ถ้าไม่มีให้ปล่อยว่าง ไม่ดึงข้อมูลเก่ามาพังระบบ
         if (data && data[user] && data[user][`p${i}`]) {
             rowData = data[user][`p${i}`];
         }
@@ -245,9 +246,19 @@ async function checkTodayStatus() {
         const snap = await db.collection("posts").where("date", "==", dateVal).get();
         if (!snap.empty) {
             currentDocId = snap.docs[0].id;
+            const d = snap.docs[0].data();
+            
+            // เช็กว่าเอกสารนี้เป็นแบบ 6 ช่องหรือยัง ถ้ายังเป็นแบบเก่า (มีเช้า/เที่ยง) ให้ลบทิ้งสร้างใหม่ป้องกันการเอ๋อ
+            if (d.kw && (d.kw.m || d.kw.n || d.kw.e)) {
+                if(confirm("พบข้อมูลเก่าที่โครงสร้างไม่รองรับระบบใหม่ ต้องการรีเซ็ตเพื่อเริ่มใช้งานแบบ 6 ช่องไหมคะ?")) {
+                    await db.collection("posts").doc(currentDocId).delete();
+                    checkTodayStatus();
+                    return;
+                }
+            }
+
             document.getElementById("randomBox").style.display = "none";
             document.getElementById("inputSection").style.display = "block";
-            const d = snap.docs[0].data();
             generateInputRows("kw", d);
             generateInputRows("su", d);
         }
@@ -363,8 +374,8 @@ async function updateDashboard() {
             const d = doc.data(); 
             if(d.date && d.date.startsWith(month) && d.kw && d.su) { 
                 for(let i=1; i<=6; i++) {
-                    if(d.kw[`p${i}`]) stats[d.kw[`p${i}`].name] = (stats[d.kw[`p${i}`].name] || 0) + (Number(d.kw[`p${i}`].num) || 0); 
-                    if(d.su[`p${i}`]) stats[d.su[`p${i}`].name] = (stats[d.su[`p${i}`].name] || 0) + (Number(d.su[`p${i}`].num) || 0); 
+                    if(d.kw[`p${i}`] && d.kw[`p${i}`].name) stats[d.kw[`p${i}`].name] = (stats[d.kw[`p${i}`].name] || 0) + (Number(d.kw[`p${i}`].num) || 0); 
+                    if(d.su[`p${i}`] && d.su[`p${i}`].name) stats[d.su[`p${i}`].name] = (stats[d.su[`p${i}`].name] || 0) + (Number(d.su[`p${i}`].num) || 0); 
                 }
             } 
         });
@@ -380,7 +391,7 @@ async function loadHistory() {
         let html = ""; 
         snap.forEach(doc => { 
             const d = doc.data(); 
-            if(d.date && d.kw && d.su) {
+            if(d.date && d.kw && d.su && d.kw.p1) {
                 html += `<div class="history-card"><strong style="color:var(--text-dark); font-size:0.95rem;">🗓 วันที่ ${d.date}</strong> <button class="btn-action" style="display:inline-block; margin-left:10px;" onclick="editEntry('${doc.id}')">✏️</button> <button class="btn-action btn-delete" style="display:inline-block;" onclick="deleteEntry('${doc.id}')">🗑️</button>`;
                 
                 html += `<div style="color:var(--royal-navy); margin-top:12px; font-weight:bold; font-size:0.95rem;">👤 พี่ขวัญ</div>`;
