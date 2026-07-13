@@ -118,6 +118,12 @@
             padding: 12px; border-radius: 16px; width: 100%; font-weight: 700; font-size: 0.95rem; cursor: pointer;
         }
         
+        .btn-toggle-dash {
+            background: linear-gradient(135deg, var(--rose-gold), #9A636C); color: #FFFFFF; border: none;
+            padding: 14px; border-radius: 16px; width: 100%; font-weight: 700; font-size: 1rem; cursor: pointer; margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(180, 123, 132, 0.2);
+        }
+        
         .btn-action { border: none; background: #F2F4F4; color: var(--royal-navy); padding: 7px; font-size: 0.85rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-action:hover { background: var(--rose-gold-light); color: var(--rose-gold); }
         .btn-delete { background: #FADBD8; color: #CB4335; }
@@ -170,6 +176,9 @@
         </div>
     </div>
 
+    <!-- ปุ่มกดเปิด/ปิดหน้าต่างกระดานสรุปยอดตามสั่ง -->
+    <button class="btn-toggle-dash" onclick="toggleDashboard()">📊 ดูยอดโพสต์ประจำเดือนนี้</button>
+
     <div id="dashBoard" class="card" style="display:none;">
         <div class="dash-title">📊 สรุปยอดรวมเดือนนี้</div>
         <div id="dashContent" class="dash-grid"></div>
@@ -194,7 +203,6 @@ try {
     }
 } catch (e) { console.error(e); }
 
-// รายชื่อฐานข้อมูลทรัพย์สินจำแนกตามรูปถ่าย (กรองเกรด C ทิ้งถาวร)
 const assetsDatabase = {
     AA: [
         "U DELIGHT 3 | ยู ดีไลท์ 3", 
@@ -234,9 +242,7 @@ const assetsDatabase = {
     ]
 };
 
-// ล็อกตัวบังคับสุ่มทุกวัน
 const mandatoryAssets = ["U DELIGHT 3 | ยู ดีไลท์ 3", "Happy condo รัชดา 18"];
-
 let currentDocId = null;
 
 function parseUserData(user, data) {
@@ -244,7 +250,6 @@ function parseUserData(user, data) {
     if (!data || !data[user]) return parsed;
     if (data[user].p1) return data[user];
     
-    // แปลงโครงสร้างเดิมรองรับประวัติเก่า
     if (data[user].m || data[user].n || data[user].e) {
         parsed.p1 = { name: data[user].m?.name || "เช้า", time: data[user].m?.time || "", num: Number(data[user].m?.num) || 0 };
         parsed.p2 = { name: data[user].n?.name || "เที่ยง", time: data[user].n?.time || "", num: Number(data[user].n?.num) || 0 };
@@ -259,7 +264,6 @@ function generateInputRows(user, data) {
     container.innerHTML = "";
     const uData = parseUserData(user, data);
     
-    // เปลี่ยนการแสดงผลระบบล็อกหน้าจอเป็นคนละ 4 ช่วงเวลา
     for (let i = 1; i <= 4; i++) {
         let rowData = { time: "", name: "", num: 0 };
         if (uData && uData[`p${i}`]) rowData = uData[`p${i}`];
@@ -287,6 +291,7 @@ async function checkTodayStatus() {
     
     document.getElementById("randomBox").style.display = "block";
     document.getElementById("inputSection").style.display = "none";
+    document.getElementById("dashBoard").style.display = "none"; // ปิดกระดานสรุปไว้ก่อนเสมอ
     if(!db) return;
 
     try {
@@ -300,7 +305,7 @@ async function checkTodayStatus() {
             generateInputRows("kw", d);
             generateInputRows("su", d);
         }
-        updateDashboard(); loadHistory();
+        loadHistory();
     } catch (e) { console.error(e); }
 }
 
@@ -310,7 +315,6 @@ async function startRandom() {
     if(!db) return;
 
     try {
-        // ตรวจสอบวันก่อนหน้าเพื่อทำระบบสลับคละฝั่ง (วันเว้นวัน) ของ ยูดีไลท์ และ แฮปปี้คอนโด
         let lastKwAssets = [];
         const yesterday = new Date(dateVal);
         yesterday.setDate(yesterday.getDate() - 1);
@@ -326,27 +330,21 @@ async function startRandom() {
             }
         }
 
-        // คละเรียงลำดับทรัพย์สิน เกรด AA -> เกรด A -> เกรด B ตามความต้องการ
         let poolAA = [...assetsDatabase.AA].sort(() => 0.5 - Math.random());
         let poolA = [...assetsDatabase.A].sort(() => 0.5 - Math.random());
         let poolB = [...assetsDatabase.B].sort(() => 0.5 - Math.random());
 
-        // ประกอบรายการสุ่มโดยดึง AA และ A ให้หมดก่อน
         let normalPool = [...poolAA, ...poolA, ...poolB];
-        // กรองตัวล็อกหลักออกชั่วคราวเพื่อแยกไปจัดสรรสลับฝั่งพี่ขวัญ/พี่สุ
         normalPool = normalPool.filter(x => !mandatoryAssets.includes(x));
 
-        // คัดเลือกรายการสุ่มสำหรับวันนี้ทั้งหมด 6 รายการที่เหลือ
         let finalSelection = [];
         while(finalSelection.length < 6 && normalPool.length > 0) {
             finalSelection.push(normalPool.shift());
         }
 
-        // จัดสรรสลับคละฝั่งตัวล็อกภาคบังคับทุกวัน
         let kw_picks = [];
         let su_picks = [];
 
-        // เงื่อนไขสลับสลับวันเว้นวัน
         if (lastKwAssets.includes(mandatoryAssets[0])) {
             kw_picks.push(mandatoryAssets[1]);
             su_picks.push(mandatoryAssets[0]);
@@ -355,11 +353,9 @@ async function startRandom() {
             su_picks.push(mandatoryAssets[1]);
         }
 
-        // แบ่งส่วนทรัพย์สินที่เหลือคนละ 3 ชิ้น รวมเป็นคนละ 4 ช่องพอดีเป๊ะ
         kw_picks.push(finalSelection[0], finalSelection[1], finalSelection[2]);
         su_picks.push(finalSelection[3], finalSelection[4], finalSelection[5]);
 
-        // สับเปลี่ยนตำแหน่งภายในช่องเวลาไม่ให้จำเจ
         kw_picks.sort(() => 0.5 - Math.random());
         su_picks.sort(() => 0.5 - Math.random());
 
@@ -430,7 +426,14 @@ async function saveData() {
 
 async function restoreBackupData() { if(!db) return; checkTodayStatus(); }
 
-async function updateDashboard() {
+// ฟังก์ชันกดเปิด-ปิด แสดงหน้ากระดานเมื่อต้องการดูยอดโพสต์
+async function toggleDashboard() {
+    const dashBox = document.getElementById("dashBoard");
+    if (dashBox.style.display === "block") {
+        dashBox.style.display = "none";
+        return;
+    }
+    
     if(!db) return;
     try {
         const dateInput = document.getElementById("date").value;
@@ -451,7 +454,7 @@ async function updateDashboard() {
             } 
         });
         document.getElementById("dashContent").innerHTML = Object.entries(stats).sort((a,b) => b[1]-a[1]).map(([n, c]) => `<div class="dash-item">${n}</div><div class="dash-item" style="text-align:right"><b>${c}</b></div>`).join('') || "ไม่มีข้อมูล";
-        document.getElementById("dashBoard").style.display = "block";
+        dashBox.style.display = "block";
     } catch (e) {}
 }
 
