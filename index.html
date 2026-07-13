@@ -152,7 +152,7 @@
     </div>
 
     <div id="randomBox" class="card" style="display:block; text-align:center;">
-        <button class="btn-random" onclick="startRandom()">✨ สุ่มแผนงานวันนี้ (คนละ 3 ทรัพย์สิน)</button>
+        <button class="btn-random" onclick="startRandom()">✨ สุ่มแผนงานวันนี้ (คนละ 4 ช่วงเวลา)</button>
     </div>
 
     <div id="inputSection" class="card" style="display: none;">
@@ -194,35 +194,62 @@ try {
     }
 } catch (e) { console.error(e); }
 
-const allAssetsList = [
-    "แฮปปี้คอนโด", "ยูดีไลท์3", "บ้านเอื้ออาทรอรัญประเทศ", 
-    "แม่ย่าพี่ปลา 11 ไร่", "บ้านพี่แดง อรัญนคร3", "ที่ดินน้าจิต วังน้ำเย็น", 
-    "บ้านอรัญนคร 1", "ที่ดิน หลังอรัญนคร 1", "บ้านพี่หนึ่ง อรัญวิลล์",
-    "ศรีวราห์การเเดน", "คอนโดชีวาทัย ฮอลล์มาร์ค", "คอนโด The Base Park East", 
-    "BANGKOK HORIZON รามคำแหง", "กรี เน่ คอนโดดอนเมือง", "คอนโดสุขุมวิท 49", 
-    "plum condo", "Lumpini Ville", "ลุมพินี วิลล์ รามอินทรา-ลาดปลาเค้า 1", 
-    "D condo", "Whizdom", "ARKIN Vibhavadi (ดอนเมือง)", "รีช พหลโยธิน 52", "ลุมพินีรามอินทรา",
-    "พี่ศรีไพร (คอนสาย)", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", 
-    "บ้านพี่ปองพระประแดง", "บ้านทาวน์โฮมพฤกษา9", "บ้านmilindaคุณมีน"
-];
+// รายชื่อฐานข้อมูลทรัพย์สินจำแนกตามรูปถ่าย (กรองเกรด C ทิ้งถาวร)
+const assetsDatabase = {
+    AA: [
+        "U DELIGHT 3 | ยู ดีไลท์ 3", 
+        "Happy condo รัชดา 18", 
+        "Plum Condo Rangsit Fresh : พลัมคอนโด รังสิต"
+    ],
+    A: [
+        "บ้านพี่แดง อรัญนคร3", 
+        "คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว-โชคชัย4(ฝน)", 
+        "ที่ดิน หลังอรัญนคร 1 ซ.ประสบโชค", 
+        "ที่ดินพื้น 3 งาน", 
+        "คอนโด The Base Park East Sukhumvit 77", 
+        "คอนโด Aston", 
+        "ลุมพินี คอนโดทาวน์ รามอินทรา-หลักสี่", 
+        "Plum Condo นวมินทร์", 
+        "Lumpini Ville แบริ่ง-ลาซาล", 
+        "กรีเน่ คอนโด ตอนเมือง-สรงประภา", 
+        "กรีเน่ คอนโด ตอนเมือง-สรงประภา เฟส 1", 
+        "Kensington Place แจ้งวัฒนะ 13", 
+        "ลุมพินี คอนโดทาวน์ รามอินทรา - ลาดปลาเค้า 2", 
+        "The IRIS พระราม 9", 
+        "ทาวน์โฮม 3 ชั้น 4 ห้องนอน 4 ห้องน้ำ"
+    ],
+    B: [
+        "แม่ย่าพี่ปลา 14 ไร่", 
+        "แม่ย่าพี่ปลา 11 ไร่", 
+        "ที่ดินน้าจิต วังน้ำเย็น", 
+        "ทด.ป่าใย ท่าข้าม", 
+        "บ้านอรัญนคร 1 (คุณแคท )", 
+        "บ้านพี่หนึ่ง อรัญวิลล์", 
+        "ที่ดิน (โบท)", 
+        "ที่ดินบ้านนา นครนายก", 
+        "บ้านพรสิริ ขอนแก่น", 
+        "BANGKOK HORIZON รามคำแหง", 
+        "บ้านทาวน์โฮม พฤกษา 9- รังสิต คลอง 3", 
+        "บ้านเอื้ออาทรอรัญประเทศ"
+    ]
+};
 
-const urgentAssets = ["แฮปปี้คอนโด", "ยูดีไลท์3", "บ้านเอื้ออาทรอรัญประเทศ"];
+// ล็อกตัวบังคับสุ่มทุกวัน
+const mandatoryAssets = ["U DELIGHT 3 | ยู ดีไลท์ 3", "Happy condo รัชดา 18"];
+
 let currentDocId = null;
 
-// ปรับปรุงฟังก์ชันแปลงข้อมูลเก่าให้เข้ากันได้กับหน้าจอ 3 ช่องใหม่ได้ทันที
 function parseUserData(user, data) {
     let parsed = {};
     if (!data || !data[user]) return parsed;
+    if (data[user].p1) return data[user];
     
-    // เคสที่ 1: เป็นข้อมูลระบบใหม่ (p1, p2, p3)
-    if (data[user].p1) {
-        return data[user];
-    }
-    // เคสที่ 2: เป็นข้อมูลระบบเก่า (m, n, e) นำมาแปลงลง 3 ช่องใหม่แบบอัตโนมัติ
+    // แปลงโครงสร้างเดิมรองรับประวัติเก่า
     if (data[user].m || data[user].n || data[user].e) {
         parsed.p1 = { name: data[user].m?.name || "เช้า", time: data[user].m?.time || "", num: Number(data[user].m?.num) || 0 };
         parsed.p2 = { name: data[user].n?.name || "เที่ยง", time: data[user].n?.time || "", num: Number(data[user].n?.num) || 0 };
         parsed.p3 = { name: data[user].e?.name || "เย็น", time: data[user].e?.time || "", num: Number(data[user].e?.num) || 0 };
+        parsed.p4 = { name: "", time: "", num: 0 };
     }
     return parsed;
 }
@@ -230,14 +257,12 @@ function parseUserData(user, data) {
 function generateInputRows(user, data) {
     const container = document.getElementById(`${user}_rows`);
     container.innerHTML = "";
-    
     const uData = parseUserData(user, data);
     
-    for (let i = 1; i <= 3; i++) {
+    // เปลี่ยนการแสดงผลระบบล็อกหน้าจอเป็นคนละ 4 ช่วงเวลา
+    for (let i = 1; i <= 4; i++) {
         let rowData = { time: "", name: "", num: 0 };
-        if (uData && uData[`p${i}`]) {
-            rowData = uData[`p${i}`];
-        }
+        if (uData && uData[`p${i}`]) rowData = uData[`p${i}`];
         
         container.innerHTML += `
             <div class="row">
@@ -253,9 +278,7 @@ function generateInputRows(user, data) {
 function editAssetName(id) {
     const input = document.getElementById(id);
     const newName = prompt("✏️ แก้ไขชื่อทรัพย์สินชั่วคราวประจำวันนี้:", input.value);
-    if (newName !== null && newName.trim() !== "") {
-        input.value = newName.trim();
-    }
+    if (newName !== null && newName.trim() !== "") input.value = newName.trim();
 }
 
 async function checkTodayStatus() {
@@ -287,58 +310,61 @@ async function startRandom() {
     if(!db) return;
 
     try {
-        let bannedAssets = new Set();
-        const targetDate = new Date(dateVal);
-        const sevenDaysAgo = new Date(targetDate);
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        const yyyymmdd_7 = sevenDaysAgo.toISOString().split('T')[0];
-        
-        const pastSnap = await db.collection("posts")
-            .where("date", ">=", yyyymmdd_7)
-            .where("date", "<", dateVal)
-            .get();
-            
-        pastSnap.forEach(doc => {
-            const d = doc.data();
-            for(let user of ['kw', 'su']) {
-                const uData = parseUserData(user, d);
-                for(let i=1; i<=3; i++) {
-                    if(uData[`p${i}`] && uData[`p${i}`].name) {
-                        bannedAssets.add(uData[`p${i}`].name);
-                    }
+        // ตรวจสอบวันก่อนหน้าเพื่อทำระบบสลับคละฝั่ง (วันเว้นวัน) ของ ยูดีไลท์ และ แฮปปี้คอนโด
+        let lastKwAssets = [];
+        const yesterday = new Date(dateVal);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yyyymmdd_1 = yesterday.toISOString().split('T')[0];
+
+        const prevSnap = await db.collection("posts").where("date", "==", yyyymmdd_1).get();
+        if (!prevSnap.empty) {
+            const prevData = prevSnap.docs[0].data();
+            if (prevData.kw) {
+                for(let i=1; i<=4; i++) {
+                    if(prevData.kw[`p${i}`]) lastKwAssets.push(prevData.kw[`p${i}`].name);
                 }
             }
-        });
-
-        let availableUrgent = urgentAssets.filter(x => !bannedAssets.has(x));
-        let availableNormal = allAssetsList.filter(x => !urgentAssets.includes(x) && !bannedAssets.has(x));
-
-        if (availableNormal.length < 6) {
-            availableNormal = allAssetsList.filter(x => !urgentAssets.includes(x));
         }
 
-        availableUrgent.sort(() => 0.5 - Math.random());
-        availableNormal.sort(() => 0.5 - Math.random());
+        // คละเรียงลำดับทรัพย์สิน เกรด AA -> เกรด A -> เกรด B ตามความต้องการ
+        let poolAA = [...assetsDatabase.AA].sort(() => 0.5 - Math.random());
+        let poolA = [...assetsDatabase.A].sort(() => 0.5 - Math.random());
+        let poolB = [...assetsDatabase.B].sort(() => 0.5 - Math.random());
 
-        let chosen = [];
-        chosen.push(...availableUrgent);
-        while(chosen.length < 6 && availableNormal.length > 0) {
-            let item = availableNormal.shift();
-            if(!chosen.includes(item)) chosen.push(item);
-        }
-        if(chosen.length < 6) {
-            let backup = [...allAssetsList].sort(() => 0.5 - Math.random());
-            for(let b of backup) {
-                if(!chosen.includes(b) && chosen.length < 6) chosen.push(b);
-            }
+        // ประกอบรายการสุ่มโดยดึง AA และ A ให้หมดก่อน
+        let normalPool = [...poolAA, ...poolA, ...poolB];
+        // กรองตัวล็อกหลักออกชั่วคราวเพื่อแยกไปจัดสรรสลับฝั่งพี่ขวัญ/พี่สุ
+        normalPool = normalPool.filter(x => !mandatoryAssets.includes(x));
+
+        // คัดเลือกรายการสุ่มสำหรับวันนี้ทั้งหมด 6 รายการที่เหลือ
+        let finalSelection = [];
+        while(finalSelection.length < 6 && normalPool.length > 0) {
+            finalSelection.push(normalPool.shift());
         }
 
-        chosen.sort(() => 0.5 - Math.random());
-        let kw_picks = [chosen[0], chosen[1], chosen[2]];
-        let su_picks = [chosen[3], chosen[4], chosen[5]];
+        // จัดสรรสลับคละฝั่งตัวล็อกภาคบังคับทุกวัน
+        let kw_picks = [];
+        let su_picks = [];
+
+        // เงื่อนไขสลับสลับวันเว้นวัน
+        if (lastKwAssets.includes(mandatoryAssets[0])) {
+            kw_picks.push(mandatoryAssets[1]);
+            su_picks.push(mandatoryAssets[0]);
+        } else {
+            kw_picks.push(mandatoryAssets[0]);
+            su_picks.push(mandatoryAssets[1]);
+        }
+
+        // แบ่งส่วนทรัพย์สินที่เหลือคนละ 3 ชิ้น รวมเป็นคนละ 4 ช่องพอดีเป๊ะ
+        kw_picks.push(finalSelection[0], finalSelection[1], finalSelection[2]);
+        su_picks.push(finalSelection[3], finalSelection[4], finalSelection[5]);
+
+        // สับเปลี่ยนตำแหน่งภายในช่องเวลาไม่ให้จำเจ
+        kw_picks.sort(() => 0.5 - Math.random());
+        su_picks.sort(() => 0.5 - Math.random());
 
         let uploadData = { date: dateVal, kw: {}, su: {} };
-        for(let i=1; i<=3; i++) {
+        for(let i=1; i<=4; i++) {
             uploadData.kw[`p${i}`] = { name: kw_picks[i-1], time: "", num: 0 };
             uploadData.su[`p${i}`] = { name: su_picks[i-1], time: "", num: 0 };
         }
@@ -346,7 +372,7 @@ async function startRandom() {
         await db.collection("posts").add(uploadData);
         checkTodayStatus();
     } catch(e) { 
-        alert("เกิดข้อผิดพลาดในระบบสุ่ม กรุณาลองใหม่อีกครั้งค่ะ"); 
+        alert("เกิดข้อผิดพลาดในการสุ่มจัดเกรดกรุณาลองใหม่ค่ะ"); 
     }
 }
 
@@ -363,7 +389,7 @@ async function searchAssetDays() {
             let found = false;
             for(let user of ['kw', 'su']) {
                 const uData = parseUserData(user, d);
-                for(let i=1; i<=3; i++) {
+                for(let i=1; i<=4; i++) {
                     if(uData[`p${i}`] && uData[`p${i}`].name.includes(key)) found = true;
                 }
             }
@@ -384,21 +410,13 @@ async function saveData() {
     if(!db) return;
     let updateData = {};
     
-    for(let i=1; i<=3; i++) {
+    for(let i=1; i<=4; i++) {
         updateData[`kw.p${i}.time`] = document.getElementById(`kw_t${i}`).value;
         updateData[`kw.p${i}.name`] = document.getElementById(`kw_n${i}`).value;
         updateData[`kw.p${i}.num`] = Number(document.getElementById(`kw_num${i}`).value);
         updateData[`su.p${i}.time`] = document.getElementById(`su_t${i}`).value;
         updateData[`su.p${i}.name`] = document.getElementById(`su_n${i}`).value;
         updateData[`su.p${i}.num`] = Number(document.getElementById(`su_num${i}`).value);
-        
-        // ล้างโครงสร้างเก่าเพื่อป้องกันปัญหาข้อมูลทับซ้อน
-        updateData[`kw.m`] = firebase.firestore.FieldValue.delete();
-        updateData[`kw.n`] = firebase.firestore.FieldValue.delete();
-        updateData[`kw.e`] = firebase.firestore.FieldValue.delete();
-        updateData[`su.m`] = firebase.firestore.FieldValue.delete();
-        updateData[`su.n`] = firebase.firestore.FieldValue.delete();
-        updateData[`su.e`] = firebase.firestore.FieldValue.delete();
     }
 
     try {
@@ -424,7 +442,7 @@ async function updateDashboard() {
             if(d.date && d.date.startsWith(month)) { 
                 for(let user of ['kw', 'su']) {
                     const uData = parseUserData(user, d);
-                    for(let i=1; i<=3; i++) {
+                    for(let i=1; i<=4; i++) {
                         if(uData[`p${i}`] && uData[`p${i}`].name) {
                             stats[uData[`p${i}`].name] = (stats[uData[`p${i}`].name] || 0) + (Number(uData[`p${i}`].num) || 0);
                         }
@@ -451,13 +469,13 @@ async function loadHistory() {
                 html += `<div class="history-card"><strong style="color:var(--text-dark); font-size:0.95rem;">🗓 วันที่ ${d.date}</strong> <button class="btn-action" style="display:inline-block; margin-left:10px;" onclick="editEntry('${doc.id}')">✏️</button> <button class="btn-action btn-delete" style="display:inline-block;" onclick="deleteEntry('${doc.id}')">🗑️</button>`;
                 
                 html += `<div style="color:var(--royal-navy); margin-top:12px; font-weight:bold; font-size:0.95rem;">👤 พี่ขวัญ</div>`;
-                for(let i=1; i<=3; i++) {
-                    if(kwData[`p${i}`]) html += `<div class="h-row" style="color:var(--text-dark)"><span>${kwData[`p${i}`].time || '--:--'}</span><span>${kwData[`p${i}`].name}</span><span><b>${kwData[`p${i}`].num}</b></span></div>`;
+                for(let i=1; i<=4; i++) {
+                    if(kwData[`p${i}`] && kwData[`p${i}`].name) html += `<div class="h-row" style="color:var(--text-dark)"><span>${kwData[`p${i}`].time || '--:--'}</span><span>${kwData[`p${i}`].name}</span><span><b>${kwData[`p${i}`].num}</b></span></div>`;
                 }
                 
                 html += `<div style="color:var(--royal-navy); margin-top:12px; font-weight:bold; font-size:0.95rem;">👤 พี่สุ</div>`;
-                for(let i=1; i<=3; i++) {
-                    if(suData[`p${i}`]) html += `<div class="h-row" style="color:var(--text-dark)"><span>${suData[`p${i}`].time || '--:--'}</span><span>${suData[`p${i}`].name}</span><span><b>${suData[`p${i}`].num}</b></span></div>`;
+                for(let i=1; i<=4; i++) {
+                    if(suData[`p${i}`] && suData[`p${i}`].name) html += `<div class="h-row" style="color:var(--text-dark)"><span>${suData[`p${i}`].time || '--:--'}</span><span>${suData[`p${i}`].name}</span><span><b>${suData[`p${i}`].num}</b></span></div>`;
                 }
                 html += `</div>`;
             } 
