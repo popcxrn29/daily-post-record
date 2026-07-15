@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Post Diary - Modern Luxury</title>
+    <title>Post Diary - Premium Auto-Sync</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght=400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -158,7 +158,7 @@
     </div>
 
     <div id="randomBox" class="card" style="display:block; text-align:center;">
-        <button class="btn-random" onclick="startRandom()">✨ สุ่มแผนงานวันนี้ (คนละ 4 ช่วงเวลา)</button>
+        <button class="btn-random" onclick="startRandom()">✨ ดึงแผนงานล็อกทรัพย์สินวันนี้</button>
     </div>
 
     <div id="inputSection" class="card" style="display: none;">
@@ -176,7 +176,6 @@
         </div>
     </div>
 
-    <!-- ปุ่มกดเปิด/ปิดหน้าต่างกระดานสรุปยอดตามสั่ง -->
     <button class="btn-toggle-dash" onclick="toggleDashboard()">📊 ดูยอดโพสต์ประจำเดือนนี้</button>
 
     <div id="dashBoard" class="card" style="display:none;">
@@ -203,59 +202,111 @@ try {
     }
 } catch (e) { console.error(e); }
 
+// ฐานข้อมูลทรัพย์สินเปิดใช้งานรวมถึง The IRIS พระราม 9 ด้วย
 const assetsDatabase = {
     AA: [
         "U DELIGHT 3 | ยู ดีไลท์ 3", 
-        "Happy condo รัชดา 18", 
+        "Happy Condo รัชดา 18", 
         "Plum Condo Rangsit Fresh : พลัมคอนโด รังสิต"
     ],
     A: [
         "บ้านพี่แดง อรัญนคร3", 
-        "คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว-โชคชัย4(ฝน)", 
-        "ที่ดิน หลังอรัญนคร 1 ซ.ประสบโชค", 
-        "ที่ดินพื้น 3 งาน", 
+        "คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", 
+        "ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", 
+        "ที่ดินพี่นุช 3 งาน", 
         "คอนโด The Base Park East Sukhumvit 77", 
         "คอนโด Aston", 
-        "ลุมพินี คอนโดทาวน์ รามอินทรา-หลักสี่", 
+        "ลุมพินี คอนโดทาวน์ รามอินทรา–หลักสี่", 
         "Plum Condo นวมินทร์", 
-        "Lumpini Ville แบริ่ง-ลาซาล", 
-        "กรีเน่ คอนโด ตอนเมือง-สรงประภา", 
-        "กรีเน่ คอนโด ตอนเมือง-สรงประภา เฟส 1", 
+        "Lumpini Ville แบริ่ง–ลาซาล", 
+        "กรีน คอนโด ดอนเมือง–สรงประภา", 
+        "กรีน คอนโด ดอนเมือง–สรงประภา เฟส 1", 
         "Kensington Place แจ้งวัฒนะ 13", 
-        "ลุมพินี คอนโดทาวน์ รามอินทรา - ลาดปลาเค้า 2", 
-        "The IRIS พระราม 9", 
-        "ทาวน์โฮม 3 ชั้น 4 ห้องนอน 4 ห้องน้ำ"
+        "ลุมพินี คอนโดทาวน์ รามอินทรา–ลาดปลาเค้า 2", 
+        "ทาวน์โฮม 3 ชั้น 4 ห้องนอน 4 ห้องน้ำ",
+        "The IRIS พระราม 9"
     ],
     B: [
         "แม่ย่าพี่ปลา 14 ไร่", 
         "แม่ย่าพี่ปลา 11 ไร่", 
-        "ที่ดินน้าจิต วังน้ำเย็น", 
-        "ทด.ป่าใย ท่าข้าม", 
-        "บ้านอรัญนคร 1 (คุณแคท )", 
+        "ที่ดินน้ำจืด วังน้ำเย็น", 
+        "ทด.ป้าย ท่าข้าม", 
+        "บ้านอรัญนคร 1 (คุณแคท)", 
         "บ้านพี่หนึ่ง อรัญวิลล์", 
         "ที่ดิน (โบท)", 
         "ที่ดินบ้านนา นครนายก", 
         "บ้านพรสิริ ขอนแก่น", 
         "BANGKOK HORIZON รามคำแหง", 
-        "บ้านทาวน์โฮม พฤกษา 9- รังสิต คลอง 3", 
-        "บ้านเอื้ออาทรอรัญประเทศ"
+        "บ้านทาวน์โฮม พฤกษา 9–รังสิต คลอง 3"
     ]
 };
 
-const mandatoryAssets = ["U DELIGHT 3 | ยู ดีไลท์ 3", "Happy condo รัชดา 18"];
+// บัญชีดำของทรัพย์สินที่คัดออก (เอา "THE IRIS" / "iris" ออกไปเพื่อให้ผ่านการตรวจสอบได้)
+const banList = [
+    "ศรีไพร", "นิมิตใหม่", "ห้องเช่า 3 ห้อง", "ห้องเช่า 9 ห้อง", "ราชพัสดุ", 
+    "บ้านเอื้อ", "บ้านเอื้ื้อ", "โกดัง", "ศรีวราห์"
+];
+
+function isBanned(name) {
+    if (!name) return false;
+    return banList.some(bannedWord => name.toLowerCase().includes(bannedWord.toLowerCase()));
+}
+
+const excelSchedules = {
+    "2026-07-13": {
+        kw: ["บ้านพี่แดง อรัญนคร3", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 14 ไร่"],
+        su: ["คอนโด Aston", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 14 ไร่"],
+        kw_times: ["10:00", "12:15", "18:30", "20:30"],
+        su_times: ["11:00", "13:30", "19:00", "21:00"]
+    },
+    "2026-07-14": {
+        kw: ["บ้านอรัญนคร 1 (คุณแคท)", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 11 ไร่"],
+        su: ["Kensington Place แจ้งวัฒนะ 13", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 11 ไร่"],
+        kw_times: ["10:00", "12:15", "18:30", "20:30"],
+        su_times: ["11:00", "13:30", "19:00", "21:00"]
+    },
+    "2026-07-15": {
+        kw: ["คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", "ที่ดินน้ำจืด วังน้ำเย็น"],
+        su: ["Plum Condo นวมินทร์", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินน้ำจืด วังน้ำเย็น"],
+        kw_times: ["10:00", "12:15", "18:30", "20:30"],
+        su_times: ["11:00", "13:30", "19:00", "21:00"]
+    },
+    "2026-07-16": {
+        kw: ["คอนโด Aston", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ทด.ป้าย ท่าข้าม"],
+        su: ["BANGKOK HORIZON รามคำแหง", "U DELIGHT 3 | ยู ดีไลท์ 3", "กรีน คอนโด ดอนเมือง–สรงประภา", "ทด.ป้าย ท่าข้าม"],
+        kw_times: ["10:00", "12:15", "18:30", "20:30"],
+        su_times: ["11:00", "13:30", "19:00", "21:00"]
+    },
+    "2026-07-17": {
+        kw: ["BANGKOK HORIZON รามคำแหง", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพี่หนึ่ง อรัญวิลล์"],
+        su: ["ลุมพินี คอนโดทาวน์ รามอินทรา–ลาดปลาเค้า 2", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพี่หนึ่ง อรัญวิลล์"],
+        kw_times: ["10:00", "12:15", "18:30", "20:30"],
+        su_times: ["11:00", "13:30", "19:00", "21:00"]
+    }
+};
+
 let currentDocId = null;
+
+function getAssetGrade(name) {
+    for (let grade in assetsDatabase) {
+        if (assetsDatabase[grade].some(item => name.toLowerCase().includes(item.toLowerCase()) || item.toLowerCase().includes(name.toLowerCase()))) {
+            return grade;
+        }
+    }
+    return "A";
+}
+
+function getRandomReplacement(grade, excludeList) {
+    let pool = assetsDatabase[grade] || assetsDatabase.A;
+    let filtered = pool.filter(x => !excludeList.includes(x));
+    if (filtered.length === 0) filtered = pool;
+    return filtered[Math.floor(Math.random() * filtered.length)] || "คอนโด Aston";
+}
 
 function parseUserData(user, data) {
     let parsed = {};
     if (!data || !data[user]) return parsed;
     if (data[user].p1) return data[user];
-    
-    if (data[user].m || data[user].n || data[user].e) {
-        parsed.p1 = { name: data[user].m?.name || "เช้า", time: data[user].m?.time || "", num: Number(data[user].m?.num) || 0 };
-        parsed.p2 = { name: data[user].n?.name || "เที่ยง", time: data[user].n?.time || "", num: Number(data[user].n?.num) || 0 };
-        parsed.p3 = { name: data[user].e?.name || "เย็น", time: data[user].e?.time || "", num: Number(data[user].e?.num) || 0 };
-        parsed.p4 = { name: "", time: "", num: 0 };
-    }
     return parsed;
 }
 
@@ -291,7 +342,7 @@ async function checkTodayStatus() {
     
     document.getElementById("randomBox").style.display = "block";
     document.getElementById("inputSection").style.display = "none";
-    document.getElementById("dashBoard").style.display = "none"; // ปิดกระดานสรุปไว้ก่อนเสมอ
+    document.getElementById("dashBoard").style.display = "none";
     if(!db) return;
 
     try {
@@ -315,60 +366,48 @@ async function startRandom() {
     if(!db) return;
 
     try {
-        let lastKwAssets = [];
-        const yesterday = new Date(dateVal);
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yyyymmdd_1 = yesterday.toISOString().split('T')[0];
+        let schedule = excelSchedules[dateVal];
+        
+        if (!schedule) {
+            schedule = {
+                kw: ["บ้านพี่แดง อรัญนคร3", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 14 ไร่"],
+                su: ["คอนโด Aston", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 14 ไร่"],
+                kw_times: ["10:00", "12:15", "18:30", "20:30"],
+                su_times: ["11:00", "13:30", "19:00", "21:00"]
+            };
+        }
 
-        const prevSnap = await db.collection("posts").where("date", "==", yyyymmdd_1).get();
-        if (!prevSnap.empty) {
-            const prevData = prevSnap.docs[0].data();
-            if (prevData.kw) {
-                for(let i=1; i<=4; i++) {
-                    if(prevData.kw[`p${i}`]) lastKwAssets.push(prevData.kw[`p${i}`].name);
+        let kw_final = [];
+        let su_final = [];
+        let usedToday = [];
+
+        function processSchedule(list, targetArray) {
+            list.forEach(item => {
+                if (isBanned(item)) {
+                    let grade = getAssetGrade(item);
+                    let replacement = getRandomReplacement(grade, usedToday);
+                    targetArray.push(replacement);
+                    usedToday.push(replacement);
+                } else {
+                    targetArray.push(item);
+                    usedToday.push(item);
                 }
-            }
+            });
         }
 
-        let poolAA = [...assetsDatabase.AA].sort(() => 0.5 - Math.random());
-        let poolA = [...assetsDatabase.A].sort(() => 0.5 - Math.random());
-        let poolB = [...assetsDatabase.B].sort(() => 0.5 - Math.random());
-
-        let normalPool = [...poolAA, ...poolA, ...poolB];
-        normalPool = normalPool.filter(x => !mandatoryAssets.includes(x));
-
-        let finalSelection = [];
-        while(finalSelection.length < 6 && normalPool.length > 0) {
-            finalSelection.push(normalPool.shift());
-        }
-
-        let kw_picks = [];
-        let su_picks = [];
-
-        if (lastKwAssets.includes(mandatoryAssets[0])) {
-            kw_picks.push(mandatoryAssets[1]);
-            su_picks.push(mandatoryAssets[0]);
-        } else {
-            kw_picks.push(mandatoryAssets[0]);
-            su_picks.push(mandatoryAssets[1]);
-        }
-
-        kw_picks.push(finalSelection[0], finalSelection[1], finalSelection[2]);
-        su_picks.push(finalSelection[3], finalSelection[4], finalSelection[5]);
-
-        kw_picks.sort(() => 0.5 - Math.random());
-        su_picks.sort(() => 0.5 - Math.random());
+        processSchedule(schedule.kw, kw_final);
+        processSchedule(schedule.su, su_final);
 
         let uploadData = { date: dateVal, kw: {}, su: {} };
         for(let i=1; i<=4; i++) {
-            uploadData.kw[`p${i}`] = { name: kw_picks[i-1], time: "", num: 0 };
-            uploadData.su[`p${i}`] = { name: su_picks[i-1], time: "", num: 0 };
+            uploadData.kw[`p${i}`] = { name: kw_final[i-1], time: schedule.kw_times[i-1] || "", num: 0 };
+            uploadData.su[`p${i}`] = { name: su_final[i-1], time: schedule.su_times[i-1] || "", num: 0 };
         }
         
         await db.collection("posts").add(uploadData);
         checkTodayStatus();
     } catch(e) { 
-        alert("เกิดข้อผิดพลาดในการสุ่มจัดเกรดกรุณาลองใหม่ค่ะ"); 
+        alert("เกิดข้อผิดพลาดในการโหลดข้อมูลตารางงาน กรุณาลองใหม่ค่ะ"); 
     }
 }
 
@@ -417,16 +456,15 @@ async function saveData() {
 
     try {
         await db.collection("posts").doc(currentDocId).update(updateData); 
-        alert("✨ บันทึกข้อมูลประจำวันเรียบร้อยแล้วค่ะ!"); 
+        alert("✨ บันทึกยอดสะสมประจำวันเรียบร้อยแล้วค่ะ!"); 
         checkTodayStatus(); 
     } catch(err) {
-        alert("เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้งค่ะ");
+        alert("เกิดข้อผิดพลาดในการบันทึก กรุณาลองใหม่อีกครั้งค่ะ");
     }
 }
 
 async function restoreBackupData() { if(!db) return; checkTodayStatus(); }
 
-// ฟังก์ชันกดเปิด-ปิด แสดงหน้ากระดานเมื่อต้องการดูยอดโพสต์
 async function toggleDashboard() {
     const dashBox = document.getElementById("dashBoard");
     if (dashBox.style.display === "block") {
