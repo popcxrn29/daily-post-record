@@ -141,7 +141,7 @@
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         
-        .btn-action { border: none; background: #F2F4F4; color: var(--royal-navy); padding: 7px; font-size: 0.85rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-action { border: none; background: #F2F4F4; color: var(--royal-navy); padding: 7px; font-size: 0.85rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
         .btn-action:hover { background: var(--rose-gold-light); color: var(--rose-gold); }
         .btn-delete { background: #FADBD8; color: #CB4335; }
         
@@ -217,7 +217,7 @@ try {
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
     }
-} catch (e) { alert("เชื่อมต่อฐานข้อมูลไม่สำเร็จ: " + e.message); }
+} catch (e) { console.error("เชื่อมต่อ Firebase ไม่สำเร็จ: ", e); }
 
 const assetsDatabase = {
     AA: ["U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18"],
@@ -285,8 +285,9 @@ function parseUserData(user, data) {
     let parsed = {};
     if (!data) return parsed;
     
+    // ดึงค่าแบบ Nested Map
     if (data[user] && typeof data[user] === 'object') {
-        for (let i = 1; i <= 5; i++) {
+        for (let i = 1; i <= 4; i++) {
             let pKey = `p${i}`;
             if (data[user][pKey]) {
                 parsed[pKey] = {
@@ -298,7 +299,8 @@ function parseUserData(user, data) {
         }
     }
     
-    for (let i = 1; i <= 5; i++) {
+    // ดึงค่าแบบ Flat
+    for (let i = 1; i <= 4; i++) {
         let pKey = `p${i}`;
         
         let nameVal = "";
@@ -354,6 +356,7 @@ function parseUserData(user, data) {
 
 function generateInputRows(user, data) {
     const container = document.getElementById(`${user}_rows`);
+    if (!container) return;
     container.innerHTML = "";
     const uData = parseUserData(user, data);
     
@@ -452,7 +455,7 @@ async function startRandom() {
         await db.collection("posts").add(uploadData);
         await checkTodayStatus();
     } catch(e) { 
-        alert("เกิดข้อผิดพลาดในการดึงตารางงาน: " + e.message); 
+        alert("เกิดข้อผิดพลาดในการสุ่ม: " + e.message); 
     } finally {
         btn.disabled = false;
         btn.innerText = "✨ ดึงแผนงานล็อกทรัพย์สินวันนี้";
@@ -473,7 +476,7 @@ async function searchAssetDays() {
             const kwData = parseUserData("kw", d);
             const suData = parseUserData("su", d);
             
-            for(let i=1; i<=5; i++) {
+            for(let i=1; i<=4; i++) {
                 if(kwData[`p${i}`] && kwData[`p${i}`].name && kwData[`p${i}`].name.includes(key)) found = true;
                 if(suData[`p${i}`] && suData[`p${i}`].name && suData[`p${i}`].name.includes(key)) found = true;
             }
@@ -490,9 +493,8 @@ async function searchAssetDays() {
     } catch(e) { alert("ค้นหาผิดพลาด: " + e.message); }
 }
 
-// 🔧 แก้ไขฟังก์ชันบันทึกข้อมูลให้บันทึกครอบคลุมโครงสร้างทั้ง 2 แบบเพื่อไม่ให้ชื่อเด้งกลับ
 async function saveData() { 
-    if(!db) return;
+    if(!db || !currentDocId) { alert("ไม่พบข้อมูลเอกสารสำหรับบันทึกวันนี้ค่ะ"); return; }
     let updateData = {};
     
     for(let i=1; i<=4; i++) {
@@ -504,7 +506,7 @@ async function saveData() {
         const su_n = document.getElementById(`su_n${i}`).value;
         const su_num = Number(document.getElementById(`su_num${i}`).value);
 
-        // 1️⃣ เขียนข้อมูลแบบ Flat-level (สำหรับโครงสร้างแบบราบ)
+        // 1. เขียนแบบ Flat-level
         updateData[`kw_t${i}`] = kw_t;
         updateData[`kw_n${i}`] = kw_n;
         updateData[`kw_num${i}`] = kw_num;
@@ -513,7 +515,7 @@ async function saveData() {
         updateData[`su_n${i}`] = su_n;
         updateData[`su_num${i}`] = su_num;
 
-        // 2️⃣ เขียนข้อมูลแบบ Nested Object Map (สำหรับโครงสร้างแบบย่อย kw.p1) ป้องกันการดึงค่าเดิมกลับมาแสดง
+        // 2. เขียนแบบ Nested Object Map ป้องกันชื่อเด้งกลับ
         updateData[`kw.p${i}.time`] = kw_t;
         updateData[`kw.p${i}.name`] = kw_n;
         updateData[`kw.p${i}.num`] = kw_num;
@@ -526,7 +528,7 @@ async function saveData() {
     try {
         await db.collection("posts").doc(currentDocId).update(updateData); 
         alert("✨ บันทึกยอดสะสมประจำวันเรียบร้อยแล้วค่ะ!"); 
-        checkTodayStatus(); 
+        await checkTodayStatus(); 
     } catch(err) {
         alert("เกิดข้อผิดพลาดในการบันทึก: " + err.message);
     }
@@ -536,6 +538,7 @@ async function restoreBackupData() { checkTodayStatus(); }
 
 async function toggleDashboard() {
     const dashBox = document.getElementById("dashBoard");
+    if (!dashBox) return;
     if (dashBox.style.display === "block") {
         dashBox.style.display = "none";
         return;
@@ -552,7 +555,7 @@ async function toggleDashboard() {
             if(d.date && d.date.startsWith(month)) { 
                 for(let user of ['kw', 'su']) {
                     const uData = parseUserData(user, d);
-                    for(let i=1; i<=5; i++) {
+                    for(let i=1; i<=4; i++) {
                         if(uData[`p${i}`] && uData[`p${i}`].name && uData[`p${i}`].name !== "ไม่มีแผนงานลงโพสต์") {
                             stats[uData[`p${i}`].name] = (stats[uData[`p${i}`].name] || 0) + (Number(uData[`p${i}`].num) || 0);
                         }
@@ -580,7 +583,7 @@ async function exportFirebaseToExcel() {
             const kwData = parseUserData("kw", d);
             const suData = parseUserData("su", d);
             
-            for(let i=1; i<=5; i++) {
+            for(let i=1; i<=4; i++) {
                 if(kwData[`p${i}`] && kwData[`p${i}`].name) {
                     excelRows.push({
                         "วันที่": d.date,
@@ -593,7 +596,7 @@ async function exportFirebaseToExcel() {
                 }
             }
             
-            for(let i=1; i<=5; i++) {
+            for(let i=1; i<=4; i++) {
                 if(suData[`p${i}`] && suData[`p${i}`].name) {
                     excelRows.push({
                         "วันที่": d.date,
@@ -613,4 +616,74 @@ async function exportFirebaseToExcel() {
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "ประวัติยอดโพสต์สะสม");
         
-        worksheet['!cols'] =
+        worksheet['!cols'] = [{ wch: 15 }, { wch: 12 }, { wch: 12 }, { wch: 15 }, { wch: 45 }, { wch: 22 }];
+        XLSX.writeFile(workbook, `ประวัติยอดโพสต์_Firebase_${new Date().toISOString().slice(0,10)}.xlsx`);
+        alert("🟢 ดาวน์โหลดไฟล์ประวัติ Excel เรียบร้อยแล้วค่ะ!");
+    } catch (error) { alert("เกิดข้อผิดพลาดในการส่งออก Excel: " + error.message); }
+}
+
+async function loadHistory() {
+    if(!db) return;
+    try {
+        const snap = await db.collection("posts").orderBy("date", "desc").limit(10).get(); 
+        let html = ""; 
+        snap.forEach(doc => { 
+            const d = doc.data(); 
+            if(d.date) {
+                const kwData = parseUserData("kw", d);
+                const suData = parseUserData("su", d);
+                
+                html += `<div class="history-card">
+                    <strong style="color:var(--text-dark); font-size:0.95rem;">🗓 วันที่ ${d.date}</strong> 
+                    <button class="btn-action" style="margin-left:10px;" onclick="editEntry('${doc.id}')">✏️</button> 
+                    <button class="btn-action btn-delete" onclick="deleteEntry('${doc.id}')">🗑️</button>
+                    
+                    <div style="color:var(--royal-navy); margin-top:12px; font-weight:bold; font-size:0.95rem;">👤 พี่ขวัญ</div>`;
+                for(let i=1; i<=4; i++) {
+                    if(kwData[`p${i}`] && kwData[`p${i}`].name) {
+                        html += `<div class="h-row" style="color:var(--text-dark)"><span>${kwData[`p${i}`].time || '--:--'}</span><span>${kwData[`p${i}`].name}</span><span><b>${kwData[`p${i}`].num}</b></span></div>`;
+                    }
+                }
+                
+                html += `<div style="color:var(--royal-navy); margin-top:12px; font-weight:bold; font-size:0.95rem;">👤 พี่สุ</div>`;
+                for(let i=1; i<=4; i++) {
+                    if(suData[`p${i}`] && suData[`p${i}`].name) {
+                        html += `<div class="h-row" style="color:var(--text-dark)"><span>${suData[`p${i}`].time || '--:--'}</span><span>${suData[`p${i}`].name}</span><span><b>${suData[`p${i}`].num}</b></span></div>`;
+                    }
+                }
+                html += `</div>`;
+            } 
+        });
+        document.getElementById("historyList").innerHTML = html;
+    } catch (e) { console.error(e); }
+}
+
+async function editEntry(id) { 
+    if(!db) return; 
+    try {
+        const doc = await db.collection("posts").doc(id).get(); 
+        if(doc.exists) {
+            document.getElementById("date").value = doc.data().date; 
+            checkTodayStatus(); 
+        }
+    } catch (e) { console.error(e); }
+}
+
+async function deleteEntry(id) { 
+    if(!db) return; 
+    if(confirm("ต้องการลบประวัติรายการนี้ใช่ไหม?")) { 
+        try {
+            await db.collection("posts").doc(id).delete(); 
+            checkTodayStatus(); 
+        } catch (e) { alert("ลบข้อมูลไม่สำเร็จ: " + e.message); }
+    } 
+}
+
+window.onload = () => { 
+    const now = new Date(); 
+    document.getElementById("date").value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`; 
+    checkTodayStatus();
+};
+</script>
+</body>
+</html>
