@@ -107,6 +107,7 @@
             padding: 14px; border-radius: 16px; width: 100%; font-weight: 700; font-size: 1rem; cursor: pointer;
             box-shadow: 0 4px 15px rgba(27, 79, 114, 0.2);
         }
+        .btn-random:disabled { background: #BDC3C7; cursor: not-allowed; box-shadow: none; }
         
         .btn-save { 
             background: linear-gradient(135deg, var(--royal-navy), #2471A3); color: #FFFFFF; border: none; 
@@ -158,7 +159,7 @@
     </div>
 
     <div id="randomBox" class="card" style="display:block; text-align:center;">
-        <button class="btn-random" onclick="startRandom()">✨ ดึงแผนงานล็อกทรัพย์สินวันนี้</button>
+        <button id="btnRandomAction" class="btn-random" onclick="startRandom()">✨ ดึงแผนงานล็อกทรัพย์สินวันนี้</button>
     </div>
 
     <div id="inputSection" class="card" style="display: none;">
@@ -190,8 +191,6 @@
 <script src="https://unpkg.com/firebase@10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-window.onerror = function(message, source, lineno, colno, error) { return true; };
-
 const firebaseConfig = { apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI", authDomain: "save-data-92eca.firebaseapp.com", projectId: "save-data-92eca", storageBucket: "save-data-92eca.firebasestorage.app", messagingSenderId: "661096454777", appId: "1:661096454777:web:d8b4297db798e14b76d2a8" };
 
 let db = null;
@@ -200,48 +199,15 @@ try {
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
     }
-} catch (e) { console.error(e); }
+} catch (e) { alert("เชื่อมต่อฐานข้อมูลภายนอกไม่สำเร็จ: " + e.message); }
 
-// ฐานข้อมูลทรัพย์สินเปิดใช้งานที่อัปเดตใหม่ล่าสุด (เอาทรัพย์สินที่สั่งคัดออกเรียบร้อยแล้ว)
 const assetsDatabase = {
-    AA: [
-        "U DELIGHT 3 | ยู ดีไลท์ 3", 
-        "Happy Condo รัชดา 18"
-    ],
-    A: [
-        "บ้านพี่แดง อรัญนคร3", 
-        "คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", 
-        "ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", 
-        "ที่ดินพี่นุช 3 งาน", 
-        "คอนโด The Base Park East Sukhumvit 77", 
-        "Plum Condo นวมินทร์", 
-        "Lumpini Ville แบริ่ง–ลาซาล", 
-        "กรีน คอนโด ดอนเมือง–สรงประภา", 
-        "กรีน คอนโด ดอนเมือง–สรงประภา เฟส 1", 
-        "ลุมพินี คอนโดทาวน์ รามอินทรา–ลาดปลาเค้า 2", 
-        "ทาวน์โฮม 3 ชั้น 4 ห้องนอน 4 ห้องน้ำ",
-        "The IRIS พระราม 9"
-    ],
-    B: [
-        "แม่ย่าพี่ปลา 14 ไร่", 
-        "แม่ย่าพี่ปลา 11 ไร่", 
-        "ที่ดินน้ำจืด วังน้ำเย็น", 
-        "ทด.ป้าย ท่าข้าม", 
-        "บ้านอรัญนคร 1 (คุณแคท)", 
-        "บ้านพี่หนึ่ง อรัญวิลล์", 
-        "ที่ดินบ้านนา นครนายก", 
-        "บ้านพรสิริ ขอนแก่น", 
-        "BANGKOK HORIZON รามคำแหง", 
-        "บ้านทาวน์โฮม พฤกษา 9–รังสิต คลอง 3"
-    ]
+    AA: ["U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18"],
+    A: ["บ้านพี่แดง อรัญนคร3", "คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", "ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", "ที่ดินพี่นุช 3 งาน", "คอนโด The Base Park East Sukhumvit 77", "Plum Condo นวมินทร์", "Lumpini Ville แบริ่ง–ลาซาล", "กรีน คอนโด ดอนเมือง–สรงประภา", "กรีน คอนโด ดอนเมือง–สรงประภา เฟส 1", "ลุมพินี คอนโดทาวน์ รามอินทรา–ลาดปลาเค้า 2", "ทาวน์โฮม 3 ชั้น 4 ห้องนอน 4 ห้องน้ำ", "The IRIS พระราม 9"],
+    B: ["แม่ย่าพี่ปลา 14 ไร่", "แม่ย่าพี่ปลา 11 ไร่", "ที่ดินน้ำจืด วังน้ำเย็น", "ทด.ป้าย ท่าข้าม", "บ้านอรัญนคร 1 (คุณแคท)", "บ้านพี่หนึ่ง อรัญวิลล์", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "BANGKOK HORIZON รามคำแหง", "บ้านทาวน์โฮม พฤกษา 9–รังสิต คลอง 3"]
 };
 
-// บัญชีดำของทรัพย์สินที่ห้ามโผล่เข้าแผนงาน (อัปเดตชุดใหม่)
-const banList = [
-    "ศรีไพร", "นิมิตใหม่", "ห้องเช่า 3 ห้อง", "ห้องเช่า 9 ห้อง", "ราชพัสดุ", 
-    "บ้านเอื้อ", "บ้านเอื้ื้อ", "โกดัง", "ศรีวราห์", "โบท", "Aston", "รามอินทรา-หลักสี่",
-    "Kensington Place", "Rangsit Fresh"
-];
+const banList = ["ศรีไพร", "นิมิตใหม่", "ห้องเช่า 3 ห้อง", "ห้องเช่า 9 ห้อง", "ราชพัสดุ", "บ้านเอื้อ", "บ้านเอื้ื้อ", "โกดัง", "ศรีวราห์", "โบท", "Aston", "รามอินทรา-หลักสี่", "Kensington Place", "Rangsit Fresh"];
 
 function isBanned(name) {
     if (!name) return false;
@@ -249,36 +215,11 @@ function isBanned(name) {
 }
 
 const excelSchedules = {
-    "2026-07-13": {
-        kw: ["บ้านพี่แดง อรัญนคร3", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 14 ไร่"],
-        su: ["คอนโด Aston", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 14 ไร่"],
-        kw_times: ["10:00", "12:15", "18:30", "20:30"],
-        su_times: ["11:00", "13:30", "19:00", "21:00"]
-    },
-    "2026-07-14": {
-        kw: ["บ้านอรัญนคร 1 (คุณแคท)", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 11 ไร่"],
-        su: ["Kensington Place แจ้งวัฒนะ 13", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 11 ไร่"],
-        kw_times: ["10:00", "12:15", "18:30", "20:30"],
-        su_times: ["11:00", "13:30", "19:00", "21:00"]
-    },
-    "2026-07-15": {
-        kw: ["คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", "ที่ดินน้ำจืด วังน้ำเย็น"],
-        su: ["Plum Condo นวมินทร์", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินน้ำจืด วังน้ำเย็น"],
-        kw_times: ["10:00", "12:15", "18:30", "20:30"],
-        su_times: ["11:00", "13:30", "19:00", "21:00"]
-    },
-    "2026-07-16": {
-        kw: ["คอนโด Aston", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ทด.ป้าย ท่าข้าม"],
-        su: ["BANGKOK HORIZON รามคำแหง", "U DELIGHT 3 | ยู ดีไลท์ 3", "กรีน คอนโด ดอนเมือง–สรงประภา", "ทด.ป้าย ท่าข้าม"],
-        kw_times: ["10:00", "12:15", "18:30", "20:30"],
-        su_times: ["11:00", "13:30", "19:00", "21:00"]
-    },
-    "2026-07-17": {
-        kw: ["BANGKOK HORIZON รามคำแหง", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพี่หนึ่ง อรัญวิลล์"],
-        su: ["ลุมพินี คอนโดทาวน์ รามอินทรา–ลาดปลาเค้า 2", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพี่หนึ่ง อรัญวิลล์"],
-        kw_times: ["10:00", "12:15", "18:30", "20:30"],
-        su_times: ["11:00", "13:30", "19:00", "21:00"]
-    }
+    "2026-07-13": { kw: ["บ้านพี่แดง อรัญนคร3", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 14 ไร่"], su: ["คอนโด Aston", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 14 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-14": { kw: ["บ้านอรัญนคร 1 (คุณแคท)", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 11 ไร่"], su: ["Kensington Place แจ้งวัฒนะ 13", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 11 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-15": { kw: ["คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", "ที่ดินน้ำจืด วังน้ำเย็น"], su: ["Plum Condo นวมินทร์", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินน้ำจืด วังน้ำเย็น"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-16": { kw: ["คอนโด Aston", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ทด.ป้าย ท่าข้าม"], su: ["BANGKOK HORIZON รามคำแหง", "U DELIGHT 3 | ยู ดีไลท์ 3", "กรีน คอนโด ดอนเมือง–สรงประภา", "ทด.ป้าย ท่าข้าม"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-17": { kw: ["BANGKOK HORIZON รามคำแหง", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพี่หนึ่ง อรัญวิลล์"], su: ["ลุมพินี คอนโดทาวน์ รามอินทรา–ลาดปลาเค้า 2", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพี่หนึ่ง อรัญวิลล์"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] }
 };
 
 let currentDocId = null;
@@ -353,17 +294,20 @@ async function checkTodayStatus() {
             generateInputRows("su", d);
         }
         loadHistory();
-    } catch (e) { console.error(e); }
+    } catch (e) { alert("โหลดข้อมูลผิดพลาด: " + e.message); }
 }
 
 async function startRandom() {
     const dateVal = document.getElementById("date").value;
-    if(!dateVal) return;
-    if(!db) return;
+    if(!dateVal) { alert("กรุณาเลือกวันที่ก่อนกดสุ่มค่ะ"); return; }
+    if(!db) { alert("ไม่สามารถติดต่อ Firebase ได้"); return; }
+
+    const btn = document.getElementById("btnRandomAction");
+    btn.disabled = true;
+    btn.innerText = "⏳ กำลังดึงข้อมูลและล็อกแผนงาน...";
 
     try {
         let schedule = excelSchedules[dateVal];
-        
         if (!schedule) {
             schedule = {
                 kw: ["บ้านพี่แดง อรัญนคร3", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 14 ไร่"],
@@ -401,9 +345,12 @@ async function startRandom() {
         }
         
         await db.collection("posts").add(uploadData);
-        checkTodayStatus();
+        await checkTodayStatus();
     } catch(e) { 
-        alert("เกิดข้อผิดพลาดในการโหลดข้อมูลตารางงาน กรุณาลองใหม่ค่ะ"); 
+        alert("เกิดข้อผิดพลาดในการสุ่มและบันทึกข้อมูล: " + e.message); 
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "✨ ดึงแผนงานล็อกทรัพย์สินวันนี้";
     }
 }
 
@@ -432,4 +379,102 @@ async function searchAssetDays() {
         if(matchDates.length > 0) {
             resBox.innerHTML = `<strong>📌 วันที่เคยลงโพสต์ของ "${key}":</strong><br>` + matchDates.map(d => `• ${d}`).join('<br>');
         } else {
-            resBox.innerHTML = `❌ ไม่พบประวัติการบันทึกของทรัพย์สินชื่อ "${key}"
+            resBox.innerHTML = `❌ ไม่พบประวัติการบันทึกของทรัพย์สินชื่อ "${key}"`;
+        }
+    } catch(e) { alert("ค้นหาผิดพลาด: " + e.message); }
+}
+
+async function saveData() { 
+    if(!db) return;
+    let updateData = {};
+    
+    for(let i=1; i<=4; i++) {
+        updateData[`kw.p${i}.time`] = document.getElementById(`kw_t${i}`).value;
+        updateData[`kw.p${i}.name`] = document.getElementById(`kw_n${i}`).value;
+        updateData[`kw.p${i}.num`] = Number(document.getElementById(`kw_num${i}`).value);
+        updateData[`su.p${i}.time`] = document.getElementById(`su_t${i}`).value;
+        updateData[`su.p${i}.name`] = document.getElementById(`su_n${i}`).value;
+        updateData[`su.p${i}.num`] = Number(document.getElementById(`su_num${i}`).value);
+    }
+
+    try {
+        await db.collection("posts").doc(currentDocId).update(updateData); 
+        alert("✨ บันทึกยอดสะสมประจำวันเรียบร้อยแล้วค่ะ!"); 
+        checkTodayStatus(); 
+    } catch(err) {
+        alert("เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+    }
+}
+
+async function restoreBackupData() { checkTodayStatus(); }
+
+async function toggleDashboard() {
+    const dashBox = document.getElementById("dashBoard");
+    if (dashBox.style.display === "block") {
+        dashBox.style.display = "none";
+        return;
+    }
+    
+    if(!db) return;
+    try {
+        const dateInput = document.getElementById("date").value;
+        const month = dateInput.substring(0, 7); 
+        const snap = await db.collection("posts").get(); 
+        let stats = {}; 
+        snap.forEach(doc => { 
+            const d = doc.data(); 
+            if(d.date && d.date.startsWith(month)) { 
+                for(let user of ['kw', 'su']) {
+                    const uData = parseUserData(user, d);
+                    for(let i=1; i<=4; i++) {
+                        if(uData[`p${i}`] && uData[`p${i}`].name) {
+                            stats[uData[`p${i}`].name] = (stats[uData[`p${i}`].name] || 0) + (Number(uData[`p${i}`].num) || 0);
+                        }
+                    }
+                }
+            } 
+        });
+        document.getElementById("dashContent").innerHTML = Object.entries(stats).sort((a,b) => b[1]-a[1]).map(([n, c]) => `<div class="dash-item">${n}</div><div class="dash-item" style="text-align:right"><b>${c}</b></div>`).join('') || "ไม่มีข้อมูล";
+        dashBox.style.display = "block";
+    } catch (e) { alert("โหลดแดชบอร์ดผิดพลาด: " + e.message); }
+}
+
+async function loadHistory() {
+    if(!db) return;
+    try {
+        const snap = await db.collection("posts").orderBy("date", "desc").get(); 
+        let html = ""; 
+        snap.forEach(doc => { 
+            const d = doc.data(); 
+            if(d.date) {
+                const kwData = parseUserData("kw", d);
+                const suData = parseUserData("su", d);
+                
+                html += `<div class="history-card"><strong style="color:var(--text-dark); font-size:0.95rem;">🗓 วันที่ ${d.date}</strong> <button class="btn-action" style="display:inline-block; margin-left:10px;" onclick="editEntry('${doc.id}')">✏️</button> <button class="btn-action btn-delete" style="display:inline-block;" onclick="deleteEntry('${doc.id}')">🗑️</button>`;
+                
+                html += `<div style="color:var(--royal-navy); margin-top:12px; font-weight:bold; font-size:0.95rem;">👤 พี่ขวัญ</div>`;
+                for(let i=1; i<=4; i++) {
+                    if(kwData[`p${i}`] && kwData[`p${i}`].name) html += `<div class="h-row" style="color:var(--text-dark)"><span>${kwData[`p${i}`].time || '--:--'}</span><span>${kwData[`p${i}`].name}</span><span><b>${kwData[`p${i}`].num}</b></span></div>`;
+                }
+                
+                html += `<div style="color:var(--royal-navy); margin-top:12px; font-weight:bold; font-size:0.95rem;">👤 พี่สุ</div>`;
+                for(let i=1; i<=4; i++) {
+                    if(suData[`p${i}`] && suData[`p${i}`].name) html += `<div class="h-row" style="color:var(--text-dark)"><span>${suData[`p${i}`].time || '--:--'}</span><span>${suData[`p${i}`].name}</span><span><b>${suData[`p${i}`].num}</b></span></div>`;
+                }
+                html += `</div>`;
+            } 
+        });
+        document.getElementById("historyList").innerHTML = html;
+    } catch (e) { console.error(e); }
+}
+
+async function editEntry(id) { if(!db)return; const doc = await db.collection("posts").doc(id).get(); document.getElementById("date").value = doc.data().date; checkTodayStatus(); }
+async function deleteEntry(id) { if(!db)return; if(confirm("ต้องการลบประวัติรายการนี้ใช่ไหม?")) { await db.collection("posts").doc(id).delete(); checkTodayStatus(); } }
+
+window.onload = () => { 
+    const now = new Date(); document.getElementById("date").value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`; 
+    checkTodayStatus();
+};
+</script>
+</body>
+</html>
