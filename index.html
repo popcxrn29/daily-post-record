@@ -274,23 +274,12 @@ function getRandomReplacement(grade, excludeList) {
     return filtered[Math.floor(Math.random() * filtered.length)] || "คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4";
 }
 
-// 🔧 ฟังก์ชันแปลงค่าที่แก้ใหม่ ดึงโครงสร้างฐานข้อมูล Firebase ได้ทุกรูปแบบไม่ค้าง
+// 🔧 ฟังก์ชันตัวแก้ปัญหาหลัก: กวาดล้างและอ่านคีย์เก่าทุกรูปแบบ ไม่มีตกหล่น
 function parseUserData(user, data) {
     let parsed = {};
     if (!data) return parsed;
     
-    // แบบยิงตรงคีย์เดี่ยว (kw_n1, kw_t1) ฟอร์แมตดั้งเดิมของพี่ขวัญ
-    if (data[`${user}_n1`] !== undefined || data[`${user}_name1`] !== undefined) {
-        for (let i = 1; i <= 4; i++) {
-            let nameVal = data[`${user}_n${i}`] || data[`${user}_name${i}`] || "";
-            let timeVal = data[`${user}_t${i}`] || data[`${user}_time${i}`] || "";
-            let numVal = data[`${user}_num${i}`] !== undefined ? data[`${user}_num${i}`] : (data[`${user}_count${i}`] || 0);
-            parsed[`p${i}`] = { name: nameVal, time: timeVal, num: Number(numVal) };
-        }
-        return parsed;
-    }
-    
-    // แบบ Map Object วัตถุซ้อน (kw.p1.name)
+    // 1. ตรวจสอบโครงสร้างแบบ Map Object วัตถุซ้อนก่อน (เช่น data.kw.p1.name)
     if (data[user] && typeof data[user] === 'object') {
         for (let i = 1; i <= 4; i++) {
             if (data[user][`p${i}`]) {
@@ -299,12 +288,35 @@ function parseUserData(user, data) {
                     time: data[user][`p${i}`].time || "",
                     num: Number(data[user][`p${i}`].num) || 0
                 };
-            } else {
-                parsed[`p${i}`] = { name: "", time: "", num: 0 };
             }
         }
-        return parsed;
     }
+    
+    // 2. สแกนคีย์ระนาบแบนราบเดี่ยว (Flat Key) ทุกชื่อที่เป็นไปได้ใน Firebase แล้วเติมจุดที่ขาดหาย
+    for (let i = 1; i <= 4; i++) {
+        // หาชื่อทรัพย์สิน
+        let nameVal = data[`${user}_n${i}`] !== undefined ? data[`${user}_n${i}`] : 
+                      (data[`${user}_name${i}`] !== undefined ? data[`${user}_name${i}`] : "");
+        
+        // หาเวลาลงโพสต์
+        let timeVal = data[`${user}_t${i}`] !== undefined ? data[`${user}_t${i}`] : 
+                      (data[`${user}_time${i}`] !== undefined ? data[`${user}_time${i}`] : "");
+        
+        // หาจำนวนยอดโพสต์
+        let numVal = data[`${user}_num${i}`] !== undefined ? data[`${user}_num${i}`] : 
+                     (data[`${user}_count${i}`] !== undefined ? data[`${user}_count${i}`] : 0);
+        
+        // ถ้าในข้อ 1 ไม่มีข้อมูล ให้เอาค่าจากข้อ 2 ไปใช้ทันที
+        if (!parsed[`p${i}`]) {
+            parsed[`p${i}`] = { name: nameVal, time: timeVal, num: Number(numVal) };
+        } else {
+            // หากข้อ 1 มีอยู่แล้วแต่ค่าว่าง ให้เอาค่าจากข้อ 2 ช่วยเติมเต็ม
+            if (!parsed[`p${i}`].name) parsed[`p${i}`].name = nameVal;
+            if (!parsed[`p${i}`].time) parsed[`p${i}`].time = timeVal;
+            if (!parsed[`p${i}`].num) parsed[`p${i}`].num = Number(numVal);
+        }
+    }
+    
     return parsed;
 }
 
@@ -401,7 +413,6 @@ async function startRandom() {
         processSchedule(schedule.kw, kw_final);
         processSchedule(schedule.su, su_final);
 
-        // 📝 บันทึกแบบโครงสร้างแบนราบดั้งเดิมเพื่อซิงค์ระบบเก่าไม่ให้บั๊ก
         let uploadData = { date: dateVal };
         for(let i=1; i<=4; i++) {
             uploadData[`kw_n${i}`] = kw_final[i-1] || "ไม่มีแผนงานลงโพสต์";
@@ -458,7 +469,6 @@ async function saveData() {
     if(!db) return;
     let updateData = {};
     
-    // บันทึกกลับเข้า Firebase เป็นคีย์หลักมาตรฐานของระบบเดิม
     for(let i=1; i<=4; i++) {
         updateData[`kw_t${i}`] = document.getElementById(`kw_t${i}`).value;
         updateData[`kw_n${i}`] = document.getElementById(`kw_n${i}`).value;
