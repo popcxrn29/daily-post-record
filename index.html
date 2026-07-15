@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Post Diary - Premium Auto-Sync</title>
+    <title>Post Diary - Premium Ultimate Sync</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght=400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -15,6 +15,7 @@
             --rose-gold-light: #F9EBEA;
             --border-luxury: #E5E8E8;
             --shadow-luxury: 0 10px 30px rgba(27, 79, 114, 0.05);
+            --emerald-green: #27AE60;
         }
         
         body { 
@@ -121,8 +122,15 @@
         
         .btn-toggle-dash {
             background: linear-gradient(135deg, var(--rose-gold), #9A636C); color: #FFFFFF; border: none;
-            padding: 14px; border-radius: 16px; width: 100%; font-weight: 700; font-size: 1rem; cursor: pointer; margin-bottom: 16px;
+            padding: 14px; border-radius: 16px; width: 100%; font-weight: 700; font-size: 1rem; cursor: pointer; margin-bottom: 12px;
             box-shadow: 0 4px 12px rgba(180, 123, 132, 0.2);
+        }
+
+        .btn-export-excel {
+            background: linear-gradient(135deg, var(--emerald-green), #1E8449); color: #FFFFFF; border: none;
+            padding: 14px; border-radius: 16px; width: 100%; font-weight: 700; font-size: 1rem; cursor: pointer; margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.2);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         
         .btn-action { border: none; background: #F2F4F4; color: var(--royal-navy); padding: 7px; font-size: 0.85rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -137,7 +145,7 @@
         .h-row { display: grid; grid-template-columns: 65px 1fr 50px; padding: 8px 0; border-bottom: 1px dashed var(--border-luxury); align-items: center; }
         
         .search-box { display: flex; gap: 8px; }
-        .search-input { flex: 1; padding: 12px 16px; border: 1px solid var(--border-luxury); border-radius: 14px; font-size: 0.9rem; outline: none; background: #FAFAFA; color: var(--text-dark); }
+        .search-input { flex: 1; padding: 12px 16px; border: 1px solid var(--border-luxury); border-radius: 14px; font-size: 0.9 /rem; outline: none; background: #FAFAFA; color: var(--text-dark); }
         .btn-search { background: var(--royal-navy); color: white; border: none; padding: 0 20px; border-radius: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 10px rgba(27, 79, 114, 0.15); }
         .search-result { background: #EBF5FB; padding: 14px; border-radius: 16px; margin-top: 12px; font-size: 0.9rem; display: none; border: 1px solid #AED6F1; color: var(--royal-navy); }
     </style>
@@ -178,6 +186,8 @@
     </div>
 
     <button class="btn-toggle-dash" onclick="toggleDashboard()">📊 ดูยอดโพสต์ประจำเดือนนี้</button>
+    
+    <button class="btn-export-excel" onclick="exportFirebaseToExcel()">🟢 ดาวน์โหลดประวัติโพสต์ทั้งหมด (Excel)</button>
 
     <div id="dashBoard" class="card" style="display:none;">
         <div class="dash-title">📊 สรุปยอดรวมเดือนนี้</div>
@@ -189,6 +199,7 @@
 
 <script src="https://unpkg.com/firebase@10.7.1/firebase-app-compat.js"></script>
 <script src="https://unpkg.com/firebase@10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <script>
 const firebaseConfig = { apiKey: "AIzaSyCSncboyEoURJMOSx9fk8qEClmuQ_PgwDI", authDomain: "save-data-92eca.firebaseapp.com", projectId: "save-data-92eca", storageBucket: "save-data-92eca.firebasestorage.app", messagingSenderId: "661096454777", appId: "1:661096454777:web:d8b4297db798e14b76d2a8" };
@@ -199,7 +210,7 @@ try {
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
     }
-} catch (e) { alert("เชื่อมต่อฐานข้อมูลภายนอกไม่สำเร็จ: " + e.message); }
+} catch (e) { alert("เชื่อมต่อฐานข้อมูลไม่สำเร็จ: " + e.message); }
 
 const assetsDatabase = {
     AA: ["U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18"],
@@ -242,8 +253,22 @@ function getRandomReplacement(grade, excludeList) {
 
 function parseUserData(user, data) {
     let parsed = {};
-    if (!data || !data[user]) return parsed;
-    if (data[user].p1) return data[user];
+    if (!data) return parsed;
+    if (data[user] && typeof data[user] === 'object' && data[user].p1) {
+        return data[user];
+    }
+    if (data[`${user}_n1`] !== undefined || data[`${user}_name1`] !== undefined) {
+        for (let i = 1; i <= 4; i++) {
+            let nameVal = data[`${user}_n${i}`] || data[`${user}_name${i}`] || "";
+            let timeVal = data[`${user}_t${i}`] || data[`${user}_time${i}`] || "";
+            let numVal = data[`${user}_num${i}`] !== undefined ? data[`${user}_num${i}`] : (data[`${user}_count${i}`] || 0);
+            parsed[`p${i}`] = { name: nameVal, time: timeVal, num: Number(numVal) };
+        }
+        return parsed;
+    }
+    if (data[user] && typeof data[user] === 'object') {
+        return data[user];
+    }
     return parsed;
 }
 
@@ -258,7 +283,7 @@ function generateInputRows(user, data) {
         
         container.innerHTML += `
             <div class="row">
-                <input type="text" class="input-time" id="${user}_t${i}" placeholder="พิมพ์เวลา" value="${rowData.time || ''}">
+                <input type="text" class="input-time" id="${user}_t${i}" placeholder="เวลา" value="${rowData.time || ''}">
                 <input id="${user}_n${i}" value="${rowData.name || ''}" readonly>
                 <button class="btn-action" onclick="editAssetName('${user}_n${i}')">✏️</button>
                 <input id="${user}_num${i}" type="number" value="${rowData.num || 0}">
@@ -300,7 +325,7 @@ async function checkTodayStatus() {
 async function startRandom() {
     const dateVal = document.getElementById("date").value;
     if(!dateVal) { alert("กรุณาเลือกวันที่ก่อนกดสุ่มค่ะ"); return; }
-    if(!db) { alert("ไม่สามารถติดต่อ Firebase ได้"); return; }
+    if(!db) { alert("ไม่สามารถติดต่อฐานข้อมูลได้"); return; }
 
     const btn = document.getElementById("btnRandomAction");
     btn.disabled = true;
@@ -340,141 +365,4 @@ async function startRandom() {
 
         let uploadData = { date: dateVal, kw: {}, su: {} };
         for(let i=1; i<=4; i++) {
-            uploadData.kw[`p${i}`] = { name: kw_final[i-1], time: schedule.kw_times[i-1] || "", num: 0 };
-            uploadData.su[`p${i}`] = { name: su_final[i-1], time: schedule.su_times[i-1] || "", num: 0 };
-        }
-        
-        await db.collection("posts").add(uploadData);
-        await checkTodayStatus();
-    } catch(e) { 
-        alert("เกิดข้อผิดพลาดในการสุ่มและบันทึกข้อมูล: " + e.message); 
-    } finally {
-        btn.disabled = false;
-        btn.innerText = "✨ ดึงแผนงานล็อกทรัพย์สินวันนี้";
-    }
-}
-
-async function searchAssetDays() {
-    const key = document.getElementById("searchKey").value.trim();
-    if(!key) return;
-    if(!db) return;
-    
-    try {
-        const snap = await db.collection("posts").orderBy("date", "desc").get();
-        let matchDates = [];
-        snap.forEach(doc => {
-            const d = doc.data();
-            let found = false;
-            for(let user of ['kw', 'su']) {
-                const uData = parseUserData(user, d);
-                for(let i=1; i<=4; i++) {
-                    if(uData[`p${i}`] && uData[`p${i}`].name.includes(key)) found = true;
-                }
-            }
-            if(found) matchDates.push(d.date);
-        });
-        
-        const resBox = document.getElementById("searchResult");
-        resBox.style.display = "block";
-        if(matchDates.length > 0) {
-            resBox.innerHTML = `<strong>📌 วันที่เคยลงโพสต์ของ "${key}":</strong><br>` + matchDates.map(d => `• ${d}`).join('<br>');
-        } else {
-            resBox.innerHTML = `❌ ไม่พบประวัติการบันทึกของทรัพย์สินชื่อ "${key}"`;
-        }
-    } catch(e) { alert("ค้นหาผิดพลาด: " + e.message); }
-}
-
-async function saveData() { 
-    if(!db) return;
-    let updateData = {};
-    
-    for(let i=1; i<=4; i++) {
-        updateData[`kw.p${i}.time`] = document.getElementById(`kw_t${i}`).value;
-        updateData[`kw.p${i}.name`] = document.getElementById(`kw_n${i}`).value;
-        updateData[`kw.p${i}.num`] = Number(document.getElementById(`kw_num${i}`).value);
-        updateData[`su.p${i}.time`] = document.getElementById(`su_t${i}`).value;
-        updateData[`su.p${i}.name`] = document.getElementById(`su_n${i}`).value;
-        updateData[`su.p${i}.num`] = Number(document.getElementById(`su_num${i}`).value);
-    }
-
-    try {
-        await db.collection("posts").doc(currentDocId).update(updateData); 
-        alert("✨ บันทึกยอดสะสมประจำวันเรียบร้อยแล้วค่ะ!"); 
-        checkTodayStatus(); 
-    } catch(err) {
-        alert("เกิดข้อผิดพลาดในการบันทึก: " + err.message);
-    }
-}
-
-async function restoreBackupData() { checkTodayStatus(); }
-
-async function toggleDashboard() {
-    const dashBox = document.getElementById("dashBoard");
-    if (dashBox.style.display === "block") {
-        dashBox.style.display = "none";
-        return;
-    }
-    
-    if(!db) return;
-    try {
-        const dateInput = document.getElementById("date").value;
-        const month = dateInput.substring(0, 7); 
-        const snap = await db.collection("posts").get(); 
-        let stats = {}; 
-        snap.forEach(doc => { 
-            const d = doc.data(); 
-            if(d.date && d.date.startsWith(month)) { 
-                for(let user of ['kw', 'su']) {
-                    const uData = parseUserData(user, d);
-                    for(let i=1; i<=4; i++) {
-                        if(uData[`p${i}`] && uData[`p${i}`].name) {
-                            stats[uData[`p${i}`].name] = (stats[uData[`p${i}`].name] || 0) + (Number(uData[`p${i}`].num) || 0);
-                        }
-                    }
-                }
-            } 
-        });
-        document.getElementById("dashContent").innerHTML = Object.entries(stats).sort((a,b) => b[1]-a[1]).map(([n, c]) => `<div class="dash-item">${n}</div><div class="dash-item" style="text-align:right"><b>${c}</b></div>`).join('') || "ไม่มีข้อมูล";
-        dashBox.style.display = "block";
-    } catch (e) { alert("โหลดแดชบอร์ดผิดพลาด: " + e.message); }
-}
-
-async function loadHistory() {
-    if(!db) return;
-    try {
-        const snap = await db.collection("posts").orderBy("date", "desc").get(); 
-        let html = ""; 
-        snap.forEach(doc => { 
-            const d = doc.data(); 
-            if(d.date) {
-                const kwData = parseUserData("kw", d);
-                const suData = parseUserData("su", d);
-                
-                html += `<div class="history-card"><strong style="color:var(--text-dark); font-size:0.95rem;">🗓 วันที่ ${d.date}</strong> <button class="btn-action" style="display:inline-block; margin-left:10px;" onclick="editEntry('${doc.id}')">✏️</button> <button class="btn-action btn-delete" style="display:inline-block;" onclick="deleteEntry('${doc.id}')">🗑️</button>`;
-                
-                html += `<div style="color:var(--royal-navy); margin-top:12px; font-weight:bold; font-size:0.95rem;">👤 พี่ขวัญ</div>`;
-                for(let i=1; i<=4; i++) {
-                    if(kwData[`p${i}`] && kwData[`p${i}`].name) html += `<div class="h-row" style="color:var(--text-dark)"><span>${kwData[`p${i}`].time || '--:--'}</span><span>${kwData[`p${i}`].name}</span><span><b>${kwData[`p${i}`].num}</b></span></div>`;
-                }
-                
-                html += `<div style="color:var(--royal-navy); margin-top:12px; font-weight:bold; font-size:0.95rem;">👤 พี่สุ</div>`;
-                for(let i=1; i<=4; i++) {
-                    if(suData[`p${i}`] && suData[`p${i}`].name) html += `<div class="h-row" style="color:var(--text-dark)"><span>${suData[`p${i}`].time || '--:--'}</span><span>${suData[`p${i}`].name}</span><span><b>${suData[`p${i}`].num}</b></span></div>`;
-                }
-                html += `</div>`;
-            } 
-        });
-        document.getElementById("historyList").innerHTML = html;
-    } catch (e) { console.error(e); }
-}
-
-async function editEntry(id) { if(!db)return; const doc = await db.collection("posts").doc(id).get(); document.getElementById("date").value = doc.data().date; checkTodayStatus(); }
-async function deleteEntry(id) { if(!db)return; if(confirm("ต้องการลบประวัติรายการนี้ใช่ไหม?")) { await db.collection("posts").doc(id).delete(); checkTodayStatus(); } }
-
-window.onload = () => { 
-    const now = new Date(); document.getElementById("date").value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`; 
-    checkTodayStatus();
-};
-</script>
-</body>
-</html>
+            uploadData.kw[`p${i}`] = { name: kw_
