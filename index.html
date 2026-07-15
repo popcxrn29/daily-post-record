@@ -202,12 +202,11 @@ try {
     }
 } catch (e) { console.error(e); }
 
-// ฐานข้อมูลทรัพย์สินเปิดใช้งานรวมถึง The IRIS พระราม 9 ด้วย
+// ฐานข้อมูลทรัพย์สินเปิดใช้งานที่อัปเดตใหม่ล่าสุด (เอาทรัพย์สินที่สั่งคัดออกเรียบร้อยแล้ว)
 const assetsDatabase = {
     AA: [
         "U DELIGHT 3 | ยู ดีไลท์ 3", 
-        "Happy Condo รัชดา 18", 
-        "Plum Condo Rangsit Fresh : พลัมคอนโด รังสิต"
+        "Happy Condo รัชดา 18"
     ],
     A: [
         "บ้านพี่แดง อรัญนคร3", 
@@ -215,13 +214,10 @@ const assetsDatabase = {
         "ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", 
         "ที่ดินพี่นุช 3 งาน", 
         "คอนโด The Base Park East Sukhumvit 77", 
-        "คอนโด Aston", 
-        "ลุมพินี คอนโดทาวน์ รามอินทรา–หลักสี่", 
         "Plum Condo นวมินทร์", 
         "Lumpini Ville แบริ่ง–ลาซาล", 
         "กรีน คอนโด ดอนเมือง–สรงประภา", 
         "กรีน คอนโด ดอนเมือง–สรงประภา เฟส 1", 
-        "Kensington Place แจ้งวัฒนะ 13", 
         "ลุมพินี คอนโดทาวน์ รามอินทรา–ลาดปลาเค้า 2", 
         "ทาวน์โฮม 3 ชั้น 4 ห้องนอน 4 ห้องน้ำ",
         "The IRIS พระราม 9"
@@ -233,7 +229,6 @@ const assetsDatabase = {
         "ทด.ป้าย ท่าข้าม", 
         "บ้านอรัญนคร 1 (คุณแคท)", 
         "บ้านพี่หนึ่ง อรัญวิลล์", 
-        "ที่ดิน (โบท)", 
         "ที่ดินบ้านนา นครนายก", 
         "บ้านพรสิริ ขอนแก่น", 
         "BANGKOK HORIZON รามคำแหง", 
@@ -241,10 +236,11 @@ const assetsDatabase = {
     ]
 };
 
-// บัญชีดำของทรัพย์สินที่คัดออก (เอา "THE IRIS" / "iris" ออกไปเพื่อให้ผ่านการตรวจสอบได้)
+// บัญชีดำของทรัพย์สินที่ห้ามโผล่เข้าแผนงาน (อัปเดตชุดใหม่)
 const banList = [
     "ศรีไพร", "นิมิตใหม่", "ห้องเช่า 3 ห้อง", "ห้องเช่า 9 ห้อง", "ราชพัสดุ", 
-    "บ้านเอื้อ", "บ้านเอื้ื้อ", "โกดัง", "ศรีวราห์"
+    "บ้านเอื้อ", "บ้านเอื้ื้อ", "โกดัง", "ศรีวราห์", "โบท", "Aston", "รามอินทรา-หลักสี่",
+    "Kensington Place", "Rangsit Fresh"
 ];
 
 function isBanned(name) {
@@ -300,7 +296,7 @@ function getRandomReplacement(grade, excludeList) {
     let pool = assetsDatabase[grade] || assetsDatabase.A;
     let filtered = pool.filter(x => !excludeList.includes(x));
     if (filtered.length === 0) filtered = pool;
-    return filtered[Math.floor(Math.random() * filtered.length)] || "คอนโด Aston";
+    return filtered[Math.floor(Math.random() * filtered.length)] || "คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4";
 }
 
 function parseUserData(user, data) {
@@ -371,7 +367,7 @@ async function startRandom() {
         if (!schedule) {
             schedule = {
                 kw: ["บ้านพี่แดง อรัญนคร3", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 14 ไร่"],
-                su: ["คอนโด Aston", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 14 ไร่"],
+                su: ["คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 14 ไร่"],
                 kw_times: ["10:00", "12:15", "18:30", "20:30"],
                 su_times: ["11:00", "13:30", "19:00", "21:00"]
             };
@@ -436,102 +432,4 @@ async function searchAssetDays() {
         if(matchDates.length > 0) {
             resBox.innerHTML = `<strong>📌 วันที่เคยลงโพสต์ของ "${key}":</strong><br>` + matchDates.map(d => `• ${d}`).join('<br>');
         } else {
-            resBox.innerHTML = `❌ ไม่พบประวัติการบันทึกของทรัพย์สินชื่อ "${key}"`;
-        }
-    } catch(e) { console.error(e); }
-}
-
-async function saveData() { 
-    if(!db) return;
-    let updateData = {};
-    
-    for(let i=1; i<=4; i++) {
-        updateData[`kw.p${i}.time`] = document.getElementById(`kw_t${i}`).value;
-        updateData[`kw.p${i}.name`] = document.getElementById(`kw_n${i}`).value;
-        updateData[`kw.p${i}.num`] = Number(document.getElementById(`kw_num${i}`).value);
-        updateData[`su.p${i}.time`] = document.getElementById(`su_t${i}`).value;
-        updateData[`su.p${i}.name`] = document.getElementById(`su_n${i}`).value;
-        updateData[`su.p${i}.num`] = Number(document.getElementById(`su_num${i}`).value);
-    }
-
-    try {
-        await db.collection("posts").doc(currentDocId).update(updateData); 
-        alert("✨ บันทึกยอดสะสมประจำวันเรียบร้อยแล้วค่ะ!"); 
-        checkTodayStatus(); 
-    } catch(err) {
-        alert("เกิดข้อผิดพลาดในการบันทึก กรุณาลองใหม่อีกครั้งค่ะ");
-    }
-}
-
-async function restoreBackupData() { if(!db) return; checkTodayStatus(); }
-
-async function toggleDashboard() {
-    const dashBox = document.getElementById("dashBoard");
-    if (dashBox.style.display === "block") {
-        dashBox.style.display = "none";
-        return;
-    }
-    
-    if(!db) return;
-    try {
-        const dateInput = document.getElementById("date").value;
-        const month = dateInput.substring(0, 7); 
-        const snap = await db.collection("posts").get(); 
-        let stats = {}; 
-        snap.forEach(doc => { 
-            const d = doc.data(); 
-            if(d.date && d.date.startsWith(month)) { 
-                for(let user of ['kw', 'su']) {
-                    const uData = parseUserData(user, d);
-                    for(let i=1; i<=4; i++) {
-                        if(uData[`p${i}`] && uData[`p${i}`].name) {
-                            stats[uData[`p${i}`].name] = (stats[uData[`p${i}`].name] || 0) + (Number(uData[`p${i}`].num) || 0);
-                        }
-                    }
-                }
-            } 
-        });
-        document.getElementById("dashContent").innerHTML = Object.entries(stats).sort((a,b) => b[1]-a[1]).map(([n, c]) => `<div class="dash-item">${n}</div><div class="dash-item" style="text-align:right"><b>${c}</b></div>`).join('') || "ไม่มีข้อมูล";
-        dashBox.style.display = "block";
-    } catch (e) {}
-}
-
-async function loadHistory() {
-    if(!db) return;
-    try {
-        const snap = await db.collection("posts").orderBy("date", "desc").get(); 
-        let html = ""; 
-        snap.forEach(doc => { 
-            const d = doc.data(); 
-            if(d.date) {
-                const kwData = parseUserData("kw", d);
-                const suData = parseUserData("su", d);
-                
-                html += `<div class="history-card"><strong style="color:var(--text-dark); font-size:0.95rem;">🗓 วันที่ ${d.date}</strong> <button class="btn-action" style="display:inline-block; margin-left:10px;" onclick="editEntry('${doc.id}')">✏️</button> <button class="btn-action btn-delete" style="display:inline-block;" onclick="deleteEntry('${doc.id}')">🗑️</button>`;
-                
-                html += `<div style="color:var(--royal-navy); margin-top:12px; font-weight:bold; font-size:0.95rem;">👤 พี่ขวัญ</div>`;
-                for(let i=1; i<=4; i++) {
-                    if(kwData[`p${i}`] && kwData[`p${i}`].name) html += `<div class="h-row" style="color:var(--text-dark)"><span>${kwData[`p${i}`].time || '--:--'}</span><span>${kwData[`p${i}`].name}</span><span><b>${kwData[`p${i}`].num}</b></span></div>`;
-                }
-                
-                html += `<div style="color:var(--royal-navy); margin-top:12px; font-weight:bold; font-size:0.95rem;">👤 พี่สุ</div>`;
-                for(let i=1; i<=4; i++) {
-                    if(suData[`p${i}`] && suData[`p${i}`].name) html += `<div class="h-row" style="color:var(--text-dark)"><span>${suData[`p${i}`].time || '--:--'}</span><span>${suData[`p${i}`].name}</span><span><b>${suData[`p${i}`].num}</b></span></div>`;
-                }
-                html += `</div>`;
-            } 
-        });
-        document.getElementById("historyList").innerHTML = html;
-    } catch (e) {}
-}
-
-async function editEntry(id) { if(!db)return; const doc = await db.collection("posts").doc(id).get(); document.getElementById("date").value = doc.data().date; checkTodayStatus(); }
-async function deleteEntry(id) { if(!db)return; if(confirm("ต้องการลบประวัติรายการนี้ใช่ไหม?")) { await db.collection("posts").doc(id).delete(); checkTodayStatus(); } }
-
-window.onload = () => { 
-    const now = new Date(); document.getElementById("date").value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`; 
-    checkTodayStatus();
-};
-</script>
-</body>
-</html>
+            resBox.innerHTML = `❌ ไม่พบประวัติการบันทึกของทรัพย์สินชื่อ "${key}"
