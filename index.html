@@ -66,7 +66,7 @@
             align-items: center; 
         }
         
-        input[readonly] { 
+        .input-name { 
             font-size: 0.95rem; 
             font-weight: 700; 
             color: var(--text-dark); 
@@ -75,6 +75,7 @@
             width: 100%;
             text-overflow: ellipsis;
             padding-left: 4px;
+            outline: none;
         }
         
         .input-time { 
@@ -224,7 +225,6 @@ function isBanned(name) {
     return banList.some(bannedWord => name.toLowerCase().includes(bannedWord.toLowerCase()));
 }
 
-// 📦 อัปเดตผังตารางงานจริงเรียงวันให้แบบไม่มีหลุดจนถึงเดือนสิงหาคมค่ะ
 const excelSchedules = {
     "2026-07-13": { kw: ["บ้านพี่แดง อรัญนคร3", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 14 ไร่"], su: ["คอนโด Aston", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 14 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
     "2026-07-14": { kw: ["บ้านอรัญนคร 1 (คุณแคท)", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 11 ไร่"], su: ["Kensington Place แจ้งวัฒนะ 13", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 11 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
@@ -243,7 +243,7 @@ const excelSchedules = {
     "2026-07-27": { kw: ["บ้านอรัญนคร 1 (คุณแคท)", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "ที่ดินบ้านนา นครนายก"], su: ["คอนโด The Base Park East Sukhumvit 77", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินบ้านนา นครนายก"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
     "2026-07-28": { kw: ["คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพรสิริ ขอนแก่น"], su: ["Plum Condo นวมินทร์", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านพรสิริ ขอนแก่น"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
     "2026-07-29": { kw: ["ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "BANGKOK HORIZON รามคำแหง"], su: ["Lumpini Ville แบริ่ง–ลาซาล", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "BANGKOK HORIZON รามคำแหง"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-30": { kw: ["ที่ดินพี่นุช 3 งาน", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านทาวน์โฮม พฤกษา 9–รังสิต คลอง 3"], su: ["กรีน คอนโด ดอนเมือง–สรงประภา", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านทาวน์โฮม พฤกษา 9–รังสิต คลอง 3"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-30": { kw: ["ที่ดินพี่นุช 3 งาน", "Happy Condo รั.ชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านทาวน์โฮม พฤกษา 9–รังสิต คลอง 3"], su: ["กรีน คอนโด ดอนเมือง–สรงประภา", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านทาวน์โฮม พฤกษา 9–รังสิต คลอง 3"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
     "2026-07-31": { kw: ["คอนโด The Base Park East Sukhumvit 77", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 14 ไร่"], su: ["กรีน คอนโด ดอนเมือง–สรงประภา เฟส 1", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 14 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
     "2026-08-01": { kw: ["Plum Condo นวมินทร์", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 11 ไร่"], su: ["ลุมพินี คอนโดทาวน์ รามอินทรา–ลาดปลาเค้า 2", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 11 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
     "2026-08-02": { kw: ["Lumpini Ville แบริ่ง–ลาซาล", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "ที่ดินน้ำจืด วังน้ำเย็น"], su: ["ทาวน์โฮม 3 ชั้น 4 ห้องนอน 4 ห้องน้ำ", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินน้ำจืด วังน้ำเย็น"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
@@ -274,18 +274,34 @@ function getRandomReplacement(grade, excludeList) {
     return filtered[Math.floor(Math.random() * filtered.length)] || "คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4";
 }
 
+// 🔧 ฟังก์ชันแปลงค่าที่แก้ใหม่ ดึงโครงสร้างฐานข้อมูล Firebase ได้ทุกรูปแบบไม่ค้าง
 function parseUserData(user, data) {
     let parsed = {};
     if (!data) return parsed;
-    if (data[user] && typeof data[user] === 'object' && data[user].p1) {
-        return data[user];
-    }
+    
+    // แบบยิงตรงคีย์เดี่ยว (kw_n1, kw_t1) ฟอร์แมตดั้งเดิมของพี่ขวัญ
     if (data[`${user}_n1`] !== undefined || data[`${user}_name1`] !== undefined) {
         for (let i = 1; i <= 4; i++) {
             let nameVal = data[`${user}_n${i}`] || data[`${user}_name${i}`] || "";
             let timeVal = data[`${user}_t${i}`] || data[`${user}_time${i}`] || "";
             let numVal = data[`${user}_num${i}`] !== undefined ? data[`${user}_num${i}`] : (data[`${user}_count${i}`] || 0);
             parsed[`p${i}`] = { name: nameVal, time: timeVal, num: Number(numVal) };
+        }
+        return parsed;
+    }
+    
+    // แบบ Map Object วัตถุซ้อน (kw.p1.name)
+    if (data[user] && typeof data[user] === 'object') {
+        for (let i = 1; i <= 4; i++) {
+            if (data[user][`p${i}`]) {
+                parsed[`p${i}`] = {
+                    name: data[user][`p${i}`].name || "",
+                    time: data[user][`p${i}`].time || "",
+                    num: Number(data[user][`p${i}`].num) || 0
+                };
+            } else {
+                parsed[`p${i}`] = { name: "", time: "", num: 0 };
+            }
         }
         return parsed;
     }
@@ -304,7 +320,7 @@ function generateInputRows(user, data) {
         container.innerHTML += `
             <div class="row">
                 <input type="text" class="input-time" id="${user}_t${i}" placeholder="เวลา" value="${rowData.time || ''}">
-                <input id="${user}_n${i}" value="${rowData.name || ''}" readonly>
+                <input class="input-name" id="${user}_n${i}" value="${rowData.name || ''}" readonly>
                 <button class="btn-action" onclick="editAssetName('${user}_n${i}')">✏️</button>
                 <input id="${user}_num${i}" type="number" value="${rowData.num || 0}">
             </div>
@@ -334,4 +350,257 @@ async function checkTodayStatus() {
             const d = snap.docs[0].data();
             
             document.getElementById("randomBox").style.display = "none";
-            document.getElementById("inputSection").style.
+            document.getElementById("inputSection").style.display = "block";
+            generateInputRows("kw", d);
+            generateInputRows("su", d);
+        }
+        loadHistory();
+    } catch (e) { console.error("โหลดข้อมูลผิดพลาด: ", e); }
+}
+
+async function startRandom() {
+    const dateVal = document.getElementById("date").value;
+    if(!dateVal) { alert("กรุณาเลือกวันที่ก่อนกดสุ่มค่ะ"); return; }
+    if(!db) { alert("ไม่สามารถติดต่อฐานข้อมูลได้"); return; }
+
+    const btn = document.getElementById("btnRandomAction");
+    btn.disabled = true;
+    btn.innerText = "⏳ กำลังดึงข้อมูลและล็อกแผนงาน...";
+
+    try {
+        let schedule = excelSchedules[dateVal];
+        if (!schedule) {
+            schedule = {
+                kw: ["บ้านพี่แดง อรัญนคร3", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 14 ไร่"],
+                su: ["คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 14 ไร่"],
+                kw_times: ["10:00", "12:15", "18:30", "20:30"],
+                su_times: ["11:00", "13:30", "19:00", "21:00"]
+            };
+        }
+
+        let kw_final = [];
+        let su_final = [];
+        let usedToday = [];
+
+        function processSchedule(list, targetArray) {
+            list.forEach(item => {
+                if (!item || item === "-" || item.trim() === "") {
+                    targetArray.push("ไม่มีแผนงานลงโพสต์");
+                } else if (isBanned(item)) {
+                    let grade = getAssetGrade(item);
+                    let replacement = getRandomReplacement(grade, usedToday);
+                    targetArray.push(replacement);
+                    usedToday.push(replacement);
+                } else {
+                    targetArray.push(item);
+                    usedToday.push(item);
+                }
+            });
+        }
+
+        processSchedule(schedule.kw, kw_final);
+        processSchedule(schedule.su, su_final);
+
+        // 📝 บันทึกแบบโครงสร้างแบนราบดั้งเดิมเพื่อซิงค์ระบบเก่าไม่ให้บั๊ก
+        let uploadData = { date: dateVal };
+        for(let i=1; i<=4; i++) {
+            uploadData[`kw_n${i}`] = kw_final[i-1] || "ไม่มีแผนงานลงโพสต์";
+            uploadData[`kw_t${i}`] = schedule.kw_times[i-1] || "--:--";
+            uploadData[`kw_num${i}`] = 0;
+            
+            uploadData[`su_n${i}`] = su_final[i-1] || "ไม่มีแผนงานลงโพสต์";
+            uploadData[`su_t${i}`] = schedule.su_times[i-1] || "--:--";
+            uploadData[`su_num${i}`] = 0;
+        }
+        
+        await db.collection("posts").add(uploadData);
+        await checkTodayStatus();
+    } catch(e) { 
+        alert("เกิดข้อผิดพลาดในการดึงตารางงาน: " + e.message); 
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "✨ ดึงแผนงานล็อกทรัพย์สินวันนี้";
+    }
+}
+
+async function searchAssetDays() {
+    const key = document.getElementById("searchKey").value.trim();
+    if(!key) return;
+    if(!db) return;
+    
+    try {
+        const snap = await db.collection("posts").orderBy("date", "desc").get();
+        let matchDates = [];
+        snap.forEach(doc => {
+            const d = doc.data();
+            let found = false;
+            const kwData = parseUserData("kw", d);
+            const suData = parseUserData("su", d);
+            
+            for(let i=1; i<=4; i++) {
+                if(kwData[`p${i}`] && kwData[`p${i}`].name && kwData[`p${i}`].name.includes(key)) found = true;
+                if(suData[`p${i}`] && suData[`p${i}`].name && suData[`p${i}`].name.includes(key)) found = true;
+            }
+            if(found) matchDates.push(d.date);
+        });
+        
+        const resBox = document.getElementById("searchResult");
+        resBox.style.display = "block";
+        if(matchDates.length > 0) {
+            resBox.innerHTML = `<strong>📌 วันที่เคยลงโพสต์ของ "${key}":</strong><br>` + matchDates.map(d => `• ${d}`).join('<br>');
+        } else {
+            resBox.innerHTML = `❌ ไม่พบประวัติการบันทึกของทรัพย์สินชื่อ "${key}"`;
+        }
+    } catch(e) { alert("ค้นหาผิดพลาด: " + e.message); }
+}
+
+async function saveData() { 
+    if(!db) return;
+    let updateData = {};
+    
+    // บันทึกกลับเข้า Firebase เป็นคีย์หลักมาตรฐานของระบบเดิม
+    for(let i=1; i<=4; i++) {
+        updateData[`kw_t${i}`] = document.getElementById(`kw_t${i}`).value;
+        updateData[`kw_n${i}`] = document.getElementById(`kw_n${i}`).value;
+        updateData[`kw_num${i}`] = Number(document.getElementById(`kw_num${i}`).value);
+        
+        updateData[`su_t${i}`] = document.getElementById(`su_t${i}`).value;
+        updateData[`su_n${i}`] = document.getElementById(`su_n${i}`).value;
+        updateData[`su_num${i}`] = Number(document.getElementById(`su_num${i}`).value);
+    }
+
+    try {
+        await db.collection("posts").doc(currentDocId).update(updateData); 
+        alert("✨ บันทึกยอดสะสมประจำวันเรียบร้อยแล้วค่ะ!"); 
+        checkTodayStatus(); 
+    } catch(err) {
+        alert("เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+    }
+}
+
+async function restoreBackupData() { checkTodayStatus(); }
+
+async function toggleDashboard() {
+    const dashBox = document.getElementById("dashBoard");
+    if (dashBox.style.display === "block") {
+        dashBox.style.display = "none";
+        return;
+    }
+    
+    if(!db) return;
+    try {
+        const dateInput = document.getElementById("date").value;
+        const month = dateInput.substring(0, 7); 
+        const snap = await db.collection("posts").get(); 
+        let stats = {}; 
+        snap.forEach(doc => { 
+            const d = doc.data(); 
+            if(d.date && d.date.startsWith(month)) { 
+                for(let user of ['kw', 'su']) {
+                    const uData = parseUserData(user, d);
+                    for(let i=1; i<=4; i++) {
+                        if(uData[`p${i}`] && uData[`p${i}`].name && uData[`p${i}`].name !== "ไม่มีแผนงานลงโพสต์") {
+                            stats[uData[`p${i}`].name] = (stats[uData[`p${i}`].name] || 0) + (Number(uData[`p${i}`].num) || 0);
+                        }
+                    }
+                }
+            } 
+        });
+        document.getElementById("dashContent").innerHTML = Object.entries(stats).sort((a,b) => b[1]-a[1]).map(([n, c]) => `<div class="dash-item">${n}</div><div class="dash-item" style="text-align:right"><b>${c}</b></div>`).join('') || "ไม่มีข้อมูล";
+        dashBox.style.display = "block";
+    } catch (e) { alert("โหลดแดชบอร์ดผิดพลาด: " + e.message); }
+}
+
+async function exportFirebaseToExcel() {
+    if(!db) { alert("ระบบไม่ได้เชื่อมต่อกับฐานข้อมูล"); return; }
+    if(!confirm("คุณต้องการดาวน์โหลดประวัติข้อมูลเก่าทั้งหมดจากระบบเป็นไฟล์ Excel ใช่ไหมคะ?")) return;
+    
+    try {
+        const snap = await db.collection("posts").orderBy("date", "asc").get();
+        let excelRows = [];
+        
+        snap.forEach(doc => {
+            const d = doc.data();
+            if(!d.date) return;
+            
+            const kwData = parseUserData("kw", d);
+            const suData = parseUserData("su", d);
+            
+            for(let i=1; i<=4; i++) {
+                if(kwData[`p${i}`] && kwData[`p${i}`].name) {
+                    excelRows.push({
+                        "วันที่": d.date,
+                        "ผู้บันทึก": "พี่ขวัญ",
+                        "ลำดับโพสต์": `โพสต์ที่ ${i}`,
+                        "เวลาลงโพสต์": kwData[`p${i}`].time || "--:--",
+                        "ชื่อทรัพย์สิน": kwData[`p${i}`].name,
+                        "จำนวนยอดโพสต์ (ครั้ง)": kwData[`p${i}`].num || 0
+                    });
+                }
+            }
+            
+            for(let i=1; i<=4; i++) {
+                if(suData[`p${i}`] && suData[`p${i}`].name) {
+                    excelRows.push({
+                        "วันที่": d.date,
+                        "ผู้บันทึก": "พี่สุ",
+                        "ลำดับโพสต์": `โพสต์ที่ ${i}`,
+                        "เวลาลงโพสต์": suData[`p${i}`].time || "--:--",
+                        "ชื่อทรัพย์สิน": suData[`p${i}`].name,
+                        "จำนวนยอดโพสต์ (ครั้ง)": suData[`p${i}`].num || 0
+                    });
+                }
+            }
+        });
+        
+        if(excelRows.length === 0) { alert("ไม่พบข้อมูลประวัติในระบบที่จะส่งออกค่ะ"); return; }
+        
+        const worksheet = XLSX.utils.json_to_sheet(excelRows);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "ประวัติยอดโพสต์สะสม");
+        
+        worksheet['!cols'] = [{ wch: 15 }, { wch: 12 }, { wch: 12 }, { wch: 15 }, { wch: 45 }, { wch: 22 }];
+        XLSX.writeFile(workbook, `ประวัติยอดโพสต์_Firebase_${new Date().toISOString().slice(0,10)}.xlsx`);
+        alert("🟢 ดาวน์โหลดไฟล์ประวัติ Excel เรียบร้อยแล้วค่ะ!");
+    } catch (error) { alert("เกิดข้อผิดพลาดในการส่งออก Excel: " + error.message); }
+}
+
+async function loadHistory() {
+    if(!db) return;
+    try {
+        const snap = await db.collection("posts").orderBy("date", "desc").limit(10).get(); 
+        let html = ""; 
+        snap.forEach(doc => { 
+            const d = doc.data(); 
+            if(d.date) {
+                const kwData = parseUserData("kw", d);
+                const suData = parseUserData("su", d);
+                
+                html += `<div class="history-card"><strong style="color:var(--text-dark); font-size:0.95rem;">🗓 วันที่ ${d.date}</strong> <button class="btn-action" style="display:inline-block; margin-left:10px;" onclick="editEntry('${doc.id}')">✏️</button> <button class="btn-action btn-delete" style="display:inline-block;" onclick="deleteEntry('${doc.id}')">🗑️</button>`;
+                
+                html += `<div style="color:var(--royal-navy); margin-top:12px; font-weight:bold; font-size:0.95rem;">👤 พี่ขวัญ</div>`;
+                for(let i=1; i<=4; i++) {
+                    if(kwData[`p${i}`] && kwData[`p${i}`].name) html += `<div class="h-row" style="color:var(--text-dark)"><span>${kwData[`p${i}`].time || '--:--'}</span><span>${kwData[`p${i}`].name}</span><span><b>${kwData[`p${i}`].num}</b></span></div>`;
+                }
+                
+                html += `<div style="color:var(--royal-navy); margin-top:12px; font-weight:bold; font-size:0.95rem;">👤 พี่สุ</div>`;
+                for(let i=1; i<=4; i++) {
+                    if(suData[`p${i}`] && suData[`p${i}`].name) html += `<div class="h-row" style="color:var(--text-dark)"><span>${suData[`p${i}`].time || '--:--'}</span><span>${suData[`p${i}`].name}</span><span><b>${suData[`p${i}`].num}</b></span></div>`;
+                }
+                html += `</div>`;
+            } 
+        });
+        document.getElementById("historyList").innerHTML = html;
+    } catch (e) { console.error(e); }
+}
+
+async function editEntry(id) { if(!db)return; const doc = await db.collection("posts").doc(id).get(); document.getElementById("date").value = doc.data().date; checkTodayStatus(); }
+async function deleteEntry(id) { if(!db)return; if(confirm("ต้องการลบประวัติรายการนี้ใช่ไหม?")) { await db.collection("posts").doc(id).delete(); checkTodayStatus(); } }
+
+window.onload = () => { 
+    const now = new Date(); document.getElementById("date").value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`; 
+    checkTodayStatus();
+};
+</script>
+</body>
+</html>
