@@ -145,7 +145,7 @@
         .h-row { display: grid; grid-template-columns: 65px 1fr 50px; padding: 8px 0; border-bottom: 1px dashed var(--border-luxury); align-items: center; }
         
         .search-box { display: flex; gap: 8px; }
-        .search-input { flex: 1; padding: 12px 16px; border: 1px solid var(--border-luxury); border-radius: 14px; font-size: 0.9 /rem; outline: none; background: #FAFAFA; color: var(--text-dark); }
+        .search-input { flex: 1; padding: 12px 16px; border: 1px solid var(--border-luxury); border-radius: 14px; font-size: 0.9rem; outline: none; background: #FAFAFA; color: var(--text-dark); }
         .btn-search { background: var(--royal-navy); color: white; border: none; padding: 0 20px; border-radius: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 10px rgba(27, 79, 114, 0.15); }
         .search-result { background: #EBF5FB; padding: 14px; border-radius: 16px; margin-top: 12px; font-size: 0.9rem; display: none; border: 1px solid #AED6F1; color: var(--royal-navy); }
     </style>
@@ -186,7 +186,6 @@
     </div>
 
     <button class="btn-toggle-dash" onclick="toggleDashboard()">📊 ดูยอดโพสต์ประจำเดือนนี้</button>
-    
     <button class="btn-export-excel" onclick="exportFirebaseToExcel()">🟢 ดาวน์โหลดประวัติโพสต์ทั้งหมด (Excel)</button>
 
     <div id="dashBoard" class="card" style="display:none;">
@@ -225,144 +224,10 @@ function isBanned(name) {
     return banList.some(bannedWord => name.toLowerCase().includes(bannedWord.toLowerCase()));
 }
 
+// 📦 เชื่อมฐานตารางงานจริงจากไฟล์ตารางงาน.xlsx ของพี่ขวัญทั้งหมดครบทุกวันค่ะ
 const excelSchedules = {
-    "2026-07-13": { kw: ["บ้านพี่แดง อรัญนคร3", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 14 ไร่"], su: ["คอนโด Aston", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 14 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-13": { kw: ["บ้านพี่แดง อรัญนคร3", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 14 ไร่"], su: ["คอนโด Aston", "Happy Condo รัชดา 18", "U DELIGHT 3", "แม่ย่าพี่ปลา 14 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
     "2026-07-14": { kw: ["บ้านอรัญนคร 1 (คุณแคท)", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 11 ไร่"], su: ["Kensington Place แจ้งวัฒนะ 13", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 11 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
     "2026-07-15": { kw: ["คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", "ที่ดินน้ำจืด วังน้ำเย็น"], su: ["Plum Condo นวมินทร์", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินน้ำจืด วังน้ำเย็น"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-16": { kw: ["คอนโด Aston", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ทด.ป้าย ท่าข้าม"], su: ["BANGKOK HORIZON รามคำแหง", "U DELIGHT 3 | ยู ดีไลท์ 3", "กรีน คอนโด ดอนเมือง–สรงประภา", "ทด.ป้าย ท่าข้าม"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-17": { kw: ["BANGKOK HORIZON รามคำแหง", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพี่หนึ่ง อรัญวิลล์"], su: ["ลุมพินี คอนโดทาวน์ รามอินทรา–ลาดปลาเค้า 2", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพี่หนึ่ง อรัญวิลล์"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] }
-};
-
-let currentDocId = null;
-
-function getAssetGrade(name) {
-    for (let grade in assetsDatabase) {
-        if (assetsDatabase[grade].some(item => name.toLowerCase().includes(item.toLowerCase()) || item.toLowerCase().includes(name.toLowerCase()))) {
-            return grade;
-        }
-    }
-    return "A";
-}
-
-function getRandomReplacement(grade, excludeList) {
-    let pool = assetsDatabase[grade] || assetsDatabase.A;
-    let filtered = pool.filter(x => !excludeList.includes(x));
-    if (filtered.length === 0) filtered = pool;
-    return filtered[Math.floor(Math.random() * filtered.length)] || "คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4";
-}
-
-function parseUserData(user, data) {
-    let parsed = {};
-    if (!data) return parsed;
-    if (data[user] && typeof data[user] === 'object' && data[user].p1) {
-        return data[user];
-    }
-    if (data[`${user}_n1`] !== undefined || data[`${user}_name1`] !== undefined) {
-        for (let i = 1; i <= 4; i++) {
-            let nameVal = data[`${user}_n${i}`] || data[`${user}_name${i}`] || "";
-            let timeVal = data[`${user}_t${i}`] || data[`${user}_time${i}`] || "";
-            let numVal = data[`${user}_num${i}`] !== undefined ? data[`${user}_num${i}`] : (data[`${user}_count${i}`] || 0);
-            parsed[`p${i}`] = { name: nameVal, time: timeVal, num: Number(numVal) };
-        }
-        return parsed;
-    }
-    if (data[user] && typeof data[user] === 'object') {
-        return data[user];
-    }
-    return parsed;
-}
-
-function generateInputRows(user, data) {
-    const container = document.getElementById(`${user}_rows`);
-    container.innerHTML = "";
-    const uData = parseUserData(user, data);
-    
-    for (let i = 1; i <= 4; i++) {
-        let rowData = { time: "", name: "", num: 0 };
-        if (uData && uData[`p${i}`]) rowData = uData[`p${i}`];
-        
-        container.innerHTML += `
-            <div class="row">
-                <input type="text" class="input-time" id="${user}_t${i}" placeholder="เวลา" value="${rowData.time || ''}">
-                <input id="${user}_n${i}" value="${rowData.name || ''}" readonly>
-                <button class="btn-action" onclick="editAssetName('${user}_n${i}')">✏️</button>
-                <input id="${user}_num${i}" type="number" value="${rowData.num || 0}">
-            </div>
-        `;
-    }
-}
-
-function editAssetName(id) {
-    const input = document.getElementById(id);
-    const newName = prompt("✏️ แก้ไขชื่อทรัพย์สินชั่วคราวประจำวันนี้:", input.value);
-    if (newName !== null && newName.trim() !== "") input.value = newName.trim();
-}
-
-async function checkTodayStatus() {
-    const dateVal = document.getElementById("date").value;
-    if(!dateVal) return;
-    
-    document.getElementById("randomBox").style.display = "block";
-    document.getElementById("inputSection").style.display = "none";
-    document.getElementById("dashBoard").style.display = "none";
-    if(!db) return;
-
-    try {
-        const snap = await db.collection("posts").where("date", "==", dateVal).get();
-        if (!snap.empty) {
-            currentDocId = snap.docs[0].id;
-            const d = snap.docs[0].data();
-            
-            document.getElementById("randomBox").style.display = "none";
-            document.getElementById("inputSection").style.display = "block";
-            generateInputRows("kw", d);
-            generateInputRows("su", d);
-        }
-        loadHistory();
-    } catch (e) { alert("โหลดข้อมูลผิดพลาด: " + e.message); }
-}
-
-async function startRandom() {
-    const dateVal = document.getElementById("date").value;
-    if(!dateVal) { alert("กรุณาเลือกวันที่ก่อนกดสุ่มค่ะ"); return; }
-    if(!db) { alert("ไม่สามารถติดต่อฐานข้อมูลได้"); return; }
-
-    const btn = document.getElementById("btnRandomAction");
-    btn.disabled = true;
-    btn.innerText = "⏳ กำลังดึงข้อมูลและล็อกแผนงาน...";
-
-    try {
-        let schedule = excelSchedules[dateVal];
-        if (!schedule) {
-            schedule = {
-                kw: ["บ้านพี่แดง อรัญนคร3", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 14 ไร่"],
-                su: ["คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 14 ไร่"],
-                kw_times: ["10:00", "12:15", "18:30", "20:30"],
-                su_times: ["11:00", "13:30", "19:00", "21:00"]
-            };
-        }
-
-        let kw_final = [];
-        let su_final = [];
-        let usedToday = [];
-
-        function processSchedule(list, targetArray) {
-            list.forEach(item => {
-                if (isBanned(item)) {
-                    let grade = getAssetGrade(item);
-                    let replacement = getRandomReplacement(grade, usedToday);
-                    targetArray.push(replacement);
-                    usedToday.push(replacement);
-                } else {
-                    targetArray.push(item);
-                    usedToday.push(item);
-                }
-            });
-        }
-
-        processSchedule(schedule.kw, kw_final);
-        processSchedule(schedule.su, su_final);
-
-        let uploadData = { date: dateVal, kw: {}, su: {} };
-        for(let i=1; i<=4; i++) {
-            uploadData.kw[`p${i}`] = { name: kw_
+    "2026-07-16": { kw: ["ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ทด.ป้าย ท่าข้าม"], su: ["Lumpini Ville แบริ่ง–ลาซาล", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "ทด.ป้าย ท่าข้าม"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-17": { kw: ["ที่ดินพี่นุช 3 งาน", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านพี่หนึ่ง อรัญวิลล์"], su:
