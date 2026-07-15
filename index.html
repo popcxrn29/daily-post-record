@@ -220,14 +220,118 @@ const assetsDatabase = {
 const banList = ["ศรีไพร", "นิมิตใหม่", "ห้องเช่า 3 ห้อง", "ห้องเช่า 9 ห้อง", "ราชพัสดุ", "บ้านเอื้อ", "บ้านเอื้ื้อ", "โกดัง", "ศรีวราห์", "โบท", "Aston", "รามอินทรา-หลักสี่", "Kensington Place", "Rangsit Fresh"];
 
 function isBanned(name) {
-    if (!name) return false;
+    if (!name || name === "-") return false;
     return banList.some(bannedWord => name.toLowerCase().includes(bannedWord.toLowerCase()));
 }
 
-// 📦 เชื่อมฐานตารางงานจริงจากไฟล์ตารางงาน.xlsx ของพี่ขวัญทั้งหมดครบทุกวันค่ะ
+// 📦 อัปเดตผังตารางงานจริงเรียงวันให้แบบไม่มีหลุดจนถึงเดือนสิงหาคมค่ะ
 const excelSchedules = {
-    "2026-07-13": { kw: ["บ้านพี่แดง อรัญนคร3", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 14 ไร่"], su: ["คอนโด Aston", "Happy Condo รัชดา 18", "U DELIGHT 3", "แม่ย่าพี่ปลา 14 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-13": { kw: ["บ้านพี่แดง อรัญนคร3", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 14 ไร่"], su: ["คอนโด Aston", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 14 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
     "2026-07-14": { kw: ["บ้านอรัญนคร 1 (คุณแคท)", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 11 ไร่"], su: ["Kensington Place แจ้งวัฒนะ 13", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 11 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
     "2026-07-15": { kw: ["คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", "ที่ดินน้ำจืด วังน้ำเย็น"], su: ["Plum Condo นวมินทร์", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินน้ำจืด วังน้ำเย็น"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
     "2026-07-16": { kw: ["ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ทด.ป้าย ท่าข้าม"], su: ["Lumpini Ville แบริ่ง–ลาซาล", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "ทด.ป้าย ท่าข้าม"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-17": { kw: ["ที่ดินพี่นุช 3 งาน", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านพี่หนึ่ง อรัญวิลล์"], su:
+    "2026-07-17": { kw: ["ที่ดินพี่นุช 3 งาน", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านพี่หนึ่ง อรัญวิลล์"], su: ["กรีน คอนโด ดอนเมือง–สรงประภา", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพี่หนึ่ง อรัญวิลล์"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-18": { kw: ["คอนโด The Base Park East Sukhumvit 77", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินบ้านนา นครนายก"], su: ["กรีน คอนโด ดอนเมือง–สรงประภา เฟส 1", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "ที่ดินบ้านนา นครนายก"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-19": { kw: ["Plum Condo นวมินทร์", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านพรสิริ ขอนแก่น"], su: ["ลุมพินี คอนโดทาวน์ รามอินทรา–ลาดปลาเค้า 2", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพรสิริ ขอนแก่น"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-20": { kw: ["Lumpini Ville แบริ่ง–ลาซาล", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "BANGKOK HORIZON รามคำแหง"], su: ["ทาวน์โฮม 3 ชั้น 4 ห้องนอน 4 ห้องน้ำ", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "BANGKOK HORIZON รามคำแหง"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-21": { kw: ["กรีน คอนโด ดอนเมือง–สรงประภา", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านทาวน์โฮม พฤกษา 9–รังสิต คลอง 3"], su: ["The IRIS พระราม 9", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านทาวน์โฮม พฤกษา 9–รังสิต คลอง 3"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-22": { kw: ["กรีน คอนโด ดอนเมือง–สรงประภา เฟส 1", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 14 ไร่"], su: ["บ้านพี่แดง อรัญนคร3", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 14 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-23": { kw: ["ลุมพินี คอนโดทาวน์ รามอินทรา–ลาดปลาเค้า 2", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 11 ไร่"], su: ["บ้านอรัญนคร 1 (คุณแคท)", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 11 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-24": { kw: ["ทาวน์โฮม 3 ชั้น 4 ห้องนอน 4 ห้องน้ำ", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินน้ำจืด วังน้ำเย็น"], su: ["คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "ที่ดินน้ำจืด วังน้ำเย็น"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-25": { kw: ["The IRIS พระราม 9", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "ทด.ป้าย ท่าข้าม"], su: ["ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ทด.ป้าย ท่าข้าม"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-26": { kw: ["บ้านพี่แดง อรัญนคร3", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพี่หนึ่ง อรัญวิลล์"], su: ["ที่ดินพี่นุช 3 งาน", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านพี่หนึ่ง อรัญวิลล์"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-27": { kw: ["บ้านอรัญนคร 1 (คุณแคท)", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "ที่ดินบ้านนา นครนายก"], su: ["คอนโด The Base Park East Sukhumvit 77", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินบ้านนา นครนายก"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-28": { kw: ["คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพรสิริ ขอนแก่น"], su: ["Plum Condo นวมินทร์", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านพรสิริ ขอนแก่น"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-29": { kw: ["ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "BANGKOK HORIZON รามคำแหง"], su: ["Lumpini Ville แบริ่ง–ลาซาล", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "BANGKOK HORIZON รามคำแหง"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-30": { kw: ["ที่ดินพี่นุช 3 งาน", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านทาวน์โฮม พฤกษา 9–รังสิต คลอง 3"], su: ["กรีน คอนโด ดอนเมือง–สรงประภา", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านทาวน์โฮม พฤกษา 9–รังสิต คลอง 3"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-07-31": { kw: ["คอนโด The Base Park East Sukhumvit 77", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 14 ไร่"], su: ["กรีน คอนโด ดอนเมือง–สรงประภา เฟส 1", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 14 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-08-01": { kw: ["Plum Condo นวมินทร์", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 11 ไร่"], su: ["ลุมพินี คอนโดทาวน์ รามอินทรา–ลาดปลาเค้า 2", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 11 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-08-02": { kw: ["Lumpini Ville แบริ่ง–ลาซาล", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "ที่ดินน้ำจืด วังน้ำเย็น"], su: ["ทาวน์โฮม 3 ชั้น 4 ห้องนอน 4 ห้องน้ำ", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินน้ำจืด วังน้ำเย็น"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-08-03": { kw: ["กรีน คอนโด ดอนเมือง–สรงประภา", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ทด.ป้าย ท่าข้าม"], su: ["The IRIS พระราม 9", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "ทด.ป้าย ท่าข้าม"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-08-04": { kw: ["กรีน คอนโด ดอนเมือง–สรงประภา เฟส 1", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านพี่หนึ่ง อรัญวิลล์"], su: ["บ้านพี่แดง อรัญนคร3", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพี่หนึ่ง อรัญวิลล์"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-08-05": { kw: ["ลุมพินี คอนโดทาวน์ รามอินทรา–ลาดปลาเค้า 2", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินบ้านนา นครนายก"], su: ["บ้านอรัญนคร 1 (คุณแคท)", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "ที่ดินบ้านนา นครนายก"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-08-06": { kw: ["ทาวน์โฮม 3 ชั้น 4 ห้องนอน 4 ห้องน้ำ", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านพรสิริ ขอนแก่น"], su: ["คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพรสิริ ขอนแก่น"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-08-07": { kw: ["The IRIS พระราม 9", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "BANGKOK HORIZON รามคำแหง"], su: ["ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "BANGKOK HORIZON รามคำแหง"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-08-08": { kw: ["คอนโด Aston", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ทด.ป้าย ท่าข้าม"], su: ["Plum Condo นวมินทร์", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "คอนโด The Base Park East Sukhumvit 77"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
+    "2026-08-09": { kw: ["ทาวน์โฮม 3 ชั้น 4 ห้องนอน 4 ห้องน้ำ", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านพี่หนึ่ง อรัญวิลล์"], su: ["BANGKOK HORIZON รามคำแหง", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพี่หนึ่ง อรัญวิลล์"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] }
+};
+
+let currentDocId = null;
+
+function getAssetGrade(name) {
+    for (let grade in assetsDatabase) {
+        if (assetsDatabase[grade].some(item => name.toLowerCase().includes(item.toLowerCase()) || item.toLowerCase().includes(name.toLowerCase()))) {
+            return grade;
+        }
+    }
+    return "A";
+}
+
+function getRandomReplacement(grade, excludeList) {
+    let pool = assetsDatabase[grade] || assetsDatabase.A;
+    let filtered = pool.filter(x => !excludeList.includes(x));
+    if (filtered.length === 0) filtered = pool;
+    return filtered[Math.floor(Math.random() * filtered.length)] || "คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4";
+}
+
+function parseUserData(user, data) {
+    let parsed = {};
+    if (!data) return parsed;
+    if (data[user] && typeof data[user] === 'object' && data[user].p1) {
+        return data[user];
+    }
+    if (data[`${user}_n1`] !== undefined || data[`${user}_name1`] !== undefined) {
+        for (let i = 1; i <= 4; i++) {
+            let nameVal = data[`${user}_n${i}`] || data[`${user}_name${i}`] || "";
+            let timeVal = data[`${user}_t${i}`] || data[`${user}_time${i}`] || "";
+            let numVal = data[`${user}_num${i}`] !== undefined ? data[`${user}_num${i}`] : (data[`${user}_count${i}`] || 0);
+            parsed[`p${i}`] = { name: nameVal, time: timeVal, num: Number(numVal) };
+        }
+        return parsed;
+    }
+    return parsed;
+}
+
+function generateInputRows(user, data) {
+    const container = document.getElementById(`${user}_rows`);
+    container.innerHTML = "";
+    const uData = parseUserData(user, data);
+    
+    for (let i = 1; i <= 4; i++) {
+        let rowData = { time: "", name: "", num: 0 };
+        if (uData && uData[`p${i}`]) rowData = uData[`p${i}`];
+        
+        container.innerHTML += `
+            <div class="row">
+                <input type="text" class="input-time" id="${user}_t${i}" placeholder="เวลา" value="${rowData.time || ''}">
+                <input id="${user}_n${i}" value="${rowData.name || ''}" readonly>
+                <button class="btn-action" onclick="editAssetName('${user}_n${i}')">✏️</button>
+                <input id="${user}_num${i}" type="number" value="${rowData.num || 0}">
+            </div>
+        `;
+    }
+}
+
+function editAssetName(id) {
+    const input = document.getElementById(id);
+    const newName = prompt("✏️ แก้ไขชื่อทรัพย์สินชั่วคราวประจำวันนี้:", input.value);
+    if (newName !== null && newName.trim() !== "") input.value = newName.trim();
+}
+
+async function checkTodayStatus() {
+    const dateVal = document.getElementById("date").value;
+    if(!dateVal) return;
+    
+    document.getElementById("randomBox").style.display = "block";
+    document.getElementById("inputSection").style.display = "none";
+    document.getElementById("dashBoard").style.display = "none";
+    if(!db) return;
+
+    try {
+        const snap = await db.collection("posts").where("date", "==", dateVal).get();
+        if (!snap.empty) {
+            currentDocId = snap.docs[0].id;
+            const d = snap.docs[0].data();
+            
+            document.getElementById("randomBox").style.display = "none";
+            document.getElementById("inputSection").style.
