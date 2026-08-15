@@ -219,73 +219,45 @@ try {
     }
 } catch (e) { console.error("เชื่อมต่อ Firebase ไม่สำเร็จ: ", e); }
 
-const assetsDatabase = {
-    AA: ["U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18"],
-    A: ["บ้านพี่แดง อรัญนคร3", "คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", "ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", "ที่ดินพี่นุช 3 งาน", "คอนโด The Base Park East Sukhumvit 77", "Plum Condo นวมินทร์", "Lumpini Ville แบริ่ง–ลาซาล", "กรีน คอนโด ดอนเมือง–สรงประภา", "กรีน คอนโด ดอนเมือง–สรงประภา เฟส 1", "ลุมพินี คอนโดทาวน์ รามอินทรา–ลาดปลาเค้า 2", "ทาวน์โฮม 3 ชั้น 4 ห้องนอน 4 ห้องน้ำ", "The IRIS พระราม 9"],
-    B: ["แม่ย่าพี่ปลา 14 ไร่", "แม่ย่าพี่ปลา 11 ไร่", "ที่ดินน้ำจืด วังน้ำเย็น", "ทด.ป้าย ท่าข้าม", "บ้านอรัญนคร 1 (คุณแคท)", "บ้านพี่หนึ่ง อรัญวิลล์", "ที่ดินบ้านนา นครนายก", "บ้านพรสิริ ขอนแก่น", "BANGKOK HORIZON รามคำแหง", "บ้านทาวน์โฮม พฤกษา 9–รังสิต คลอง 3"]
-};
+// 🏢 ฐานข้อมูลอัปเดตใหม่แบ่งตามกลุ่ม 1 (คอนโด) และ กลุ่ม 2 (บ้านที่ดิน)
+const assetsGroup1_Condo = [
+    "BANGKOK HORIZON รามคำแหง",
+    "คอนโดชีวาทัย ฮอล์มาร์ค",
+    "กรีเน่ คอนโด ดอนเมือง–สรงประภา",
+    "Lumpini Ville แบริ่ง–ลาซาล",
+    "กรีเน่ คอนโด ดอนเมือง–สรงประภา เฟส 1",
+    "Kensington Place แจ้งวัฒนะ 13",
+    "รีช พหลโยธิน 52",
+    "ทิพยฤกษ์",
+    "Cool House Condo รัชดา 12"
+];
 
-const banList = ["ศรีไพร", "นิมิตใหม่", "ห้องเช่า 3 ห้อง", "ห้องเช่า 9 ห้อง", "ราชพัสดุ", "บ้านเอื้อ", "บ้านเอื้ื้อ", "โกดัง", "ศรีวราห์", "โบท", "Aston", "รามอินทรา-หลักสี่", "Kensington Place", "Rangsit Fresh"];
+const assetsGroup2_HouseLand = [
+    "บ้านพี่แดง อรัญนคร3",
+    "แม่ย่าพี่ปลา 14 ไร่",
+    "แม่ย่าพี่ปลา 11 ไร่",
+    "บ้านอรัญนคร 1",
+    "ที่ดิน หลังอรัญนคร 1 ซ.ประสบโชค",
+    "ที่ดินน้าจิต วังน้ำเย็น",
+    "บ้านพี่หนึ่ง อรัญวิลล์",
+    "ที่ดินบ้านนา นครนายก",
+    "บ้านพรสิริ ขอนแก่น",
+    "บ้านพี่ปองพระประแดง",
+    "บ้านคุณมีน"
+];
 
-function isBanned(name) {
-    if (!name || name === "-") return false;
-    return banList.some(bannedWord => name.toLowerCase().includes(bannedWord.toLowerCase()));
-}
+const uDelightAsset = "U DELIGHT 3 | ยู ดีไลท์ 3";
+const dCondoAsset = "ดีคอนโด รามอินทรา";
 
-const excelSchedules = {
-    "2026-07-13": { kw: ["บ้านพี่แดง อรัญนคร3", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 14 ไร่"], su: ["คอนโด Aston", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 14 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-14": { kw: ["บ้านอรัญนคร 1 (คุณแคท)", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 11 ไร่"], su: ["Kensington Place แจ้งวัฒนะ 13", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 11 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-15": { kw: ["คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", "ที่ดินน้ำจืด วังน้ำเย็น"], su: ["Plum Condo นวมินทร์", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินน้ำจืด วังน้ำเย็น"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-16": { kw: ["ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ทด.ป้าย ท่าข้าม"], su: ["Lumpini Ville แบริ่ง–ลาซาล", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "ทด.ป้าย ท่าข้าม"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-17": { kw: ["ที่ดินพี่นุช 3 งาน", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านพี่หนึ่ง อรัญวิลล์"], su: ["กรีน คอนโด ดอนเมือง–สรงประภา", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพี่หนึ่ง อรัญวิลล์"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-18": { kw: ["คอนโด The Base Park East Sukhumvit 77", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินบ้านนา นครนายก"], su: ["กรีน คอนโด ดอนเมือง–สรงประภา เฟส 1", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "ที่ดินบ้านนา นครนายก"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-19": { kw: ["Plum Condo นวมินทร์", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านพรสิริ ขอนแก่น"], su: ["ลุมพินี คอนโดทาวน์ รามอินทรา–ลาดปลาเค้า 2", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพรสิริ ขอนแก่น"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-20": { kw: ["Lumpini Ville แบริ่ง–ลาซาล", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "BANGKOK HORIZON รามคำแหง"], su: ["ทาวน์โฮม 3 ชั้น 4 ห้องนอน 4 ห้องน้ำ", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "BANGKOK HORIZON รามคำแหง"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-21": { kw: ["กรีน คอนโด ดอนเมือง–สรงประภา", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านทาวน์โฮม พฤกษา 9–รังสิต คลอง 3"], su: ["The IRIS พระราม 9", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านทาวน์โฮม พฤกษา 9–รังสิต คลอง 3"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-22": { kw: ["กรีน คอนโด ดอนเมือง–สรงประภา เฟส 1", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 14 ไร่"], su: ["บ้านพี่แดง อรัญนคร3", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 14 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-23": { kw: ["ลุมพินี คอนโดทาวน์ รามอินทรา–ลาดปลาเค้า 2", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 11 ไร่"], su: ["บ้านอรัญนคร 1 (คุณแคท)", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 11 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-24": { kw: ["ทาวน์โฮม 3 ชั้น 4 ห้องนอน 4 ห้องน้ำ", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินน้ำจืด วังน้ำเย็น"], su: ["คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "ที่ดินน้ำจืด วังน้ำเย็น"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-25": { kw: ["The IRIS พระราม 9", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "ทด.ป้าย ท่าข้าม"], su: ["ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ทด.ป้าย ท่าข้าม"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-26": { kw: ["บ้านพี่แดง อรัญนคร3", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพี่หนึ่ง อรัญวิลล์"], su: ["ที่ดินพี่นุช 3 งาน", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านพี่หนึ่ง อรัญวิลล์"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-27": { kw: ["บ้านอรัญนคร 1 (คุณแคท)", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "ที่ดินบ้านนา นครนายก"], su: ["คอนโด The Base Park East Sukhumvit 77", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินบ้านนา นครนายก"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-28": { kw: ["คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพรสิริ ขอนแก่น"], su: ["Plum Condo นวมินทร์", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านพรสิริ ขอนแก่น"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-29": { kw: ["ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "BANGKOK HORIZON รามคำแหง"], su: ["Lumpini Ville แบริ่ง–ลาซาล", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "BANGKOK HORIZON รามคำแหง"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-30": { kw: ["ที่ดินพี่นุช 3 งาน", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านทาวน์โฮม พฤกษา 9–รังสิต คลอง 3"], su: ["กรีน คอนโด ดอนเมือง–สรงประภา", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านทาวน์โฮม พฤกษา 9–รังสิต คลอง 3"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-07-31": { kw: ["คอนโด The Base Park East Sukhumvit 77", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 14 ไร่"], su: ["กรีน คอนโด ดอนเมือง–สรงประภา เฟส 1", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 14 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-08-01": { kw: ["Plum Condo นวมินทร์", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 11 ไร่"], su: ["ลุมพินี คอนโดทาวน์ รามอินทรา–ลาดปลาเค้า 2", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 11 ไร่"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-08-02": { kw: ["Lumpini Ville แบริ่ง–ลาซาล", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "ที่ดินน้ำจืด วังน้ำเย็น"], su: ["ทาวน์โฮม 3 ชั้น 4 ห้องนอน 4 ห้องน้ำ", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินน้ำจืด วังน้ำเย็น"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-08-03": { kw: ["กรีน คอนโด ดอนเมือง–สรงประภา", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ทด.ป้าย ท่าข้าม"], su: ["The IRIS พระราม 9", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "ทด.ป้าย ท่าข้าม"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-08-04": { kw: ["กรีน คอนโด ดอนเมือง–สรงประภา เฟส 1", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านพี่หนึ่ง อรัญวิลล์"], su: ["บ้านพี่แดง อรัญนคร3", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพี่หนึ่ง อรัญวิลล์"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-08-05": { kw: ["ลุมพินี คอนโดทาวน์ รามอินทรา–ลาดปลาเค้า 2", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ที่ดินบ้านนา นครนายก"], su: ["บ้านอรัญนคร 1 (คุณแคท)", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "ที่ดินบ้านนา นครนายก"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-08-06": { kw: ["ทาวน์โฮม 3 ชั้น 4 ห้องนอน 4 ห้องน้ำ", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านพรสิริ ขอนแก่น"], su: ["คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพรสิริ ขอนแก่น"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-08-07": { kw: ["The IRIS พระราม 9", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "BANGKOK HORIZON รามคำแหง"], su: ["ที่ดินหลังอรัญนคร 1 ซ.ประสบโชค", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "BANGKOK HORIZON รามคำแหง"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-08-08": { kw: ["คอนโด Aston", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "ทด.ป้าย ท่าข้าม"], su: ["Plum Condo นวมินทร์", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "คอนโด The Base Park East Sukhumvit 77"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] },
-    "2026-08-09": { kw: ["ทาวน์โฮม 3 ชั้น 4 ห้องนอน 4 ห้องน้ำ", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "บ้านพี่หนึ่ง อรัญวิลล์"], su: ["BANGKOK HORIZON รามคำแหง", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "บ้านพี่หนึ่ง อรัญวิลล์"], kw_times: ["10:00", "12:15", "18:30", "20:30"], su_times: ["11:00", "13:30", "19:00", "21:00"] }
-};
+const defaultTimesKW = ["10:00", "12:15", "18:30", "20:30"];
+const defaultTimesSU = ["11:00", "13:30", "19:00", "21:00"];
 
 let currentDocId = null;
-
-function getAssetGrade(name) {
-    for (let grade in assetsDatabase) {
-        if (assetsDatabase[grade].some(item => name.toLowerCase().includes(item.toLowerCase()) || item.toLowerCase().includes(name.toLowerCase()))) {
-            return grade;
-        }
-    }
-    return "A";
-}
-
-function getRandomReplacement(grade, excludeList) {
-    let pool = assetsDatabase[grade] || assetsDatabase.A;
-    let filtered = pool.filter(x => !excludeList.includes(x));
-    if (filtered.length === 0) filtered = pool;
-    return filtered[Math.floor(Math.random() * filtered.length)] || "คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4";
-}
 
 function parseUserData(user, data) {
     let parsed = {};
     if (!data) return parsed;
     
-    // ดึงค่าแบบ Nested Map
     if (data[user] && typeof data[user] === 'object') {
         for (let i = 1; i <= 4; i++) {
             let pKey = `p${i}`;
@@ -299,7 +271,6 @@ function parseUserData(user, data) {
         }
     }
     
-    // ดึงค่าแบบ Flat
     for (let i = 1; i <= 4; i++) {
         let pKey = `p${i}`;
         
@@ -333,7 +304,7 @@ function parseUserData(user, data) {
         let possibleNumKeys = [
             `${user}_num${i}`, `${user}_count${i}`, `${user}_c${i}`, 
             `${user}${i}_num`, `${user}${i}_count`, `${user}${i}_c`, 
-            `${user}num${i}`, `${user}count${i}`, `${user}c${i}`, `${user}${i}num`
+            `${user}num${i}`, `${user}count${i}`, `${user}${i}num`
         ];
         for (let key of possibleNumKeys) {
             if (data[key] !== undefined) {
@@ -408,47 +379,78 @@ async function startRandom() {
     btn.innerText = "⏳ กำลังดึงข้อมูลและล็อกแผนงาน...";
 
     try {
-        let schedule = excelSchedules[dateVal];
-        if (!schedule) {
-            schedule = {
-                kw: ["บ้านพี่แดง อรัญนคร3", "U DELIGHT 3 | ยู ดีไลท์ 3", "Happy Condo รัชดา 18", "แม่ย่าพี่ปลา 14 ไร่"],
-                su: ["คอนโดชีวาทัย ฮอลล์มาร์ค ลาดพร้าว–โชคชัย 4", "Happy Condo รัชดา 18", "U DELIGHT 3 | ยู ดีไลท์ 3", "แม่ย่าพี่ปลา 14 ไร่"],
-                kw_times: ["10:00", "12:15", "18:30", "20:30"],
-                su_times: ["11:00", "13:30", "19:00", "21:00"]
-            };
-        }
-
-        let kw_final = [];
-        let su_final = [];
-        let usedToday = [];
-
-        function processSchedule(list, targetArray) {
-            list.forEach(item => {
-                if (!item || item === "-" || item.trim() === "") {
-                    targetArray.push("ไม่มีแผนงานลงโพสต์");
-                } else if (isBanned(item)) {
-                    let grade = getAssetGrade(item);
-                    let replacement = getRandomReplacement(grade, usedToday);
-                    targetArray.push(replacement);
-                    usedToday.push(replacement);
-                } else {
-                    targetArray.push(item);
-                    usedToday.push(item);
+        // 1. ดึงประวัติทั้งหมดมาวิเคราะห์ความถี่เพื่อเรียงลำดับทรัพย์สินที่ไม่เคยลงก่อน
+        const snapHistory = await db.collection("posts").orderBy("date", "desc").get();
+        
+        let lastUsedMap = {};
+        let yesterdayAssets = new Set();
+        let targetDateObj = new Date(dateVal);
+        
+        snapHistory.forEach(doc => {
+            const d = doc.data();
+            if(!d.date) return;
+            
+            let dObj = new Date(d.date);
+            let diffDays = Math.floor((targetDateObj - dObj) / (1000 * 60 * 60 * 24));
+            
+            const kwD = parseUserData("kw", d);
+            const suD = parseUserData("su", d);
+            
+            const checkAndAdd = (item) => {
+                if(item && item !== "ไม่มีแผนงานลงโพสต์") {
+                    if(lastUsedMap[item] === undefined) lastUsedMap[item] = diffDays;
+                    if(diffDays === 1) yesterdayAssets.add(item);
                 }
-            });
-        }
+            };
 
-        processSchedule(schedule.kw, kw_final);
-        processSchedule(schedule.su, su_final);
+            for(let i=1; i<=4; i++) {
+                if(kwD[`p${i}`]) checkAndAdd(kwD[`p${i}`].name);
+                if(suD[`p${i}`]) checkAndAdd(suD[`p${i}`].name);
+            }
+        });
+
+        // 2. คำนวณวันเว้นวัน (Alternate Days) ล็อก U DELIGHT 3 และ ดีคอนโด รามอินทรา
+        const baseDate = new Date("2026-08-16");
+        const dayOffset = Math.floor((targetDateObj - baseDate) / (1000 * 60 * 60 * 24));
+        
+        let lockedToday = (dayOffset % 2 === 0) ? uDelightAsset : dCondoAsset;
+
+        // 3. จัดการเรียงลำดับทรัพย์สินตามลำดับที่ "ยังไม่เคยลง" หรือ "ไม่ได้ลงนานที่สุด"
+        const sortByRecency = (arr) => {
+            return [...arr].sort((a, b) => {
+                let recA = lastUsedMap[a] !== undefined ? lastUsedMap[a] : 9999;
+                let recB = lastUsedMap[b] !== undefined ? lastUsedMap[b] : 9999;
+                if(recA !== recB) return recB - recA; // ทรัพย์ที่ไม่เคยลง (9999) หรือลงนานแล้วขึ้นก่อน
+                return 0.5 - Math.random();
+            });
+        };
+
+        // กรองทรัพย์สินที่ไม่ติดเงื่อนไขซ้ำวันก่อน
+        let poolG1 = sortByRecency(assetsGroup1_Condo.filter(item => item !== lockedToday && !yesterdayAssets.has(item)));
+        let poolG2 = sortByRecency(assetsGroup2_HouseLand.filter(item => item !== lockedToday && !yesterdayAssets.has(item)));
+        
+        // หากกรองแล้วไม่พอ (กรณีประวัติแน่น) ให้เอาทรัพย์กลับมาเสริม
+        if (poolG1.length < 3) poolG1 = sortByRecency(assetsGroup1_Condo.filter(item => item !== lockedToday));
+        if (poolG2.length < 4) poolG2 = sortByRecency(assetsGroup2_HouseLand.filter(item => item !== lockedToday));
+
+        // ดึง 3 จากกลุ่มคอนโด + 4 จากกลุ่มบ้านที่ดิน = 7 ทรัพย์สิน (+ 1 ทรัพย์ล็อก = 8 ครบพอดี)
+        let selected7 = [...poolG1.slice(0, 3), ...poolG2.slice(0, 4)];
+        selected7.sort(() => 0.5 - Math.random());
+        
+        let finalDailyList = [lockedToday, ...selected7];
+        finalDailyList.sort(() => 0.5 - Math.random());
+
+        let kw_final = finalDailyList.slice(0, 4);
+        let su_final = finalDailyList.slice(4, 8);
 
         let uploadData = { date: dateVal };
         for(let i=1; i<=4; i++) {
             uploadData[`kw_n${i}`] = kw_final[i-1] || "ไม่มีแผนงานลงโพสต์";
-            uploadData[`kw_t${i}`] = schedule.kw_times[i-1] || "--:--";
+            uploadData[`kw_t${i}`] = defaultTimesKW[i-1] || "--:--";
             uploadData[`kw_num${i}`] = 0;
             
             uploadData[`su_n${i}`] = su_final[i-1] || "ไม่มีแผนงานลงโพสต์";
-            uploadData[`su_t${i}`] = schedule.su_times[i-1] || "--:--";
+            uploadData[`su_t${i}`] = defaultTimesSU[i-1] || "--:--";
             uploadData[`su_num${i}`] = 0;
         }
         
@@ -506,7 +508,6 @@ async function saveData() {
         const su_n = document.getElementById(`su_n${i}`).value;
         const su_num = Number(document.getElementById(`su_num${i}`).value);
 
-        // 1. เขียนแบบ Flat-level
         updateData[`kw_t${i}`] = kw_t;
         updateData[`kw_n${i}`] = kw_n;
         updateData[`kw_num${i}`] = kw_num;
@@ -515,7 +516,6 @@ async function saveData() {
         updateData[`su_n${i}`] = su_n;
         updateData[`su_num${i}`] = su_num;
 
-        // 2. เขียนแบบ Nested Object Map ป้องกันชื่อเด้งกลับ
         updateData[`kw.p${i}.time`] = kw_t;
         updateData[`kw.p${i}.name`] = kw_n;
         updateData[`kw.p${i}.num`] = kw_num;
@@ -680,8 +680,9 @@ async function deleteEntry(id) {
 }
 
 window.onload = () => { 
-    const now = new Date(); 
-    document.getElementById("date").value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`; 
+    const tomorrow = new Date(); 
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    document.getElementById("date").value = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`; 
     checkTodayStatus();
 };
 </script>
