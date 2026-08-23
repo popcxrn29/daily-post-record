@@ -219,7 +219,7 @@ try {
     }
 } catch (e) { console.error("เชื่อมต่อ Firebase ไม่สำเร็จ: ", e); }
 
-// 🏢 ฐานข้อมูลอัปเดตใหม่แบ่งตามกลุ่ม 1 (คอนโด) และ กลุ่ม 2 (บ้านที่ดิน)
+// 🏢 ฐานข้อมูลกลุ่มที่ 1 (คอนโด 9 รายการ - ตัด รีช พหลโยธิน 52 ออก และมี Diamond Ratchada Cool House)
 const assetsGroup1_Condo = [
     "BANGKOK HORIZON รามคำแหง",
     "คอนโดชีวาทัย ฮอล์มาร์ค",
@@ -227,11 +227,12 @@ const assetsGroup1_Condo = [
     "Lumpini Ville แบริ่ง–ลาซาล",
     "กรีเน่ คอนโด ดอนเมือง–สรงประภา เฟส 1",
     "Kensington Place แจ้งวัฒนะ 13",
-    "รีช พหลโยธิน 52",
     "ทิพยฤกษ์",
-    "Cool House Condo รัชดา 12"
+    "Cool House Condo รัชดา 12",
+    "Diamond Ratchada Cool House"
 ];
 
+// 🏡 ฐานข้อมูลกลุ่มที่ 2 (บ้านและที่ดิน 12 รายการ - เพิ่ม บ้านเอื้ออาทรอรัญประเทศ)
 const assetsGroup2_HouseLand = [
     "บ้านพี่แดง อรัญนคร3",
     "แม่ย่าพี่ปลา 14 ไร่",
@@ -243,7 +244,8 @@ const assetsGroup2_HouseLand = [
     "ที่ดินบ้านนา นครนายก",
     "บ้านพรสิริ ขอนแก่น",
     "บ้านพี่ปองพระประแดง",
-    "บ้านคุณมีน"
+    "บ้านคุณมีน",
+    "บ้านเอื้ออาทรอรัญประเทศ"
 ];
 
 const uDelightAsset = "U DELIGHT 3 | ยู ดีไลท์ 3";
@@ -379,7 +381,7 @@ async function startRandom() {
     btn.innerText = "⏳ กำลังดึงข้อมูลและล็อกแผนงาน...";
 
     try {
-        // 1. ดึงประวัติทั้งหมดมาวิเคราะห์ความถี่เพื่อเรียงลำดับทรัพย์สินที่ไม่เคยลงก่อน
+        // 1. ตรวจสอบประวัติการโพสต์เพื่อเรียงลำดับทรัพย์สินที่ไม่เคยลง หรือลงนานที่สุดขึ้นก่อน
         const snapHistory = await db.collection("posts").orderBy("date", "desc").get();
         
         let lastUsedMap = {};
@@ -415,26 +417,25 @@ async function startRandom() {
         
         let lockedToday = (dayOffset % 2 === 0) ? uDelightAsset : dCondoAsset;
 
-        // 3. จัดการเรียงลำดับทรัพย์สินตามลำดับที่ "ยังไม่เคยลง" หรือ "ไม่ได้ลงนานที่สุด"
+        // 3. เรียงลำดับทรัพย์ตามความถี่ ยิ่งเว้นนานยิ่งมีโอกาสถูกสุ่มก่อน
         const sortByRecency = (arr) => {
             return [...arr].sort((a, b) => {
                 let recA = lastUsedMap[a] !== undefined ? lastUsedMap[a] : 9999;
                 let recB = lastUsedMap[b] !== undefined ? lastUsedMap[b] : 9999;
-                if(recA !== recB) return recB - recA; // ทรัพย์ที่ไม่เคยลง (9999) หรือลงนานแล้วขึ้นก่อน
+                if(recA !== recB) return recB - recA;
                 return 0.5 - Math.random();
             });
         };
 
-        // กรองทรัพย์สินที่ไม่ติดเงื่อนไขซ้ำวันก่อน
+        // กรองรายการที่ไม่ติดเงื่อนไขซ้ำวันก่อนหน้า
         let poolG1 = sortByRecency(assetsGroup1_Condo.filter(item => item !== lockedToday && !yesterdayAssets.has(item)));
         let poolG2 = sortByRecency(assetsGroup2_HouseLand.filter(item => item !== lockedToday && !yesterdayAssets.has(item)));
         
-        // หากกรองแล้วไม่พอ (กรณีประวัติแน่น) ให้เอาทรัพย์กลับมาเสริม
-        if (poolG1.length < 3) poolG1 = sortByRecency(assetsGroup1_Condo.filter(item => item !== lockedToday));
-        if (poolG2.length < 4) poolG2 = sortByRecency(assetsGroup2_HouseLand.filter(item => item !== lockedToday));
+        if (poolG1.length < 4) poolG1 = sortByRecency(assetsGroup1_Condo.filter(item => item !== lockedToday));
+        if (poolG2.length < 3) poolG2 = sortByRecency(assetsGroup2_HouseLand.filter(item => item !== lockedToday));
 
-        // ดึง 3 จากกลุ่มคอนโด + 4 จากกลุ่มบ้านที่ดิน = 7 ทรัพย์สิน (+ 1 ทรัพย์ล็อก = 8 ครบพอดี)
-        let selected7 = [...poolG1.slice(0, 3), ...poolG2.slice(0, 4)];
+        // 4. สุ่มเลือกเน้นคอนโดมากกว่า (ดึง คอนโด 4 รายการ + บ้าน/ที่ดิน 3 รายการ + 1 ทรัพย์ล็อก = 8 รายการ/วัน)
+        let selected7 = [...poolG1.slice(0, 4), ...poolG2.slice(0, 3)];
         selected7.sort(() => 0.5 - Math.random());
         
         let finalDailyList = [lockedToday, ...selected7];
